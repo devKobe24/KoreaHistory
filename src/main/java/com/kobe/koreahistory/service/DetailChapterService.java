@@ -3,7 +3,7 @@ package com.kobe.koreahistory.service;
 import com.kobe.koreahistory.domain.entity.DetailChapter;
 import com.kobe.koreahistory.dto.request.CreateDetailChapterRequestDto;
 import com.kobe.koreahistory.dto.request.PatchChapterDetailTitleRequestDto;
-import com.kobe.koreahistory.dto.response.ChapterDetailTitlePatchResponseDto;
+import com.kobe.koreahistory.dto.response.PatchChapterDetailTitleResponseDto;
 import com.kobe.koreahistory.dto.response.CreateDetailChapterResponseDto;
 import com.kobe.koreahistory.repository.DetailChapterRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class DetailChapterService {
 	}
 
 	@Transactional
-	public ChapterDetailTitlePatchResponseDto updateChapterDetailTitle(Long detailChapterId, PatchChapterDetailTitleRequestDto requestDto) {
+	public PatchChapterDetailTitleResponseDto updateChapterDetailTitle(Long detailChapterId, PatchChapterDetailTitleRequestDto requestDto) {
 		// 1. ID로 수정할 Chapter 조회
 		DetailChapter detailChapter = detailChapterRepository.findById(detailChapterId)
 			.orElseThrow(() -> new IllegalArgumentException("소분류 챕터를 찾을 수 없습니다."));
@@ -49,6 +49,6 @@ public class DetailChapterService {
 		detailChapter.updateChapterDetail(requestDto.getToChangeDetailTitle());
 
 		// 3. 변경된 chapter 엔티티를 DTO로 변환하여 반환.
-		return new ChapterDetailTitlePatchResponseDto(detailChapter);
+		return new PatchChapterDetailTitleResponseDto(detailChapter);
 	}
 }

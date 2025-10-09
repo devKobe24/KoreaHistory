@@ -49,38 +49,38 @@ public class KoreaHistoryController {
 	}
 
 	@PostMapping("/create/chapter")
-	public ResponseEntity<ChapterCreateResponseDto> createChapter(
+	public ResponseEntity<CreateChapterResponseDto> createChapter(
 		@RequestBody CreateChapterRequestDto requestDto
 	) {
 		return ResponseEntity.ok(chapterService.createChapter(requestDto));
 	}
 
 	@PatchMapping("/chapters/{id}/number")
-	public ResponseEntity<ChapterNumberPatchResponseDto> patchChapterNumber(
+	public ResponseEntity<PatchChapterNumberResponseDto> patchChapterNumber(
 		@PathVariable Long id,
 		@RequestBody PatchChapterNumberRequestDto requestDto
 	) {
-		ChapterNumberPatchResponseDto responseDto = chapterService.updateChapterNumber(id, requestDto);
+		PatchChapterNumberResponseDto responseDto = chapterService.updateChapterNumber(id, requestDto);
 		return ResponseEntity.ok(responseDto);
 	}
 
 	// TODO: - UPDATE CHAPTER TITLE
 	@PatchMapping("/chapters/{id}/title")
-	public ResponseEntity<ChapterTitlePatchResponseDto> patchChapterTitle(
+	public ResponseEntity<PatchChapterTitleResponseDto> patchChapterTitle(
 		@PathVariable Long id,
 		@RequestBody PatchChapterTitleRequestDto requestDto
 	) {
-		ChapterTitlePatchResponseDto responseDto = chapterService.updateChapterTitle(id, requestDto);
+		PatchChapterTitleResponseDto responseDto = chapterService.updateChapterTitle(id, requestDto);
 		return ResponseEntity.ok(responseDto);
 	}
 
 	// TODO: - UPDATE DETAIL CHAPTERS
 	@PatchMapping("/chapters/detail/{id}")
-	public ResponseEntity<ChapterDetailTitlePatchResponseDto> patchChapterDetail(
+	public ResponseEntity<PatchChapterDetailTitleResponseDto> patchChapterDetail(
 		@PathVariable Long id,
 		@RequestBody PatchChapterDetailTitleRequestDto requestDto
 	) {
-		ChapterDetailTitlePatchResponseDto responseDto = detailChapterService.updateChapterDetailTitle(id, requestDto);
+		PatchChapterDetailTitleResponseDto responseDto = detailChapterService.updateChapterDetailTitle(id, requestDto);
 		return ResponseEntity.ok(responseDto);
 	}
 }

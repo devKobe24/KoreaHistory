@@ -66,7 +66,7 @@ public class ChapterService {
 	}
 
 	@Transactional
-	public ChapterCreateResponseDto createChapter(CreateChapterRequestDto requestDto) {
+	public CreateChapterResponseDto createChapter(CreateChapterRequestDto requestDto) {
 		// 1. DTO로부터 새로운 Chapter Entity를 생성합니다.
 		Chapter newChapter = Chapter.builder()
 			.chapterNumber(requestDto.getChapterNumber())
@@ -91,11 +91,11 @@ public class ChapterService {
 		Chapter savedChapter = chapterRepository.save(newChapter);
 
 		// 5. 저장된 결과를 Response DTO로 변환하여 반환합니다.
-		return new ChapterCreateResponseDto(savedChapter);
+		return new CreateChapterResponseDto(savedChapter);
 	}
 
 	@Transactional
-	public ChapterNumberPatchResponseDto updateChapterNumber(Long chapterId, PatchChapterNumberRequestDto requestDto) {
+	public PatchChapterNumberResponseDto updateChapterNumber(Long chapterId, PatchChapterNumberRequestDto requestDto) {
 		// 1. ID로 수정할 Chapter를 조회
 		Chapter chapter = chapterRepository.findById(chapterId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 챕터를 찾을 수 없습니다."));
@@ -104,11 +104,11 @@ public class ChapterService {
 		chapter.updateChapterNumber(requestDto.getChapterNumber());
 
 		// 3. 변경된 chapter 엔티티를 DTO로 변환하여 반환
-		return new ChapterNumberPatchResponseDto(chapter);
+		return new PatchChapterNumberResponseDto(chapter);
 	}
 
 	@Transactional
-	public ChapterTitlePatchResponseDto updateChapterTitle(Long chapterId, PatchChapterTitleRequestDto requestDto) {
+	public PatchChapterTitleResponseDto updateChapterTitle(Long chapterId, PatchChapterTitleRequestDto requestDto) {
 		// 1. ID로 수정할 Chapter 조회
 		Chapter chapter = chapterRepository.findById(chapterId)
 			.orElseThrow(() -> new IllegalArgumentException("chapter not found"));
@@ -117,6 +117,6 @@ public class ChapterService {
 		chapter.updateChapterTitle(requestDto.getChapterTitle());
 
 		// 3. 변경된 chapter 엔티티를 DTO로 변환하여 반환.
-		return new ChapterTitlePatchResponseDto(chapter);
+		return new PatchChapterTitleResponseDto(chapter);
 	}
 }

@@ -15,12 +15,12 @@ import lombok.Getter;
  * 2025. 10. 8.        kobe       최초 생성
  */
 @Getter
-public class ChapterNumberPatchResponseDto {
+public class PatchChapterNumberResponseDto {
 	private final Long id;
 	private final Integer changedChapterNumber;
 
 	// Entity를 인자로 받는 단일 Public 생성자
-	public ChapterNumberPatchResponseDto(Chapter entity) {
+	public PatchChapterNumberResponseDto(Chapter entity) {
 		this.id = entity.getId();
 		this.changedChapterNumber = entity.getChapterNumber();
 	}
