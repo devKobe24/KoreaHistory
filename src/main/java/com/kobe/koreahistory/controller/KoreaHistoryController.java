@@ -5,6 +5,7 @@ import com.kobe.koreahistory.dto.response.*;
 import com.kobe.koreahistory.service.ChapterService;
 import com.kobe.koreahistory.service.DetailChapterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,15 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(chapterService.createChapter(requestDto));
 	}
 
+	@PostMapping("/chapters/{chapterId}/details")
+	public ResponseEntity<CreateDetailChapterResponseDto> addDetailChapter(
+		@PathVariable Long chapterId,
+		@RequestBody CreateDetailChapterRequestDto requestDto
+	) {
+		CreateDetailChapterResponseDto responseDto = detailChapterService.createDetailChapter(chapterId, requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); // 생성 성공을 의미하는 201 Created 응답.
+	}
+
 	@PatchMapping("/chapters/{id}/number")
 	public ResponseEntity<PatchChapterNumberResponseDto> patchChapterNumber(
 		@PathVariable Long id,
@@ -64,7 +74,6 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(responseDto);
 	}
 
-	// TODO: - UPDATE CHAPTER TITLE
 	@PatchMapping("/chapters/{id}/title")
 	public ResponseEntity<PatchChapterTitleResponseDto> patchChapterTitle(
 		@PathVariable Long id,
@@ -74,7 +83,6 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(responseDto);
 	}
 
-	// TODO: - UPDATE DETAIL CHAPTERS
 	@PatchMapping("/chapters/detail/{id}")
 	public ResponseEntity<PatchChapterDetailTitleResponseDto> patchChapterDetail(
 		@PathVariable Long id,
