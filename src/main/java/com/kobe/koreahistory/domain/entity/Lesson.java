@@ -22,32 +22,35 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DetailChapter {
+public class Lesson {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private Integer number;
+	private Integer lessonNumber;
 
 	@Column(nullable = false)
-	private String title;
+	private String lessonTitle;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "chapter_id")
 	private Chapter chapter;
 
-	@OneToMany(mappedBy = "detailChapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Keyword> keywords;
 
+	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Section> sections;
+
 	@Builder
-	public DetailChapter(Integer number, String title, Chapter chapter) {
-		this.number = number;
-		this.title = title;
+	public Lesson(Integer lessonNumber, String lessonTitle, Chapter chapter) {
+		this.lessonNumber = lessonNumber;
+		this.lessonTitle = lessonTitle;
 		this.chapter = chapter;
 	}
 
-	public void updateChapterDetail(String newChapterTitle) {
-		this.title = newChapterTitle;
+	public void updateLesson(String newLessonTitle) {
+		this.lessonTitle = newLessonTitle;
 	}
 }
