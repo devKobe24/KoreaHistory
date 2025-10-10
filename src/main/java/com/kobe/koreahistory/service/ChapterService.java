@@ -37,6 +37,14 @@ public class ChapterService {
 	private final KeywordRepository keywordRepository;
 	private final KeywordContentRepository keywordContentRepository;
 
+	@Transactional(readOnly = true)
+	public List<ChapterResponseDto> findAll() {
+		List<Chapter> results = chapterRepository.findAll();
+
+		return results.stream()
+			.map(ChapterResponseDto::new)
+			.collect(Collectors.toList());
+	}
 
 	@Transactional(readOnly = true)
 	public ChapterResponseDto findChapterWithDetails(String chapterName) {
