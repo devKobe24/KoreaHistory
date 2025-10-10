@@ -1,10 +1,7 @@
 package com.kobe.koreahistory.dto.response;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
-import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +23,7 @@ public class ChapterResponseDto {
 	private final Integer chapterNumber;
 	private final String chapterTitle;
 	// 단일 객체가 아닌 List로 변경하여 1:N 관계를 정확히 표현
-	private final List<DetailChapterResponseDto> detailChapters;
+	private final List<LessonResponseDto> lessons;
 
 	// Entity를 인자로 받은 단일 생성자로 변환 로직을 캡슐화
 	public ChapterResponseDto(Chapter entity) {
@@ -34,8 +31,8 @@ public class ChapterResponseDto {
 		this.chapterNumber = entity.getChapterNumber();
 		this.chapterTitle = entity.getChapterTitle();
 		// Entity의 DetailChapter 리스트를 Stream을 사용해 DTO 리스트로 변환
-		this.detailChapters = entity.getDetailChapters().stream()
-			.map(DetailChapterResponseDto::new) // 각각의 DetailChapter를 DTO로 변환
+		this.lessons = entity.getLessons().stream()
+			.map(LessonResponseDto::new) // 각각의 DetailChapter를 DTO로 변환
 			.collect(Collectors.toList());
 	}
 }
