@@ -39,6 +39,12 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/chapters/search/all")
+	public ResponseEntity<List<ChapterResponseDto>> searchAllChapters() {
+		List<ChapterResponseDto> response = chapterService.findAll();
+		return ResponseEntity.ok(response);
+	}
+
 	@PostMapping("/search/chapters")
 	public ResponseEntity<ChapterResponseDto> searchChapters(
 		@RequestBody ChapterSearchRequestDto requestDto
