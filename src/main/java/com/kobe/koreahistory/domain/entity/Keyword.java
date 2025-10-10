@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * packageName    : com.kobe.koreahistory.domain.entity
  * fileName       : Keyword
@@ -31,17 +28,17 @@ public class Keyword {
 	@Column(nullable = false)
 	private String keyword;
 
-	// N : 1 = Keyword(N) : DetailChapter(1)
+	// N : 1 = Keyword(N) : Lesson(1)
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "detail_chapter_id")
-	private DetailChapter detailChapter;
+	@JoinColumn(name = "lesson_id")
+	private Lesson lesson;
 
 	@OneToOne(mappedBy = "keyword", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private KeywordContent keywordContent;
 
 	@Builder
-	public Keyword(String keyword, DetailChapter detailChapter) {
+	public Keyword(String keyword, Lesson lesson) {
 		this.keyword = keyword;
-		this.detailChapter = detailChapter;
+		this.lesson = lesson;
 	}
 }
