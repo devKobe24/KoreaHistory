@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * packageName    : com.kobe.koreahistory.controller
  * fileName       : KoreaHistoryController
@@ -28,6 +30,15 @@ public class KoreaHistoryController {
 	private final ChapterService chapterService;
 	private final DetailChapterService detailChapterService;
 
+	@GetMapping("/detail/search")
+	public ResponseEntity<List<ReadDetailChapterResponseDto>> searchDetailChapter(
+		@RequestParam(required = false) Integer detailChapterNumber,
+		@RequestParam(required = false) String detailChapterTitle
+	) {
+		List<ReadDetailChapterResponseDto> response = detailChapterService.readDetailChapter(detailChapterNumber, detailChapterTitle);
+		return ResponseEntity.ok(response);
+	}
+
 	@PostMapping("/search/chapters")
 	public ResponseEntity<ChapterResponseDto> searchChapters(
 		@RequestBody ChapterSearchRequestDto requestDto
@@ -35,15 +46,15 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(chapterService.findChapterWithDetails(requestDto.getChapterTitle()));
 	}
 
-	@PostMapping("/search/keywords")
-	public ResponseEntity<KeywordSearchResponseDto> searchKeywords(
+	@PostMapping("/search/keyword/and/chapter")
+	public ResponseEntity<KeywordSearchResponseDto> searchKeywordsWithDetailChapter(
 		@RequestBody KeywordSearchRequestDto requestDto
 	) {
 		return ResponseEntity.ok(chapterService.findKeywordWithContents(requestDto.getKeyword()));
 	}
 
-	@PostMapping("/search/details")
-	public ResponseEntity<KeywordContentSearchResponseDto> searchDetails(
+	@PostMapping("/search/by/keywords")
+	public ResponseEntity<KeywordContentSearchResponseDto> searchByKeywords(
 		@RequestBody KeywordSearchRequestDto requestDto
 	) {
 		return ResponseEntity.ok(chapterService.findKeywordContentWithKeyword(requestDto.getKeyword()));
