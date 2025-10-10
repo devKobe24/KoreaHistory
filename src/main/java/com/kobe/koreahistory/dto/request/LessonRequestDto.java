@@ -1,7 +1,6 @@
 package com.kobe.koreahistory.dto.request;
 
-import com.kobe.koreahistory.domain.entity.DetailChapter;
-import lombok.AccessLevel;
+import com.kobe.koreahistory.domain.entity.Lesson;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,21 +18,21 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
-public class DetailChapterRequestDto {
-	private Integer number;
-	private String title;
+public class LessonRequestDto {
+	private Integer lessonNumber;
+	private String lessonTitle;
 
 	@Builder
-	public DetailChapterRequestDto(Integer number, String title) {
-		this.number = number;
-		this.title = title;
+	public LessonRequestDto(Integer lessonNumber, String lessonTitle) {
+		this.lessonNumber = lessonNumber;
+		this.lessonTitle = lessonTitle;
 	}
 
 	// Request DTO의 핵심 역할 : DTO -> Entity 변환
-	public static DetailChapter toEntity(DetailChapterRequestDto requestDto) {
-		return DetailChapter.builder()
-			.number(requestDto.number)
-			.title(requestDto.title)
+	public static Lesson toEntity(LessonRequestDto requestDto) {
+		return Lesson.builder()
+			.lessonNumber(requestDto.getLessonNumber())
+			.lessonTitle(requestDto.getLessonTitle())
 			.build();
 	}
 }
