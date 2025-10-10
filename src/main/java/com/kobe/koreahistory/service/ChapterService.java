@@ -1,7 +1,7 @@
 package com.kobe.koreahistory.service;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
-import com.kobe.koreahistory.domain.entity.DetailChapter;
+import com.kobe.koreahistory.domain.entity.Lesson;
 import com.kobe.koreahistory.domain.entity.Keyword;
 import com.kobe.koreahistory.domain.entity.KeywordContent;
 import com.kobe.koreahistory.dto.request.CreateChapterRequestDto;
@@ -81,19 +81,19 @@ public class ChapterService {
 			.chapterTitle(requestDto.getChapterTitle())
 			.build();
 
-		// 2. DTO에 포함된 DetailChapter 정보들도 Entity로 변환합니다.
-		// 이때, 각 DetailChapter가 부모인 newChapter를 참조하도록 설정합니다 (양방향 연관관계 편의 메서드 권장)
-		List<DetailChapter> detailChapters = requestDto.getDetailChapters().stream()
-			.map(detailDto -> DetailChapter.builder()
-				.number(detailDto.getNumber())
-				.title(detailDto.getTitle())
+		// 2. DTO에 포함된 Lesson 정보들도 Entity로 변환합니다.
+		// 이때, 각 Lesson가 부모인 newChapter를 참조하도록 설정합니다 (양방향 연관관계 편의 메서드 권장)
+		List<Lesson> lessons = requestDto.getLessons().stream()
+			.map(detailDto -> Lesson.builder()
+				.lessonNumber(detailDto.getLessonNumber())
+				.lessonTitle(detailDto.getLessonTitle())
 				.chapter(newChapter) // 부모(Chapter)를 설정
 				.build())
 			.collect(Collectors.toList());
 
-		// 3. Chapter에 DetailChapter 리스트를 추가합니다.
-		//    Cascade 설정에 의해 Chapter만 저장해도 DetailChapter들이 함께 저장됩니다.
-		newChapter.getDetailChapters().addAll(detailChapters);
+		// 3. Chapter에 Lesson 리스트를 추가합니다.
+		//    Cascade 설정에 의해 Chapter만 저장해도 Lesson들이 함께 저장됩니다.
+		newChapter.getLessons().addAll(lessons);
 
 		// 4. Repository를 통해 Chapter를 저장합니다.
 		Chapter savedChapter = chapterRepository.save(newChapter);
