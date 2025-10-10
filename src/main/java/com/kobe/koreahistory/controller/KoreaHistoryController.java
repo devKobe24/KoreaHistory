@@ -1,9 +1,16 @@
 package com.kobe.koreahistory.controller;
 
 import com.kobe.koreahistory.dto.request.*;
+import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
+import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
 import com.kobe.koreahistory.dto.response.*;
+import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
+import com.kobe.koreahistory.dto.response.section.ReadSectionResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
 import com.kobe.koreahistory.service.ChapterService;
-import com.kobe.koreahistory.service.DetailChapterService;
+import com.kobe.koreahistory.service.LessonService;
+import com.kobe.koreahistory.service.SectionService;
+import com.kobe.koreahistory.service.SubsectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +35,16 @@ import java.util.List;
 public class KoreaHistoryController {
 
 	private final ChapterService chapterService;
-	private final DetailChapterService detailChapterService;
+	private final LessonService lessonService;
+	private final SectionService sectionService;
+	private final SubsectionService subsectionService;
 
 	@GetMapping("/detail/search")
-	public ResponseEntity<List<ReadDetailChapterResponseDto>> searchDetailChapter(
-		@RequestParam(required = false) Integer detailChapterNumber,
-		@RequestParam(required = false) String detailChapterTitle
+	public ResponseEntity<List<ReadLessonResponseDto>> searchLesson(
+		@RequestParam(required = false) Integer lessonNumber,
+		@RequestParam(required = false) String lessonTitle
 	) {
-		List<ReadDetailChapterResponseDto> response = detailChapterService.readDetailChapter(detailChapterNumber, detailChapterTitle);
+		List<ReadLessonResponseDto> response = lessonService.readDetailChapter(lessonNumber, lessonTitle);
 		return ResponseEntity.ok(response);
 	}
 
@@ -43,6 +52,15 @@ public class KoreaHistoryController {
 	public ResponseEntity<List<ChapterResponseDto>> searchAllChapters() {
 		List<ChapterResponseDto> response = chapterService.findAll();
 		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/section/{sectionId}")
+	public ResponseEntity<ReadSectionResponseDto> searchSection(
+		@PathVariable Long sectionId
+	) {
+		ReadSectionResponseDto responseDto = sectionService.readSection(sectionId);
+
+		return ResponseEntity.ok(responseDto);
 	}
 
 	@PostMapping("/search/chapters")
@@ -74,11 +92,11 @@ public class KoreaHistoryController {
 	}
 
 	@PostMapping("/chapters/{chapterId}/details")
-	public ResponseEntity<CreateDetailChapterResponseDto> addDetailChapter(
+	public ResponseEntity<CreateLessonResponseDto> addLesson(
 		@PathVariable Long chapterId,
-		@RequestBody CreateDetailChapterRequestDto requestDto
+		@RequestBody CreateLessonRequestDto requestDto
 	) {
-		CreateDetailChapterResponseDto responseDto = detailChapterService.createDetailChapter(chapterId, requestDto);
+		CreateLessonResponseDto responseDto = lessonService.createLesson(chapterId, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); // 생성 성공을 의미하는 201 Created 응답.
 	}
 
@@ -101,12 +119,30 @@ public class KoreaHistoryController {
 	}
 
 	@PatchMapping("/chapters/detail/{id}")
-	public ResponseEntity<PatchChapterDetailTitleResponseDto> patchChapterDetail(
+	public ResponseEntity<PatchLessonTitleResponseDto> patchLessonTitle(
 		@PathVariable Long id,
-		@RequestBody PatchChapterDetailTitleRequestDto requestDto
+		@RequestBody PatchLessonTitleRequestDto requestDto
 	) {
-		PatchChapterDetailTitleResponseDto responseDto = detailChapterService.updateChapterDetailTitle(id, requestDto);
+		PatchLessonTitleResponseDto responseDto = lessonService.updateLessonTitle(id, requestDto);
 		return ResponseEntity.ok(responseDto);
+	}
+
+	@PostMapping("/create/section/{lessonId}")
+	public ResponseEntity<CreateSectionResponseDto> createSection(
+		@PathVariable Long lessonId,
+		@RequestBody CreateSectionRequestDto requestDto
+	) {
+		CreateSectionResponseDto response = sectionService.createSection(lessonId, requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+
+	@PostMapping("/create/subsection/{sectionId}")
+	public ResponseEntity<CreateSubsectionResponseDto> createSubsection(
+		@PathVariable Long sectionId,
+		@RequestBody CreateSubsectionRequestDto requestDto
+	) {
+		CreateSubsectionResponseDto response = subsectionService.createSubsection(sectionId, requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@DeleteMapping("/chapters/{id}")
