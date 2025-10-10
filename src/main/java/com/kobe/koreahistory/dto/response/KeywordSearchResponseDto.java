@@ -1,8 +1,6 @@
 package com.kobe.koreahistory.dto.response;
 
-import com.kobe.koreahistory.domain.entity.DetailChapter;
 import com.kobe.koreahistory.domain.entity.Keyword;
-import com.kobe.koreahistory.domain.entity.KeywordContent;
 import lombok.Getter;
 
 /**
@@ -19,7 +17,7 @@ import lombok.Getter;
 @Getter
 public class KeywordSearchResponseDto {
 	private final Long id;
-	private final DetailChapterResponseDto detailChapter;
+	private final LessonResponseDto detailChapter;
 	private final String keyword;
 	private final KeywordContentSearchResponseDto keywordContent;
 
@@ -28,6 +26,6 @@ public class KeywordSearchResponseDto {
 		this.id = entity.getId();
 		this.keywordContent = new KeywordContentSearchResponseDto(entity.getKeywordContent());
 		this.keyword = entity.getKeyword();
-		this.detailChapter = new DetailChapterResponseDto(entity.getDetailChapter());
+		this.detailChapter = new LessonResponseDto(entity.getLesson());
 	}
 }
