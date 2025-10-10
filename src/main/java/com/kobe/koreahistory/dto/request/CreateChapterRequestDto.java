@@ -21,5 +21,5 @@ import java.util.List;
 public class CreateChapterRequestDto {
 	private int chapterNumber;
 	private String chapterTitle;
-	private List<DetailChapterRequestDto> detailChapters;
+	private List<LessonRequestDto> lessons;
 }
