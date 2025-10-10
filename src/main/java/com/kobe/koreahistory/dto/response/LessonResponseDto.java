@@ -1,6 +1,6 @@
 package com.kobe.koreahistory.dto.response;
 
-import com.kobe.koreahistory.domain.entity.DetailChapter;
+import com.kobe.koreahistory.domain.entity.Lesson;
 import lombok.Getter;
 
 /**
@@ -15,15 +15,15 @@ import lombok.Getter;
  * 2025. 10. 6.        kobe       최초 생성
  */
 @Getter
-public class DetailChapterResponseDto {
+public class LessonResponseDto {
 	private Long id;
-	private Integer number;
-	private String title;
+	private Integer lessonNumber;
+	private String lessonTitle;
 
 	// Entity를 인자로 받는 단일 public 생성자로 통일
-	public DetailChapterResponseDto(DetailChapter entity) {
+	public LessonResponseDto(Lesson entity) {
 		this.id = entity.getId();
-		this.number = entity.getNumber();
-		this.title = entity.getTitle();
+		this.lessonNumber = entity.getLessonNumber();
+		this.lessonTitle = entity.getLessonTitle();
 	}
 }
