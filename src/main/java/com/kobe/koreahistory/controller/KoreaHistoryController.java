@@ -108,4 +108,11 @@ public class KoreaHistoryController {
 		PatchChapterDetailTitleResponseDto responseDto = detailChapterService.updateChapterDetailTitle(id, requestDto);
 		return ResponseEntity.ok(responseDto);
 	}
+
+	@DeleteMapping("/chapters/{id}")
+	public ResponseEntity<Void> deleteChapter(
+		@PathVariable Long id) {
+		chapterService.deleteChapter(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
 }
