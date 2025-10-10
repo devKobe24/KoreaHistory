@@ -1,9 +1,7 @@
 package com.kobe.koreahistory.dto.request;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
-import com.kobe.koreahistory.domain.entity.DetailChapter;
-import com.kobe.koreahistory.dto.response.DetailChapterResponseDto;
-import lombok.AccessLevel;
+import com.kobe.koreahistory.domain.entity.Lesson;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,22 +22,20 @@ import lombok.NoArgsConstructor;
 public class ChapterRequestDto {
 	private Integer chapterNumber;
 	private String chapterTitle;
-	private DetailChapter detailChapter;
+	private Lesson lesson;
 
 	@Builder
-	public ChapterRequestDto(Integer chapterNumber, String chapterTitle, DetailChapter detailChapter) {
+	public ChapterRequestDto(Integer chapterNumber, String chapterTitle, Lesson lesson) {
 		this.chapterNumber = chapterNumber;
 		this.chapterTitle = chapterTitle;
-		this.detailChapter = detailChapter;
+		this.lesson = lesson;
 	}
 
 	// Request DTO의 핵심 역할 : DTO -> Entity 변환
 	public static Chapter toEntity(ChapterRequestDto requestDto) {
 		return Chapter.builder()
-			.chapterNumber(requestDto.chapterNumber)
-			.chapterTitle(requestDto.chapterTitle)
+			.chapterNumber(requestDto.getChapterNumber())
+			.chapterTitle(requestDto.getChapterTitle())
 			.build();
 	}
-
-
 }
