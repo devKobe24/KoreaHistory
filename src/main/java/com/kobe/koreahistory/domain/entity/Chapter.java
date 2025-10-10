@@ -1,6 +1,5 @@
 package com.kobe.koreahistory.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,7 +35,7 @@ public class Chapter {
 	private String chapterTitle;
 
 	@OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<DetailChapter> detailChapters = new ArrayList<>();
+	private List<Lesson> lessons = new ArrayList<>();
 
 	@Builder
 	public Chapter(Integer chapterNumber, String chapterTitle) {
