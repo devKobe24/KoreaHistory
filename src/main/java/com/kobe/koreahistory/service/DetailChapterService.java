@@ -4,13 +4,17 @@ import com.kobe.koreahistory.domain.entity.Chapter;
 import com.kobe.koreahistory.domain.entity.DetailChapter;
 import com.kobe.koreahistory.dto.request.CreateDetailChapterRequestDto;
 import com.kobe.koreahistory.dto.request.PatchChapterDetailTitleRequestDto;
-import com.kobe.koreahistory.dto.response.PatchChapterDetailTitleResponseDto;
 import com.kobe.koreahistory.dto.response.CreateDetailChapterResponseDto;
+import com.kobe.koreahistory.dto.response.PatchChapterDetailTitleResponseDto;
+import com.kobe.koreahistory.dto.response.ReadDetailChapterResponseDto;
 import com.kobe.koreahistory.repository.ChapterRepository;
 import com.kobe.koreahistory.repository.DetailChapterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * packageName    : com.kobe.koreahistory.service
@@ -61,5 +65,14 @@ public class DetailChapterService {
 
 		// 3. 변경된 chapter 엔티티를 DTO로 변환하여 반환.
 		return new PatchChapterDetailTitleResponseDto(detailChapter);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ReadDetailChapterResponseDto> readDetailChapter(Integer detailChapterNumber, String detailChapterTitle) {
+		List<DetailChapter> result = detailChapterRepository.searchByNumberOrTitle(detailChapterNumber, detailChapterTitle);
+
+		return result.stream()
+			.map(ReadDetailChapterResponseDto::new)
+			.collect(Collectors.toList());
 	}
 }
