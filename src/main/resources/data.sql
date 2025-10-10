@@ -2,13 +2,13 @@
 INSERT INTO chapter (chapter_number, chapter_title) VALUES ('1', '선사시대');
 
 -- "소분류" 생성
-INSERT INTO detail_chapter (number, title, chapter_id) VALUES (1, '구석기 시대 ~ 철기 시대', (SELECT id FROM chapter WHERE chapter_number = 1 LIMIT 1));
-INSERT INTO detail_chapter (number, title, chapter_id) VALUES (2, '고조선과 여러 나라의 성장', (SELECT id FROM chapter WHERE chapter_number = 1 LIMIT 1));
+INSERT INTO lesson (lesson_number, lesson_title, chapter_id) VALUES (1, '구석기 시대 ~ 철기 시대', (SELECT id FROM chapter WHERE chapter_number = 1 LIMIT 1));
+INSERT INTO lesson (lesson_number, lesson_title, chapter_id) VALUES (2, '고조선과 여러 나라의 성장', (SELECT id FROM chapter WHERE chapter_number = 1 LIMIT 1));
 
 -- "키워드" 생성
-INSERT INTO keyword (keyword, detail_chapter_id) VALUES ('뗀석기', (SELECT dc.id FROM detail_chapter dc JOIN chapter c ON c.id = dc.chapter_id WHERE c.chapter_number = 1 AND dc.number = 1 LIMIT 1));
-INSERT INTO keyword (keyword, detail_chapter_id) VALUES ('숨베찌르개', (SELECT dc.id FROM detail_chapter dc JOIN chapter c ON c.id = dc.chapter_id WHERE c.chapter_number = 1 AND dc.number = 1 LIMIT 1));
-INSERT INTO keyword (keyword, detail_chapter_id) VALUES ('주요 뗀석기', (SELECT dc.id FROM detail_chapter dc JOIN chapter c ON c.id = dc.chapter_id WHERE c.chapter_number = 1 AND dc.number = 1 LIMIT 1));
+INSERT INTO keyword (keyword, lesson_id) VALUES ('뗀석기', (SELECT ls.id FROM lesson ls JOIN chapter c ON c.id = ls.chapter_id WHERE c.chapter_number = 1 AND ls.lesson_number = 1 LIMIT 1));
+INSERT INTO keyword (keyword, lesson_id) VALUES ('숨베찌르개', (SELECT ls.id FROM lesson ls JOIN chapter c ON c.id = ls.chapter_id WHERE c.chapter_number = 1 AND ls.lesson_number = 1 LIMIT 1));
+INSERT INTO keyword (keyword, lesson_id) VALUES ('주요 뗀석기', (SELECT ls.id FROM lesson ls JOIN chapter c ON c.id = ls.chapter_id WHERE c.chapter_number = 1 AND ls.lesson_number = 1 LIMIT 1));
 
 -- "콘텐츠" 생성
 INSERT INTO content (main_category, sub_category, detail) VALUES ('1. 구석기 시대', '(1) 도구', '① 뗀석기: 돌을 깨뜨리고 떼어 내어 날을 만든 도구인 "뗀석기를 주로 사용"하였다.');
