@@ -127,4 +127,9 @@ public class ChapterService {
 		// 3. 변경된 chapter 엔티티를 DTO로 변환하여 반환.
 		return new PatchChapterTitleResponseDto(chapter);
 	}
+
+	@Transactional
+	public void deleteChapter(Long chapterId) {
+		chapterRepository.deleteById(chapterId);
+	}
 }
