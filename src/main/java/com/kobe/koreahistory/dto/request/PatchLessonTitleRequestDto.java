@@ -16,6 +16,6 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @NoArgsConstructor
-public class PatchChapterDetailTitleRequestDto {
-	private String toChangeDetailTitle;
+public class PatchLessonTitleRequestDto {
+	private String toChangeLessonTitle;
 }
