@@ -1,10 +1,15 @@
 package com.kobe.koreahistory.service;
 
 import com.kobe.koreahistory.domain.entity.*;
-import com.kobe.koreahistory.dto.request.CreateChapterRequestDto;
-import com.kobe.koreahistory.dto.request.PatchChapterNumberRequestDto;
-import com.kobe.koreahistory.dto.request.PatchChapterTitleRequestDto;
+import com.kobe.koreahistory.dto.request.chapter.CreateChapterRequestDto;
+import com.kobe.koreahistory.dto.request.chapter.PatchChapterNumberRequestDto;
+import com.kobe.koreahistory.dto.request.chapter.PatchChapterTitleRequestDto;
 import com.kobe.koreahistory.dto.response.*;
+import com.kobe.koreahistory.dto.response.chapter.ChapterResponseDto;
+import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
+import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
+import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.KeywordSearchResponseDto;
 import com.kobe.koreahistory.repository.ChapterRepository;
 import com.kobe.koreahistory.repository.KeywordContentRepository;
 import com.kobe.koreahistory.repository.KeywordRepository;
