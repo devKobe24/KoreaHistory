@@ -2,11 +2,11 @@ package com.kobe.koreahistory.service;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
 import com.kobe.koreahistory.domain.entity.Lesson;
-import com.kobe.koreahistory.dto.request.CreateLessonRequestDto;
-import com.kobe.koreahistory.dto.request.PatchLessonTitleRequestDto;
-import com.kobe.koreahistory.dto.response.CreateLessonResponseDto;
-import com.kobe.koreahistory.dto.response.PatchLessonTitleResponseDto;
-import com.kobe.koreahistory.dto.response.ReadLessonResponseDto;
+import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
+import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
+import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
 import com.kobe.koreahistory.repository.ChapterRepository;
 import com.kobe.koreahistory.repository.LessonRepository;
 import lombok.RequiredArgsConstructor;
