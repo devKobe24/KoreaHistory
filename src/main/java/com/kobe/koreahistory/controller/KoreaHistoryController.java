@@ -1,9 +1,14 @@
 package com.kobe.koreahistory.controller;
 
 import com.kobe.koreahistory.dto.request.*;
+import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
+import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
 import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
 import com.kobe.koreahistory.dto.response.*;
+import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
 import com.kobe.koreahistory.dto.response.section.ReadSectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
@@ -85,10 +90,11 @@ public class KoreaHistoryController {
 	}
 
 	@PostMapping("/create/chapter")
-	public ResponseEntity<CreateChapterResponseDto> createChapter(
-		@RequestBody CreateChapterRequestDto requestDto
+	public ResponseEntity<List<CreateChapterResponseDto>> createChapter(
+		@RequestBody List<CreateChapterRequestDto> requestDtos
 	) {
-		return ResponseEntity.ok(chapterService.createChapter(requestDto));
+		List<CreateChapterResponseDto> response = chapterService.createChapters(requestDtos);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@PostMapping("/chapters/{chapterId}/details")
