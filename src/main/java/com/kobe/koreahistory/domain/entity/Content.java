@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class Content {
 	private String detail;
 
 	@ManyToMany(mappedBy = "contents", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<KeywordContent> keywordContents;
+	private List<KeywordContent> keywordContents = new ArrayList<>();
 
 	@Builder
 	public Content(String mainCategory, String subCategory, String detail) {
