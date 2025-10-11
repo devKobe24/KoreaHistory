@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,10 +39,10 @@ public class Lesson {
 	private Chapter chapter;
 
 	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Keyword> keywords;
+	private List<Keyword> keywords = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Section> sections;
+	private List<Section> sections = new ArrayList<>();
 
 	@Builder
 	public Lesson(Integer lessonNumber, String lessonTitle, Chapter chapter) {
