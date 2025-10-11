@@ -1,9 +1,16 @@
--- "대분류" 생성
+-- ########## 1. 대분류 (Chapter) 생성 ##########
 INSERT INTO chapter (chapter_number, chapter_title) VALUES ('1', '선사시대');
 
--- "소분류" 생성
+-- ########## 2. 중분류 (Lesson) 생성 ##########
+-- 2-1. '선사시대'에 속한 Lesson들
 INSERT INTO lesson (lesson_number, lesson_title, chapter_id) VALUES (1, '구석기 시대 ~ 철기 시대', (SELECT id FROM chapter WHERE chapter_number = 1 LIMIT 1));
 INSERT INTO lesson (lesson_number, lesson_title, chapter_id) VALUES (2, '고조선과 여러 나라의 성장', (SELECT id FROM chapter WHERE chapter_number = 1 LIMIT 1));
+
+-- ########## 3. 소분류 (Section) 생성 ##########
+INSERT INTO section (section_number, section_title, lesson_id) VALUES (1, '구석기 시대와 신석기 시대', (SELECT id FROM lesson WHERE lesson_title = '구석기 시대 ~ 철기 시대'));
+INSERT INTO section (section_number, section_title, lesson_id) VALUES (2, '청동기 시대와 철기 시대', (SELECT id FROM lesson WHERE lesson_title = '구석기 시대 ~ 철기 시대'));
+INSERT INTO section (section_number, section_title, lesson_id) VALUES (3, '고조선', (SELECT id FROM lesson WHERE lesson_title = '고조선과 여러 나라의 성장'));
+INSERT INTO section (section_number, section_title, lesson_id) VALUES (4, '여러 나라의 성장', (SELECT id FROM lesson WHERE lesson_title = '고조선과 여러 나라의 성장'));
 
 -- "키워드" 생성
 INSERT INTO keyword (keyword, lesson_id) VALUES ('뗀석기', (SELECT ls.id FROM lesson ls JOIN chapter c ON c.id = ls.chapter_id WHERE c.chapter_number = 1 AND ls.lesson_number = 1 LIMIT 1));
