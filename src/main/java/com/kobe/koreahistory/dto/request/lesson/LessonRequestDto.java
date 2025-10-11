@@ -1,9 +1,11 @@
-package com.kobe.koreahistory.dto.request;
+package com.kobe.koreahistory.dto.request.lesson;
 
-import com.kobe.koreahistory.domain.entity.Lesson;
+import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.request
@@ -21,18 +23,11 @@ import lombok.NoArgsConstructor;
 public class LessonRequestDto {
 	private Integer lessonNumber;
 	private String lessonTitle;
-
+	private List<CreateSectionRequestDto> sections;
 	@Builder
-	public LessonRequestDto(Integer lessonNumber, String lessonTitle) {
+	public LessonRequestDto(Integer lessonNumber, String lessonTitle, List<CreateSectionRequestDto> sections) {
 		this.lessonNumber = lessonNumber;
 		this.lessonTitle = lessonTitle;
-	}
-
-	// Request DTO의 핵심 역할 : DTO -> Entity 변환
-	public static Lesson toEntity(LessonRequestDto requestDto) {
-		return Lesson.builder()
-			.lessonNumber(requestDto.getLessonNumber())
-			.lessonTitle(requestDto.getLessonTitle())
-			.build();
+		this.sections = sections;
 	}
 }
