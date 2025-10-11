@@ -1,4 +1,4 @@
-package com.kobe.koreahistory.dto.request;
+package com.kobe.koreahistory.dto.request.chapter;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
 import com.kobe.koreahistory.domain.entity.Lesson;
