@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,11 +38,10 @@ public class KeywordContent {
 		joinColumns = @JoinColumn(name = "keyword_content_id"),
 		inverseJoinColumns = @JoinColumn(name = "content_id")
 	)
-	private List<Content> contents;
+	private List<Content> contents = new ArrayList<>();
 
 	@Builder
-	public KeywordContent(Keyword keyword, List<Content> contents) {
+	public KeywordContent(Keyword keyword) {
 		this.keyword = keyword;
-		this.contents = contents;
 	}
 }
