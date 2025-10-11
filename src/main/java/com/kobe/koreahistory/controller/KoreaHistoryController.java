@@ -1,11 +1,20 @@
 package com.kobe.koreahistory.controller;
 
-import com.kobe.koreahistory.dto.request.*;
+import com.kobe.koreahistory.dto.request.chapter.ChapterSearchRequestDto;
+import com.kobe.koreahistory.dto.request.chapter.CreateChapterRequestDto;
+import com.kobe.koreahistory.dto.request.chapter.PatchChapterNumberRequestDto;
+import com.kobe.koreahistory.dto.request.chapter.PatchChapterTitleRequestDto;
+import com.kobe.koreahistory.dto.request.keyword.KeywordSearchRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
 import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
 import com.kobe.koreahistory.dto.response.*;
+import com.kobe.koreahistory.dto.response.chapter.ChapterResponseDto;
+import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
+import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
+import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.KeywordSearchResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
