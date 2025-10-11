@@ -1,4 +1,4 @@
-package com.kobe.koreahistory.dto.response;
+package com.kobe.koreahistory.dto.response.lesson;
 
 import com.kobe.koreahistory.domain.entity.Lesson;
 import lombok.Getter;
