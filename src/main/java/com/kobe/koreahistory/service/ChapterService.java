@@ -94,11 +94,27 @@ public class ChapterService {
 
 						// Lesson에 속한 Section들 생성
 						List<Section> sections = lessonDto.getSections().stream()
-							.map(sectionDto -> Section.builder()
-								.sectionNumber(sectionDto.getSectionNumber())
-								.sectionTitle(sectionDto.getSectionTitle())
-								.lesson(newLesson) // 부모 Lesson 설정
-								.build())
+							.map(sectionDto -> {
+								// Section 생성 (부모 Lesson 설정)
+								Section newSection = Section.builder()
+									.sectionNumber(sectionDto.getSectionNumber())
+									.sectionTitle(sectionDto.getSectionTitle())
+									.lesson(newLesson)
+									.build();
+
+								// Section에 속한 Subsection들 생성
+								List<Subsection> subsections = sectionDto.getSubsections().stream()
+									.map(subsectionDto -> Subsection.builder()
+										.subsectionNumber(subsectionDto.getSubsectionNumber())
+										.subsectionTitle(subsectionDto.getSubsectionTitle())
+										.section(newSection)
+										.build())
+									.collect(Collectors.toList());
+
+								// Section에 Subsecion 리스트 추가
+								newSection.getSubsections().addAll(subsections);
+								return newSection;
+							})
 							.collect(Collectors.toList());
 
 						// Lesson에 Section 리스트 추가
