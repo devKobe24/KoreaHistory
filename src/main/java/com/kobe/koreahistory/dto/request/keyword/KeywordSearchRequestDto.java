@@ -1,12 +1,9 @@
-package com.kobe.koreahistory.dto.request;
+package com.kobe.koreahistory.dto.request.keyword;
 
 import com.kobe.koreahistory.domain.entity.Keyword;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.request
