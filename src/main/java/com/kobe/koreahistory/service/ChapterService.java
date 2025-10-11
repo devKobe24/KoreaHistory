@@ -1,9 +1,6 @@
 package com.kobe.koreahistory.service;
 
-import com.kobe.koreahistory.domain.entity.Chapter;
-import com.kobe.koreahistory.domain.entity.Lesson;
-import com.kobe.koreahistory.domain.entity.Keyword;
-import com.kobe.koreahistory.domain.entity.KeywordContent;
+import com.kobe.koreahistory.domain.entity.*;
 import com.kobe.koreahistory.dto.request.CreateChapterRequestDto;
 import com.kobe.koreahistory.dto.request.PatchChapterNumberRequestDto;
 import com.kobe.koreahistory.dto.request.PatchChapterTitleRequestDto;
@@ -47,10 +44,11 @@ public class ChapterService {
 	}
 
 	@Transactional(readOnly = true)
-	public ChapterResponseDto findChapterWithDetails(String chapterName) {
-		Chapter chapter = chapterRepository.findByChapterTitle(chapterName)
-			.orElseThrow(() -> new IllegalArgumentException("chapter not found"));
-
+	public ChapterResponseDto findChapterWithDetails(String chapterTitle) {
+		Chapter chapter = chapterRepository.findByChapterTitleWithDetails(chapterTitle)
+			.orElseThrow(() -> new IllegalArgumentException("해당 챕터를 찾을 수 없습니다. name =" + chapterTitle));
+		// ChapterResponseDto가 LessonResponseDto를,
+		// LessonResponseDto가 SectionResponseDto를 연쇄적으로 호출하여 반환을 완료합니다.
 		return new ChapterResponseDto(chapter);
 	}
 
@@ -74,32 +72,55 @@ public class ChapterService {
 	}
 
 	@Transactional
-	public CreateChapterResponseDto createChapter(CreateChapterRequestDto requestDto) {
+	public List<CreateChapterResponseDto> createChapters(List<CreateChapterRequestDto> requestDtos) {
 		// 1. DTO로부터 새로운 Chapter Entity를 생성합니다.
-		Chapter newChapter = Chapter.builder()
-			.chapterNumber(requestDto.getChapterNumber())
-			.chapterTitle(requestDto.getChapterTitle())
-			.build();
+		List<Chapter> chapters = requestDtos.stream()
+			.map(chapterDto -> {
+				// Chapter 생성
+				Chapter newChapter = Chapter.builder()
+					.chapterNumber(chapterDto.getChapterNumber())
+					.chapterTitle(chapterDto.getChapterTitle())
+					.build();
 
-		// 2. DTO에 포함된 Lesson 정보들도 Entity로 변환합니다.
-		// 이때, 각 Lesson가 부모인 newChapter를 참조하도록 설정합니다 (양방향 연관관계 편의 메서드 권장)
-		List<Lesson> lessons = requestDto.getLessons().stream()
-			.map(detailDto -> Lesson.builder()
-				.lessonNumber(detailDto.getLessonNumber())
-				.lessonTitle(detailDto.getLessonTitle())
-				.chapter(newChapter) // 부모(Chapter)를 설정
-				.build())
+				// Chapter에 속한 Lesson들 생성
+				List<Lesson> lessons = chapterDto.getLessons().stream()
+					.map(lessonDto -> {
+						// Lesson 생성 (부모 Chapter 설정)
+						Lesson newLesson = Lesson.builder()
+							.lessonNumber(lessonDto.getLessonNumber())
+							.lessonTitle(lessonDto.getLessonTitle())
+							.chapter(newChapter)
+							.build();
+
+						// Lesson에 속한 Section들 생성
+						List<Section> sections = lessonDto.getSections().stream()
+							.map(sectionDto -> Section.builder()
+								.sectionNumber(sectionDto.getSectionNumber())
+								.sectionTitle(sectionDto.getSectionTitle())
+								.lesson(newLesson) // 부모 Lesson 설정
+								.build())
+							.collect(Collectors.toList());
+
+						// Lesson에 Section 리스트 추가
+						newLesson.getSections().addAll(sections);
+						return newLesson;
+					})
+					.collect(Collectors.toList());
+
+				// Chapter에 Lesson 리스트 추가
+				newChapter.getLessons().addAll(lessons);
+				return newChapter;
+			})
 			.collect(Collectors.toList());
 
-		// 3. Chapter에 Lesson 리스트를 추가합니다.
-		//    Cascade 설정에 의해 Chapter만 저장해도 Lesson들이 함께 저장됩니다.
-		newChapter.getLessons().addAll(lessons);
+		// 2. Repository를 통해 모든 Chapter들을 한 번에 저장합니다.
+		// Cascade 설정에 의해 하위의 Lesson과 Section들도 모두 함께 저장됩니다.
+		List<Chapter> savedChapters = chapterRepository.saveAll(chapters);
 
-		// 4. Repository를 통해 Chapter를 저장합니다.
-		Chapter savedChapter = chapterRepository.save(newChapter);
-
-		// 5. 저장된 결과를 Response DTO로 변환하여 반환합니다.
-		return new CreateChapterResponseDto(savedChapter);
+		// 3. 저장된 결과를 Response DTO 리스트로 변환하여 변환합니다.
+		return savedChapters.stream()
+			.map(CreateChapterResponseDto::new)
+			.collect(Collectors.toList());
 	}
 
 	@Transactional
