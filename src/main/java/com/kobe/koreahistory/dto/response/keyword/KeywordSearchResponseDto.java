@@ -1,6 +1,7 @@
-package com.kobe.koreahistory.dto.response;
+package com.kobe.koreahistory.dto.response.keyword;
 
 import com.kobe.koreahistory.domain.entity.Keyword;
+import com.kobe.koreahistory.dto.response.KeywordContentSearchResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.LessonResponseDto;
 import lombok.Getter;
 
