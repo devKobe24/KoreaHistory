@@ -1,9 +1,11 @@
 package com.kobe.koreahistory.dto.request.section;
 
-import com.kobe.koreahistory.domain.entity.Section;
+import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.request.section
@@ -22,18 +24,12 @@ public class CreateSectionRequestDto {
 
 	private Integer sectionNumber;
 	private String sectionTitle;
+	private List<CreateSubsectionRequestDto> subsections;
 
 	@Builder
-	public CreateSectionRequestDto(Integer sectionNumber, String sectionTitle) {
+	public CreateSectionRequestDto(Integer sectionNumber, String sectionTitle, List<CreateSubsectionRequestDto> subsections) {
 		this.sectionNumber = sectionNumber;
 		this.sectionTitle = sectionTitle;
-	}
-
-	// Request DTO의 핵심 역할: DTO -> Entity 변환
-	public static Section toEntity(CreateSectionRequestDto requestDto) {
-		return Section.builder()
-			.sectionNumber(requestDto.getSectionNumber())
-			.sectionTitle(requestDto.getSectionTitle())
-			.build();
+		this.subsections = subsections;
 	}
 }
