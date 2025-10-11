@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class Section {
 	private Lesson lesson;
 
 	@OneToMany(mappedBy = "section", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Subsection> subsections;
+	private List<Subsection> subsections = new ArrayList<>();
 
 	@Builder
 	public Section(Integer sectionNumber, String sectionTitle, Lesson lesson) {
