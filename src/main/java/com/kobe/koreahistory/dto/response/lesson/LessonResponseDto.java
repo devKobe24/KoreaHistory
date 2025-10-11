@@ -1,7 +1,11 @@
-package com.kobe.koreahistory.dto.response;
+package com.kobe.koreahistory.dto.response.lesson;
 
 import com.kobe.koreahistory.domain.entity.Lesson;
+import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
 import lombok.Getter;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.response
@@ -16,14 +20,20 @@ import lombok.Getter;
  */
 @Getter
 public class LessonResponseDto {
-	private Long id;
-	private Integer lessonNumber;
-	private String lessonTitle;
+	private final Long id;
+	private final Integer lessonNumber;
+	private final String lessonTitle;
+	private final List<CreateSectionResponseDto> sections;
 
 	// Entity를 인자로 받는 단일 public 생성자로 통일
 	public LessonResponseDto(Lesson entity) {
 		this.id = entity.getId();
 		this.lessonNumber = entity.getLessonNumber();
 		this.lessonTitle = entity.getLessonTitle();
+
+		// Lesson에 포함된 Section들을 DTO로 변환하는 로직
+		this.sections = entity.getSections().stream()
+			.map(CreateSectionResponseDto::new)
+			.collect(Collectors.toList());
 	}
 }
