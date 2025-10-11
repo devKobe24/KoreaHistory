@@ -1,5 +1,7 @@
 package com.kobe.koreahistory.dto.request;
 
+import com.kobe.koreahistory.dto.request.lesson.LessonRequestDto;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +24,11 @@ public class CreateChapterRequestDto {
 	private int chapterNumber;
 	private String chapterTitle;
 	private List<LessonRequestDto> lessons;
+
+	@Builder
+	public CreateChapterRequestDto(int chapterNumber, String chapterTitle, List<LessonRequestDto> lessons) {
+		this.chapterNumber = chapterNumber;
+		this.chapterTitle = chapterTitle;
+		this.lessons = lessons;
+	}
 }
