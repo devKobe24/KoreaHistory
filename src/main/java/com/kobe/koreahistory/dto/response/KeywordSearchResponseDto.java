@@ -1,6 +1,7 @@
 package com.kobe.koreahistory.dto.response;
 
 import com.kobe.koreahistory.domain.entity.Keyword;
+import com.kobe.koreahistory.dto.response.lesson.LessonResponseDto;
 import lombok.Getter;
 
 /**
