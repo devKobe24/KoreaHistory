@@ -1,4 +1,4 @@
-package com.kobe.koreahistory.dto.request;
+package com.kobe.koreahistory.dto.request.chapter;
 
 import com.kobe.koreahistory.dto.request.lesson.LessonRequestDto;
 import lombok.Builder;
