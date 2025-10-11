@@ -1,6 +1,5 @@
-package com.kobe.koreahistory.dto.request;
+package com.kobe.koreahistory.dto.request.chapter;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
