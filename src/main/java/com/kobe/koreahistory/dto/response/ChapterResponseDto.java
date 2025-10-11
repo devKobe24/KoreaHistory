@@ -1,6 +1,7 @@
 package com.kobe.koreahistory.dto.response;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
+import com.kobe.koreahistory.dto.response.lesson.LessonResponseDto;
 import lombok.Getter;
 
 import java.util.List;
@@ -30,9 +31,9 @@ public class ChapterResponseDto {
 		this.id = entity.getId();
 		this.chapterNumber = entity.getChapterNumber();
 		this.chapterTitle = entity.getChapterTitle();
-		// Entity의 DetailChapter 리스트를 Stream을 사용해 DTO 리스트로 변환
+		// Entity의 Lesson 리스트를 Stream을 사용해 DTO 리스트로 변환
 		this.lessons = entity.getLessons().stream()
-			.map(LessonResponseDto::new) // 각각의 DetailChapter를 DTO로 변환
+			.map(LessonResponseDto::new) // 각각의 Lesson를 DTO로 변환
 			.collect(Collectors.toList());
 	}
 }
