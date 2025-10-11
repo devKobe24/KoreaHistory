@@ -1,4 +1,4 @@
-package com.kobe.koreahistory.dto.request;
+package com.kobe.koreahistory.dto.request.lesson;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
