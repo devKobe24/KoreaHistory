@@ -1,9 +1,12 @@
 package com.kobe.koreahistory.dto.request.subsection;
 
-import com.kobe.koreahistory.domain.entity.Subsection;
+import com.kobe.koreahistory.dto.request.topic.CreateTopicRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.request.subsection
@@ -21,18 +24,12 @@ import lombok.NoArgsConstructor;
 public class CreateSubsectionRequestDto {
 	private Integer subsectionNumber;
 	private String subsectionTitle;
+	private List<CreateTopicRequestDto> topics = new ArrayList<>();
 
 	@Builder
-	public CreateSubsectionRequestDto(Integer subsectionNumber, String subsectionTitle) {
+	public CreateSubsectionRequestDto(Integer subsectionNumber, String subsectionTitle, List<CreateTopicRequestDto> topics) {
 		this.subsectionNumber = subsectionNumber;
 		this.subsectionTitle = subsectionTitle;
-	}
-
-	// Request DTO의 핵심 역할: DTO -> Entity 변환
-	public static Subsection toEntity(CreateSubsectionRequestDto requestDto) {
-		return Subsection.builder()
-			.subsectionNumber(requestDto.getSubsectionNumber())
-			.subsectionTitle(requestDto.getSubsectionTitle())
-			.build();
+		this.topics = topics;
 	}
 }

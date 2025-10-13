@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * packageName    : com.kobe.koreahistory.domain.entity
  * fileName       : Content
@@ -28,22 +25,16 @@ public class Content {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private String mainCategory;
-
-	@Column(nullable = false)
-	private String subCategory;
-
+	// CONSIDER - Should I make detail entity?
 	@Column(nullable = false)
 	private String detail;
 
-	@ManyToMany(mappedBy = "contents", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<KeywordContent> keywordContents = new ArrayList<>();
-
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "keyword_id")
+	private Keyword keyword;
 	@Builder
-	public Content(String mainCategory, String subCategory, String detail) {
-		this.mainCategory = mainCategory;
-		this.subCategory = subCategory;
+	public Content(String detail, Keyword keyword) {
 		this.detail = detail;
+		this.keyword = keyword;
 	}
 }

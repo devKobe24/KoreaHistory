@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,8 @@ import java.util.List;
 public class LessonRequestDto {
 	private Integer lessonNumber;
 	private String lessonTitle;
-	private List<CreateSectionRequestDto> sections;
+	private List<CreateSectionRequestDto> sections = new ArrayList<>();
+
 	@Builder
 	public LessonRequestDto(Integer lessonNumber, String lessonTitle, List<CreateSectionRequestDto> sections) {
 		this.lessonNumber = lessonNumber;

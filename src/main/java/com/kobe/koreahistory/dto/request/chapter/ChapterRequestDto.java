@@ -30,12 +30,4 @@ public class ChapterRequestDto {
 		this.chapterTitle = chapterTitle;
 		this.lesson = lesson;
 	}
-
-	// Request DTO의 핵심 역할 : DTO -> Entity 변환
-	public static Chapter toEntity(ChapterRequestDto requestDto) {
-		return Chapter.builder()
-			.chapterNumber(requestDto.getChapterNumber())
-			.chapterTitle(requestDto.getChapterTitle())
-			.build();
-	}
 }

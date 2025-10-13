@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * packageName    : com.kobe.koreahistory.domain.entity
  * fileName       : Subsection
@@ -34,6 +37,9 @@ public class Subsection {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "section_id")
 	private Section section;
+
+	@OneToMany(mappedBy = "subsection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Topic> topics = new ArrayList<>();
 
 	@Builder
 	public Subsection(Integer subsectionNumber, String subsectionTitle, Section section) {

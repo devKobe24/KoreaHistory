@@ -4,14 +4,11 @@ import com.kobe.koreahistory.domain.entity.*;
 import com.kobe.koreahistory.dto.request.chapter.CreateChapterRequestDto;
 import com.kobe.koreahistory.dto.request.chapter.PatchChapterNumberRequestDto;
 import com.kobe.koreahistory.dto.request.chapter.PatchChapterTitleRequestDto;
-import com.kobe.koreahistory.dto.response.*;
 import com.kobe.koreahistory.dto.response.chapter.ChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.KeywordSearchResponseDto;
 import com.kobe.koreahistory.repository.ChapterRepository;
-import com.kobe.koreahistory.repository.KeywordContentRepository;
 import com.kobe.koreahistory.repository.KeywordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,7 +34,6 @@ public class ChapterService {
 
 	private final ChapterRepository chapterRepository;
 	private final KeywordRepository keywordRepository;
-	private final KeywordContentRepository keywordContentRepository;
 
 	@Transactional(readOnly = true)
 	public List<ChapterResponseDto> findAll() {
@@ -55,25 +51,6 @@ public class ChapterService {
 		// ChapterResponseDto가 LessonResponseDto를,
 		// LessonResponseDto가 SectionResponseDto를 연쇄적으로 호출하여 반환을 완료합니다.
 		return new ChapterResponseDto(chapter);
-	}
-
-	@Transactional(readOnly = true)
-	public KeywordSearchResponseDto findKeywordWithContents(String searchKeyword) {
-		Keyword keyword = keywordRepository.findByKeyword(searchKeyword)
-			.orElseThrow(() -> new IllegalArgumentException("keyword not found"));
-
-		return new KeywordSearchResponseDto(keyword);
-	}
-
-	@Transactional(readOnly = true)
-	public KeywordContentSearchResponseDto findKeywordContentWithKeyword(String searchKeyword) {
-		Keyword keyword = keywordRepository.findByKeyword(searchKeyword)
-			.orElseThrow(() -> new IllegalArgumentException("keyword not found"));
-
-		KeywordContent keywordAndContent = keywordContentRepository.findByKeyword(keyword)
-			.orElseThrow(() -> new IllegalArgumentException("keyword and content not found"));
-
-		return new KeywordContentSearchResponseDto(keywordAndContent);
 	}
 
 	@Transactional
@@ -109,14 +86,46 @@ public class ChapterService {
 
 								// Section에 속한 Subsection들 생성
 								List<Subsection> subsections = sectionDto.getSubsections().stream()
-									.map(subsectionDto -> Subsection.builder()
-										.subsectionNumber(subsectionDto.getSubsectionNumber())
-										.subsectionTitle(subsectionDto.getSubsectionTitle())
-										.section(newSection)
-										.build())
+									.map(subsectionDto -> {
+										// Subsection 생성 (부모 Section 설정)
+										Subsection newSubsection = Subsection.builder()
+											.subsectionNumber(subsectionDto.getSubsectionNumber())
+											.subsectionTitle(subsectionDto.getSubsectionTitle())
+											.section(newSection)
+											.build();
+
+										// Subsection에 속한 Topic들 생성
+										List<Topic> topics = subsectionDto.getTopics().stream()
+											.map(topicDto -> {
+												// Topic 생성 (부모 Subsection 설정)
+												Topic newTopic = Topic.builder()
+													.topicNumber(topicDto.getTopicNumber())
+													.topicTitle(topicDto.getTopicTitle())
+													.subsection(newSubsection)
+													.build();
+
+												// Topic에 속한 Keyword들 생성
+												List<Keyword> keywords = topicDto.getKeywords().stream()
+													.map(keywordDto -> Keyword.builder()
+														.keywordNumber(keywordDto.getKeywordNumber())
+														.keyword(keywordDto.getKeyword())
+														.topic(newTopic)
+														.build())
+													.collect(Collectors.toList());
+
+												// Topic에 Keyword 리스트 추가
+												newTopic.getKeywords().addAll(keywords);
+												return newTopic;
+											})
+											.collect(Collectors.toList());
+
+										// Subsection에 Topic 리스트 추가
+										newSubsection.getTopics().addAll(topics);
+										return newSubsection;
+									})
 									.collect(Collectors.toList());
 
-								// Section에 Subsecion 리스트 추가
+								// Section에 Subsection 리스트 추가
 								newSection.getSubsections().addAll(subsections);
 								return newSection;
 							})

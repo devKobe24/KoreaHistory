@@ -39,9 +39,6 @@ public class Lesson {
 	private Chapter chapter;
 
 	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Keyword> keywords = new ArrayList<>();
-
-	@OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Section> sections = new ArrayList<>();
 
 	@Builder

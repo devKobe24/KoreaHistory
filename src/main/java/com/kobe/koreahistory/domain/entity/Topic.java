@@ -11,48 +11,42 @@ import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.domain.entity
- * fileName       : Keyword
+ * fileName       : Topic
  * author         : kobe
- * date           : 2025. 10. 7.
+ * date           : 2025. 10. 12.
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2025. 10. 7.        kobe       최초 생성
+ * 2025. 10. 12.        kobe       최초 생성
  */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Keyword {
+public class Topic {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private Integer keywordNumber;
+	private Integer topicNumber;
 
 	@Column(nullable = false)
-	private String keyword;
+	private String topicTitle;
 
-	// TODO: - connect to Subsection
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "subsection_id")
 	private Subsection subsection;
 
-	// TODO: - connect to Topic
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "topic_id")
-	private Topic topic;
-
-	// TODO: - connect to Content
-	@OneToMany(mappedBy = "keyword", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Content> contents = new ArrayList<>();
+	// QUESTION: - why dose not init this keywords?
+	// The subsection was init but keywords doesn't.
+	@OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Keyword> keywords = new ArrayList<>();
 
 	@Builder
-	public Keyword(Integer keywordNumber, String keyword, Subsection subsection, Topic topic) {
-		this.keywordNumber = keywordNumber;
-		this.keyword = keyword;
+	public Topic(Integer topicNumber, String topicTitle, Subsection subsection) {
+		this.topicNumber = topicNumber;
+		this.topicTitle = topicTitle;
 		this.subsection = subsection;
-		this.topic = topic;
 	}
 }
