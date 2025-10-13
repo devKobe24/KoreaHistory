@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class CreateSectionRequestDto {
 
 	private Integer sectionNumber;
 	private String sectionTitle;
-	private List<CreateSubsectionRequestDto> subsections;
+	private List<CreateSubsectionRequestDto> subsections = new ArrayList<>();
 
 	@Builder
 	public CreateSectionRequestDto(Integer sectionNumber, String sectionTitle, List<CreateSubsectionRequestDto> subsections) {

@@ -1,7 +1,10 @@
 package com.kobe.koreahistory.dto.response.chapter;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
+import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import com.kobe.koreahistory.dto.response.lesson.LessonResponseDto;
+import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
 import lombok.Getter;
 
 import java.util.List;
@@ -25,6 +28,7 @@ public class CreateChapterResponseDto {
 	private final String chapterTitle;
 	// 단일 객체가 아닌 List로 변경하여 1:N 관계를 정확히 표현
 	private final List<LessonResponseDto> lessons;
+
 
 	// Entity를 인자로 받는 단일 public 생성자
 	public CreateChapterResponseDto(Chapter entity) {

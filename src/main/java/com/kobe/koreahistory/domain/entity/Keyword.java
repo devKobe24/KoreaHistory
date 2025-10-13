@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * packageName    : com.kobe.koreahistory.domain.entity
  * fileName       : Keyword
@@ -26,19 +29,22 @@ public class Keyword {
 	private Long id;
 
 	@Column(nullable = false)
+	private Integer keywordNumber;
+
+	@Column(nullable = false)
 	private String keyword;
 
-	// N : 1 = Keyword(N) : Lesson(1)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "lesson_id")
-	private Lesson lesson;
+	@OneToMany(mappedBy = "keyword", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Content> contents = new ArrayList<>();
 
-	@OneToOne(mappedBy = "keyword", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private KeywordContent keywordContent;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "topic_id")
+	private Topic topic;
 
 	@Builder
-	public Keyword(String keyword, Lesson lesson) {
+	public Keyword(Integer keywordNumber, String keyword, Topic topic) {
+		this.keywordNumber = keywordNumber;
 		this.keyword = keyword;
-		this.lesson = lesson;
+		this.topic = topic;
 	}
 }

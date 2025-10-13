@@ -11,37 +11,40 @@ import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.domain.entity
- * fileName       : KeywordContent
+ * fileName       : Topic
  * author         : kobe
- * date           : 2025. 10. 7.
+ * date           : 2025. 10. 12.
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2025. 10. 7.        kobe       최초 생성
+ * 2025. 10. 12.        kobe       최초 생성
  */
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class KeywordContent {
+public class Topic {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "keyword_id")
-	private Keyword keyword;
+	@Column(nullable = false)
+	private Integer topicNumber;
 
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JoinTable(
-		name = "keyword_content_contents",
-		joinColumns = @JoinColumn(name = "keyword_content_id"),
-		inverseJoinColumns = @JoinColumn(name = "content_id")
-	)
-	private List<Content> contents = new ArrayList<>();
+	@Column(nullable = false)
+	private String topicTitle;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "subsection_id")
+	private Subsection subsection;
+
+	@OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Keyword> keywords = new ArrayList<>();
 
 	@Builder
-	public KeywordContent(Keyword keyword) {
-		this.keyword = keyword;
+	public Topic(Integer topicNumber, String topicTitle, Subsection subsection) {
+		this.topicNumber = topicNumber;
+		this.topicTitle = topicTitle;
+		this.subsection = subsection;
 	}
 }

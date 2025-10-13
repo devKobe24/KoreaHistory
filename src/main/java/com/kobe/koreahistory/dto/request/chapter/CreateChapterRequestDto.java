@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
 public class CreateChapterRequestDto {
 	private int chapterNumber;
 	private String chapterTitle;
-	private List<LessonRequestDto> lessons;
+	private List<LessonRequestDto> lessons = new ArrayList<>();
 
 	@Builder
 	public CreateChapterRequestDto(int chapterNumber, String chapterTitle, List<LessonRequestDto> lessons) {
