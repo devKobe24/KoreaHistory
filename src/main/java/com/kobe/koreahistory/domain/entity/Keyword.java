@@ -34,25 +34,17 @@ public class Keyword {
 	@Column(nullable = false)
 	private String keyword;
 
-	// TODO: - connect to Subsection
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subsection_id")
-	private Subsection subsection;
+	@OneToMany(mappedBy = "keyword", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Content> contents = new ArrayList<>();
 
-	// TODO: - connect to Topic
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "topic_id")
 	private Topic topic;
 
-	// TODO: - connect to Content
-	@OneToMany(mappedBy = "keyword", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Content> contents = new ArrayList<>();
-
 	@Builder
-	public Keyword(Integer keywordNumber, String keyword, Subsection subsection, Topic topic) {
+	public Keyword(Integer keywordNumber, String keyword, Topic topic) {
 		this.keywordNumber = keywordNumber;
 		this.keyword = keyword;
-		this.subsection = subsection;
 		this.topic = topic;
 	}
 }

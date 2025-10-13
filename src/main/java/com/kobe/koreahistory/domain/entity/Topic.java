@@ -38,8 +38,6 @@ public class Topic {
 	@JoinColumn(name = "subsection_id")
 	private Subsection subsection;
 
-	// QUESTION: - why dose not init this keywords?
-	// The subsection was init but keywords doesn't.
 	@OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Keyword> keywords = new ArrayList<>();
 
