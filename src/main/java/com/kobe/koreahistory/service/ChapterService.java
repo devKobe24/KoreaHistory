@@ -108,7 +108,7 @@ public class ChapterService {
 												List<Keyword> keywords = topicDto.getKeywords().stream()
 													.map(keywordDto -> Keyword.builder()
 														.keywordNumber(keywordDto.getKeywordNumber())
-														.keyword(keywordDto.getKeyword())
+														.keywords(keywordDto.getKeywords())
 														.topic(newTopic)
 														.build())
 													.collect(Collectors.toList());
