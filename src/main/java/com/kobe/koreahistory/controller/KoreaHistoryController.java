@@ -4,6 +4,9 @@ import com.kobe.koreahistory.dto.request.chapter.ChapterSearchRequestDto;
 import com.kobe.koreahistory.dto.request.chapter.CreateChapterRequestDto;
 import com.kobe.koreahistory.dto.request.chapter.PatchChapterNumberRequestDto;
 import com.kobe.koreahistory.dto.request.chapter.PatchChapterTitleRequestDto;
+import com.kobe.koreahistory.dto.request.keyword.CreateKeywordRequestDto;
+import com.kobe.koreahistory.dto.request.keyword.DeleteKeywordRequestDto;
+import com.kobe.koreahistory.dto.request.keyword.PatchKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
 import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
@@ -12,16 +15,17 @@ import com.kobe.koreahistory.dto.response.chapter.ChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.CreateKeywordResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.DeleteKeywordResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.PatchKeywordResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.ReadKeywordResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
 import com.kobe.koreahistory.dto.response.section.ReadSectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
-import com.kobe.koreahistory.service.ChapterService;
-import com.kobe.koreahistory.service.LessonService;
-import com.kobe.koreahistory.service.SectionService;
-import com.kobe.koreahistory.service.SubsectionService;
+import com.kobe.koreahistory.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +53,7 @@ public class KoreaHistoryController {
 	private final LessonService lessonService;
 	private final SectionService sectionService;
 	private final SubsectionService subsectionService;
+	private final KeywordService keywordService;
 
 	@GetMapping("/detail/search")
 	public ResponseEntity<List<ReadLessonResponseDto>> searchLesson(
@@ -74,6 +79,25 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(responseDto);
 	}
 
+	@GetMapping("/search/keywords")
+	public ResponseEntity<List<ReadKeywordResponseDto>> searchKeyword(
+		@RequestParam String keyword
+	) {
+		List<ReadKeywordResponseDto> response = keywordService.searchKeywords(keyword);
+		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/create/keyword")
+	public ResponseEntity<CreateKeywordResponseDto> createKeyword(
+		@RequestParam String topicTitle,
+		@RequestBody CreateKeywordRequestDto requestDto
+	) {
+
+		CreateKeywordResponseDto response = keywordService.createKeyword(topicTitle, requestDto);
+
+		return ResponseEntity.ok(response);
+	}
+
 	@PostMapping("/search/chapters")
 	public ResponseEntity<ChapterResponseDto> searchChapters(
 		@RequestBody ChapterSearchRequestDto requestDto
@@ -96,6 +120,15 @@ public class KoreaHistoryController {
 	) {
 		CreateLessonResponseDto responseDto = lessonService.createLesson(chapterId, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); // 생성 성공을 의미하는 201 Created 응답.
+	}
+
+	@PatchMapping("/keyword/update/{keywordId}")
+	public ResponseEntity<PatchKeywordResponseDto> updateKeyword(
+		@PathVariable Long keywordId,
+		@RequestBody PatchKeywordRequestDto requestDto
+	) {
+		PatchKeywordResponseDto response = keywordService.updateKeyword(keywordId, requestDto);
+		return ResponseEntity.ok(response);
 	}
 
 	@PatchMapping("/chapters/{id}/number")
@@ -148,5 +181,14 @@ public class KoreaHistoryController {
 		@PathVariable Long id) {
 		chapterService.deleteChapter(id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@DeleteMapping("/delete/keyword/{keywordId}")
+	public ResponseEntity<DeleteKeywordResponseDto> deleteKeyword(
+		@PathVariable Long keywordId,
+		@RequestBody DeleteKeywordRequestDto requestDto
+	) {
+		DeleteKeywordResponseDto response = keywordService.deleteKeyword(keywordId, requestDto);
+		return ResponseEntity.ok(response);
 	}
 }
