@@ -1,9 +1,10 @@
 package com.kobe.koreahistory.dto.request.content;
 
-import com.kobe.koreahistory.domain.entity.Keyword;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.request.content
@@ -19,12 +20,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CreateContentRequestDto {
-	private String detail;
-	private Keyword keyword;
+	private List<String> details;
 
 	@Builder
-	public CreateContentRequestDto(String detail, Keyword keyword) {
-		this.detail = detail;
-		this.keyword = keyword;
+	public CreateContentRequestDto(List<String> details) {
+		this.details = details;
 	}
 }
