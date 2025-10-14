@@ -31,8 +31,13 @@ public class Keyword {
 	@Column(nullable = false)
 	private Integer keywordNumber;
 
-	@Column(nullable = false)
-	private String keyword;
+	@ElementCollection(fetch = FetchType.LAZY)
+	@CollectionTable(
+		name = "keywords", // 키워드 문자열을 저장할 테이블 이름
+		joinColumns = @JoinColumn(name = "keywords_id") // 이 테이블이 참조할 외래 키
+	)
+	@Column(name = "keywords_value") // 실제 키워드 값이 저장될 컬럼 이름
+	private List<String> keywords = new ArrayList<>();
 
 	@OneToMany(mappedBy = "keyword", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Content> contents = new ArrayList<>();
@@ -42,9 +47,9 @@ public class Keyword {
 	private Topic topic;
 
 	@Builder
-	public Keyword(Integer keywordNumber, String keyword, Topic topic) {
+	public Keyword(Integer keywordNumber, List<String> keywords, Topic topic) {
 		this.keywordNumber = keywordNumber;
-		this.keyword = keyword;
+		this.keywords = keywords;
 		this.topic = topic;
 	}
 }
