@@ -52,4 +52,12 @@ public class Keyword {
 		this.keywords = keywords;
 		this.topic = topic;
 	}
+
+	public void updateKeyword(String newKeyword) {
+		this.keywords.add(newKeyword);
+	}
+
+	public void deleteKeyword(String targetKeyword) {
+		this.keywords.remove(targetKeyword);
+	}
 }
