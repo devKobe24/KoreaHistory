@@ -1,6 +1,5 @@
 package com.kobe.koreahistory.dto.request.keyword;
 
-import com.kobe.koreahistory.domain.entity.Content;
 import com.kobe.koreahistory.dto.request.content.CreateContentRequestDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,13 +23,13 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateKeywordRequestDto {
 	private Integer keywordNumber;
-	private String keyword;
+	private List<String> keywords = new ArrayList<>();
 	private List<CreateContentRequestDto> contents = new ArrayList<>();
 
 	@Builder
-	public CreateKeywordRequestDto(Integer keywordNumber, String keyword, List<CreateContentRequestDto> contents) {
+	public CreateKeywordRequestDto(Integer keywordNumber, List<String> keywords, List<CreateContentRequestDto> contents) {
 		this.keywordNumber = keywordNumber;
-		this.keyword = keyword;
+		this.keywords = keywords;
 		this.contents = contents;
 	}
 }
