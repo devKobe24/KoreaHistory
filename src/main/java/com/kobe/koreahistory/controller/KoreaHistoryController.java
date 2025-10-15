@@ -8,6 +8,7 @@ import com.kobe.koreahistory.dto.request.keyword.CreateKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.DeleteKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.PatchKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
+import com.kobe.koreahistory.dto.request.lesson.PatchLessonNumberRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
 import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
@@ -20,6 +21,7 @@ import com.kobe.koreahistory.dto.response.keyword.DeleteKeywordResponseDto;
 import com.kobe.koreahistory.dto.response.keyword.PatchKeywordResponseDto;
 import com.kobe.koreahistory.dto.response.keyword.ReadKeywordResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.PatchLessonNumberResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
@@ -149,13 +151,22 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(responseDto);
 	}
 
-	@PatchMapping("/chapters/detail/{id}")
+	@PatchMapping("/chapter/lesson/{id}/title")
 	public ResponseEntity<PatchLessonTitleResponseDto> patchLessonTitle(
 		@PathVariable Long id,
 		@RequestBody PatchLessonTitleRequestDto requestDto
 	) {
 		PatchLessonTitleResponseDto responseDto = lessonService.updateLessonTitle(id, requestDto);
 		return ResponseEntity.ok(responseDto);
+	}
+
+	@PatchMapping("/chapter/lesson/{id}/number")
+	public ResponseEntity<PatchLessonNumberResponseDto> patchLessonNumber(
+		@PathVariable Long id,
+		@RequestBody PatchLessonNumberRequestDto requestDto
+	) {
+		PatchLessonNumberResponseDto response = lessonService.updateLessonNumber(id, requestDto);
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping("/create/section/{lessonId}")
