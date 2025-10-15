@@ -48,7 +48,11 @@ public class Lesson {
 		this.chapter = chapter;
 	}
 
-	public void updateLesson(String newLessonTitle) {
+	public void updateLessonNumber(Integer lessonNumber) {
+		this.lessonNumber = lessonNumber;
+	}
+
+	public void updateLessonTitle(String newLessonTitle) {
 		this.lessonTitle = newLessonTitle;
 	}
 }
