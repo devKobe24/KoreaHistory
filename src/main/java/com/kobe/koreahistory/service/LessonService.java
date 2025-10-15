@@ -3,8 +3,10 @@ package com.kobe.koreahistory.service;
 import com.kobe.koreahistory.domain.entity.Chapter;
 import com.kobe.koreahistory.domain.entity.Lesson;
 import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
+import com.kobe.koreahistory.dto.request.lesson.PatchLessonNumberRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
 import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.PatchLessonNumberResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
 import com.kobe.koreahistory.repository.ChapterRepository;
@@ -61,10 +63,20 @@ public class LessonService {
 			.orElseThrow(() -> new IllegalArgumentException("소분류 챕터를 찾을 수 없습니다."));
 
 		// 2. Entity의 비즈니스 메서드를 호출하여 상태를 변경함.
-		lesson.updateLesson(requestDto.getToChangeLessonTitle());
+		lesson.updateLessonTitle(requestDto.getToChangeLessonTitle());
 
 		// 3. 변경된 chapter 엔티티를 DTO로 변환하여 반환.
 		return new PatchLessonTitleResponseDto(lesson);
+	}
+
+	@Transactional
+	public PatchLessonNumberResponseDto updateLessonNumber(Long lessonId, PatchLessonNumberRequestDto requestDto) {
+		Lesson lesson = lessonRepository.findById(lessonId)
+			.orElseThrow(() -> new IllegalArgumentException("소분류 챕터를 찾을 수 없습니다."));
+
+		lesson.updateLessonNumber(requestDto.getLessonNumber());
+
+		return new PatchLessonNumberResponseDto(lesson);
 	}
 
 	@Transactional(readOnly = true)
