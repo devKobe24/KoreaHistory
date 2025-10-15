@@ -1,5 +1,6 @@
 package com.kobe.koreahistory.dto.request.lesson;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,4 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PatchLessonTitleRequestDto {
 	private String toChangeLessonTitle;
+
+	@Builder
+	public PatchLessonTitleRequestDto(String toChangeLessonTitle) {
+		this.toChangeLessonTitle = toChangeLessonTitle;
+	}
 }
