@@ -2,7 +2,7 @@
 
 한국사 주요 개념과 흐름을 학습하고 관리하기 위한 RESTful API 서버입니다.
 
-이 프로젝트는 Spring Boot, JPA(Hibernate), H2 데이터베이스를 기반으로 구축되었으며, 한국사 시대별 대분류(Chapter), 소분류(Lesson), 섹션(Section), 서브섹션(Subsection), 핵심 키워드(Keyword) 및 상세 내용(Content)을 계층적으로 관리하는 기능을 제공합니다.
+Spring Boot, JPA(Hibernate), H2 데이터베이스를 기반으로 구축되었으며, 한국사 시대별 대분류(Chapter)부터 세부 키워드(Keyword)까지 계층적으로 관리하는 기능을 제공합니다.
 
 ---
 
@@ -10,10 +10,11 @@
 
 - [주요 기능](#-주요-기능)
 - [기술 스택](#️-기술-스택)
-- [데이터 모델](#-데이터-모델)
+- [데이터 모델](#️-데이터-모델)
 - [시작하기](#-시작하기)
 - [API 명세](#-api-명세)
 - [프로젝트 구조](#-프로젝트-구조)
+- [개발 환경 설정](#-개발-환경-설정)
 - [기여하기](#-기여하기)
 - [라이센스](#-라이센스)
 
@@ -21,47 +22,69 @@
 
 ## ✨ 주요 기능
 
-- **생성 (Create)**: 대분류(Chapter)와 하위 소분류(Lesson)를 한 번에 생성하고, Section과 Subsection을 추가할 수 있습니다
-- **조회 (Read)**: 대분류, 소분류, 섹션, 키워드 및 상세 내용을 다양한 조건으로 조회합니다
-- **수정 (Update)**: 대분류 및 소분류의 번호와 제목을 부분적으로 수정합니다
-- **삭제 (Delete)**: 대분류를 삭제할 수 있습니다 (Cascade로 하위 데이터 자동 삭제)
+### CRUD 작업
+- **생성**: 대분류(Chapter)와 하위 구조를 한 번에 생성
+- **조회**: 다양한 조건으로 계층적 데이터 조회
+- **수정**: 엔티티별 부분 수정 지원
+- **삭제**: Cascade를 통한 하위 데이터 자동 삭제
+
+### 키워드 관리
+- 다중 키워드 지원 (@ElementCollection 활용)
+- 키워드 검색 (부분 일치)
+- 키워드 추가/삭제
+
+### 상세 내용 관리
+- 키워드별 다중 상세 정보 저장
+- 컬렉션 테이블을 통한 유연한 데이터 구조
 
 ---
 
 ## 🛠️ 기술 스택
 
-- **언어**: Java 17
-- **프레임워크**: Spring Boot 3.5.6
-- **데이터베이스**: H2 In-Memory Database
-- **ORM**: Spring Data JPA (Hibernate)
-- **빌드 도구**: Gradle 8.14.3
-- **기타**: Lombok, Validation
+| 분류 | 기술 |
+|------|------|
+| **언어** | Java 17 |
+| **프레임워크** | Spring Boot 3.5.6 |
+| **데이터베이스** | H2 In-Memory Database |
+| **ORM** | Spring Data JPA (Hibernate) |
+| **빌드 도구** | Gradle 8.14.3 |
+| **기타** | Lombok, Validation |
 
 ---
 
 ## 🗂️ 데이터 모델
 
-프로젝트는 계층적 구조로 한국사 학습 데이터를 관리합니다:
+### 계층 구조
 
 ```
-Chapter (대분류)
-  └── Lesson (소분류)
-        ├── Keyword (키워드)
-        │     └── KeywordContent
-        │           └── Content
-        └── Section (섹션)
-              └── Subsection (서브섹션)
+Chapter (대분류 - 시대)
+  └── Lesson (중분류 - 시대별 주제)
+        └── Section (소분류 - 세부 주제)
+              └── Subsection (서브섹션 - 상세 주제)
+                    └── Topic (토픽 - 학습 주제)
+                          └── Keyword (키워드 그룹)
+                                ├── keywords (다중 키워드 문자열)
+                                └── Content (상세 내용)
+                                      └── details (다중 상세 설명)
 ```
 
 ### 주요 엔티티
 
-- **Chapter**: 시대별 대분류 (예: 선사시대, 고대)
-- **Lesson**: 대분류 내의 세부 주제 (예: 구석기 시대 ~ 철기 시대)
-- **Section**: 소분류 내의 섹션
-- **Subsection**: 섹션 내의 서브섹션
-- **Keyword**: 학습 키워드 (예: 뗀석기, 숨베찌르개)
-- **KeywordContent**: 키워드와 연결된 콘텐츠
-- **Content**: 실제 학습 내용 (대분류, 소분류, 상세 내용 포함)
+| 엔티티 | 설명 | 예시 |
+|--------|------|------|
+| **Chapter** | 시대별 대분류 | 선사시대, 고대 |
+| **Lesson** | 대분류 내의 세부 주제 | 구석기 시대 ~ 철기 시대 |
+| **Section** | 소분류 내의 섹션 | 구석기 시대와 신석기 시대 |
+| **Subsection** | 섹션 내의 서브섹션 | 구석기 시대 |
+| **Topic** | 학습 토픽 | 도구, 생활 모습, 사회 |
+| **Keyword** | 키워드 그룹 (다중 키워드 포함) | 뗀석기, 주먹 도끼, 찍개 등 |
+| **Content** | 실제 학습 내용 (다중 상세 설명 포함) | 뗀석기의 사용법, 특징 등 |
+
+### 특징
+
+- **@ElementCollection 활용**: Keyword와 Content는 각각 다중 문자열을 저장하는 컬렉션 테이블 구조
+- **Cascade 설정**: 부모 엔티티 삭제 시 하위 엔티티 자동 삭제
+- **Lazy Loading**: 성능 최적화를 위한 지연 로딩 적용
 
 ---
 
@@ -83,8 +106,6 @@ cd KoreaHistory
 
 #### 2. 애플리케이션 실행
 
-아래 Gradle 명령어를 사용하여 애플리케이션을 실행합니다.
-
 ```bash
 # Windows
 gradlew.bat bootRun
@@ -93,21 +114,36 @@ gradlew.bat bootRun
 ./gradlew bootRun
 ```
 
-서버는 `http://localhost:8080`에서 실행됩니다.
+서버가 `http://localhost:8080`에서 실행됩니다.
 
 ### 데이터베이스 확인
 
-애플리케이션 실행 후, 웹 브라우저에서 H2 콘솔에 접속할 수 있습니다:
+애플리케이션 실행 후, H2 콘솔에 접속하여 데이터를 확인할 수 있습니다.
 
-- **URL**: `http://localhost:8080/h2-console`
-- **JDBC URL**: `jdbc:h2:mem:koreahistory`
-- **Username**: `sa`
-- **Password**: (공백)
-- **초기 데이터**: `src/main/resources/data.sql` 파일에 의해 자동으로 생성됩니다
+| 항목 | 값 |
+|------|-----|
+| **URL** | http://localhost:8080/h2-console |
+| **JDBC URL** | jdbc:h2:mem:koreahistory |
+| **Username** | sa |
+| **Password** | (공백) |
+
+**초기 데이터**: `src/main/resources/data.sql` 파일에 의해 자동 생성
+- 2개의 Chapter (선사시대, 고대)
+- 4개의 Topic (도구, 생활 모습, 사회, 주요 유적)
+- 6개의 Keyword 그룹 (37개의 키워드 문자열)
+- 관련 Content 데이터
 
 ---
 
 ## 📖 API 명세
+
+### Base URL
+
+```
+http://localhost:8080/api/v1
+```
+
+---
 
 ### 1. Chapter (대분류)
 
@@ -117,7 +153,7 @@ gradlew.bat bootRun
 GET /api/v1/chapters/search/all
 ```
 
-**Response (200 OK)**
+**응답 예시 (200 OK)**
 
 ```json
 [
@@ -129,26 +165,22 @@ GET /api/v1/chapters/search/all
       {
         "id": 1,
         "lessonNumber": 1,
-        "lessonTitle": "구석기 시대 ~ 철기 시대"
-      },
-      {
-        "id": 2,
-        "lessonNumber": 2,
-        "lessonTitle": "고조선과 여러 나라의 성장"
+        "lessonTitle": "구석기 시대 ~ 철기 시대",
+        "sections": []
       }
     ]
   }
 ]
 ```
 
-#### 1.2. 대분류 조회 (제목으로)
+#### 1.2. 대분류 상세 조회 (제목으로)
 
 ```http
 POST /api/v1/search/chapters
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
 {
@@ -156,59 +188,49 @@ Content-Type: application/json
 }
 ```
 
-**Response (200 OK)**
-
-```json
-{
-  "id": 1,
-  "chapterNumber": 1,
-  "chapterTitle": "선사시대",
-  "lessons": [
-    {
-      "id": 1,
-      "lessonNumber": 1,
-      "lessonTitle": "구석기 시대 ~ 철기 시대"
-    }
-  ]
-}
-```
-
 #### 1.3. 대분류 생성
-
-대분류(Chapter)와 하위 소분류(Lesson)들을 한 번에 생성합니다.
 
 ```http
 POST /api/v1/create/chapter
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
-{
-  "chapterNumber": 2,
-  "chapterTitle": "고대",
-  "lessons": [
-    {
-      "lessonNumber": 3,
-      "lessonTitle": "고구려"
-    },
-    {
-      "lessonNumber": 4,
-      "lessonTitle": "백제"
-    }
-  ]
-}
+[
+  {
+    "chapterNumber": 2,
+    "chapterTitle": "고대",
+    "lessons": [
+      {
+        "lessonNumber": 3,
+        "lessonTitle": "고구려",
+        "sections": []
+      }
+    ]
+  }
+]
 ```
 
-**Response (200 OK)**
+**응답 (201 Created)**
 
 ```json
-{
-  "id": 2,
-  "chapterNumber": 2,
-  "chapterTitle": "고대"
-}
+[
+  {
+    "id": 2,
+    "chapterNumber": 2,
+    "chapterTitle": "고대",
+    "lessons": [
+      {
+        "id": 3,
+        "lessonNumber": 3,
+        "lessonTitle": "고구려",
+        "sections": []
+      }
+    ]
+  }
+]
 ```
 
 #### 1.4. 대분류 번호 수정
@@ -218,20 +240,11 @@ PATCH /api/v1/chapters/{id}/number
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
 {
   "chapterNumber": 10
-}
-```
-
-**Response (200 OK)**
-
-```json
-{
-  "id": 1,
-  "changedChapterNumber": 10
 }
 ```
 
@@ -242,20 +255,11 @@ PATCH /api/v1/chapters/{id}/title
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
 {
   "chapterTitle": "수정된 대분류 제목"
-}
-```
-
-**Response (200 OK)**
-
-```json
-{
-  "id": 1,
-  "changedChapterTitle": "수정된 대분류 제목"
 }
 ```
 
@@ -265,42 +269,30 @@ Content-Type: application/json
 DELETE /api/v1/chapters/{id}
 ```
 
-**Response (204 No Content)**
+**응답 (204 No Content)**
 
 ---
 
-### 2. Lesson (소분류)
+### 2. Lesson (중분류)
 
-#### 2.1. 소분류 조회
-
-번호 또는 제목으로 소분류를 동적으로 검색합니다.
+#### 2.1. 중분류 조회
 
 ```http
 GET /api/v1/detail/search?lessonNumber=1&lessonTitle=구석기
 ```
 
-**Response (200 OK)**
+**쿼리 파라미터**
+- `lessonNumber` (optional): 중분류 번호
+- `lessonTitle` (optional): 중분류 제목 (부분 검색)
 
-```json
-[
-  {
-    "id": 1,
-    "lessonNumber": 1,
-    "lessonTitle": "구석기 시대 ~ 철기 시대"
-  }
-]
-```
-
-#### 2.2. 소분류 생성
-
-기존 대분류에 새로운 소분류를 추가합니다.
+#### 2.2. 중분류 생성
 
 ```http
 POST /api/v1/chapters/{chapterId}/details
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
 {
@@ -309,82 +301,45 @@ Content-Type: application/json
 }
 ```
 
-**Response (201 Created)**
-
-```json
-{
-  "id": 5,
-  "lessonNumber": 5,
-  "lessonTitle": "신라"
-}
-```
-
-#### 2.3. 소분류 제목 수정
+#### 2.3. 중분류 제목 수정
 
 ```http
 PATCH /api/v1/chapters/detail/{id}
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
 {
-  "toChangeLessonTitle": "수정된 소분류 제목"
-}
-```
-
-**Response (200 OK)**
-
-```json
-{
-  "changedLessonTitle": "수정된 소분류 제목"
+  "toChangeLessonTitle": "수정된 중분류 제목"
 }
 ```
 
 ---
 
-### 3. Section (섹션)
+### 3. Section (소분류)
 
-#### 3.1. 섹션 조회
+#### 3.1. 소분류 조회
 
 ```http
 GET /api/v1/search/section/{sectionId}
 ```
 
-**Response (200 OK)**
-
-```json
-{
-  "id": 1,
-  "sectionNumber": 1,
-  "sectionTitle": "도구"
-}
-```
-
-#### 3.2. 섹션 생성
+#### 3.2. 소분류 생성
 
 ```http
 POST /api/v1/create/section/{lessonId}
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
 {
   "sectionNumber": 1,
-  "sectionTitle": "도구"
-}
-```
-
-**Response (201 Created)**
-
-```json
-{
-  "id": 1,
-  "sectionNumber": 1,
-  "sectionTitle": "도구"
+  "sectionTitle": "구석기 시대와 신석기 시대",
+  "subsections": []
 }
 ```
 
@@ -399,22 +354,13 @@ POST /api/v1/create/subsection/{sectionId}
 Content-Type: application/json
 ```
 
-**Request Body**
+**요청 본문**
 
 ```json
 {
   "subsectionNumber": 1,
-  "subsectionTitle": "뗀석기"
-}
-```
-
-**Response (201 Created)**
-
-```json
-{
-  "id": 1,
-  "subsectionNumber": 1,
-  "subsectionTitle": "뗀석기"
+  "subsectionTitle": "구석기 시대",
+  "topics": []
 }
 ```
 
@@ -422,64 +368,110 @@ Content-Type: application/json
 
 ### 5. Keyword (키워드)
 
-#### 5.1. 키워드 조회 (상세 내용 포함)
+#### 5.1. 키워드 검색
 
 ```http
-POST /api/v1/search/keyword/and/chapter
-Content-Type: application/json
+GET /api/v1/search/keywords?keyword=뗀석기
 ```
 
-**Request Body**
+**쿼리 파라미터**
+- `keyword`: 검색할 키워드 (부분 일치 검색)
+
+**응답 예시 (200 OK)**
 
 ```json
-{
-  "keyword": "뗀석기"
-}
-```
-
-**Response (200 OK)**
-
-```json
-{
-  "id": 1,
-  "detailChapter": {
+[
+  {
     "id": 1,
-    "lessonNumber": 1,
-    "lessonTitle": "구석기 시대 ~ 철기 시대"
+    "keywordNumber": 1,
+    "keywords": ["뗀석기"]
   },
-  "keyword": "뗀석기",
-  "keywordContent": {
-    "id": 1,
-    "mainCategory": "1. 구석기 시대",
-    "subCategory": "(1) 도구",
-    "detail": "① 뗀석기: 돌을 깨뜨리고 떼어 내어 날을 만든 도구인 \"뗀석기를 주로 사용\"하였다."
+  {
+    "id": 2,
+    "keywordNumber": 2,
+    "keywords": ["주요 뗀석기", "주먹 도끼", "찍개", "슴베찌르개"]
   }
-}
+]
 ```
 
-#### 5.2. 키워드로 콘텐츠만 조회
+#### 5.2. 키워드 생성
 
 ```http
-POST /api/v1/search/by/keywords
+POST /api/v1/create/keyword?topicTitle=도구
 Content-Type: application/json
 ```
 
-**Request Body**
+**쿼리 파라미터**
+- `topicTitle`: 부모 Topic의 제목
+
+**요청 본문**
 
 ```json
 {
-  "keyword": "뗀석기"
+  "keywordNumber": 1,
+  "keywords": ["뗀석기", "돌도구"],
+  "contents": []
 }
 ```
 
-**Response (200 OK)**
+**응답 예시 (200 OK)**
 
 ```json
 {
   "id": 1,
-  "mainCategory": "1. 구석기 시대",
-  "subCategory": "(1) 도구",
-  "detail": "① 뗀석기: 돌을 깨뜨리고 떼어 내어 날을 만든 도구인 \"뗀석기를 주로 사용\"하였다."
+  "keywordNumber": 1,
+  "keywords": ["뗀석기", "돌도구"],
+  "contents": []
+}
+```
+
+#### 5.3. 키워드 추가 (수정)
+
+```http
+PATCH /api/v1/keyword/update/{keywordId}
+Content-Type: application/json
+```
+
+**요청 본문**
+
+```json
+{
+  "keyword": "석기"
+}
+```
+
+**응답 예시 (200 OK)**
+
+```json
+{
+  "id": 1,
+  "keywordNumber": 1,
+  "updatedKeywords": ["뗀석기", "돌도구", "석기"]
+}
+```
+
+#### 5.4. 키워드 삭제
+
+```http
+DELETE /api/v1/delete/keyword/{keywordId}
+Content-Type: application/json
+```
+
+**요청 본문**
+
+```json
+{
+  "targetKeyword": "석기"
+}
+```
+
+**응답 예시 (200 OK)**
+
+```json
+{
+  "id": 1,
+  "resultKeywords": ["뗀석기", "돌도구"],
+  "message": "성공적으로 삭제 되었습니다."
 }
 ```
 
@@ -491,46 +483,59 @@ Content-Type: application/json
 KoreaHistory/
 ├── src/
 │   ├── main/
-│   │   ├── java/
-│   │   │   └── com/kobe/koreahistory/
-│   │   │       ├── controller/           # REST API 컨트롤러
-│   │   │       │   └── KoreaHistoryController.java
-│   │   │       ├── service/              # 비즈니스 로직
-│   │   │       │   ├── ChapterService.java
-│   │   │       │   ├── LessonService.java
-│   │   │       │   ├── SectionService.java
-│   │   │       │   └── SubsectionService.java
-│   │   │       ├── repository/           # JPA 리포지토리
-│   │   │       │   ├── ChapterRepository.java
-│   │   │       │   ├── LessonRepository.java
-│   │   │       │   ├── SectionRepository.java
-│   │   │       │   ├── SubsectionRepository.java
-│   │   │       │   ├── KeywordRepository.java
-│   │   │       │   └── KeywordContentRepository.java
-│   │   │       ├── domain/entity/        # JPA 엔티티
-│   │   │       │   ├── Chapter.java
-│   │   │       │   ├── Lesson.java
-│   │   │       │   ├── Section.java
-│   │   │       │   ├── Subsection.java
-│   │   │       │   ├── Keyword.java
-│   │   │       │   ├── KeywordContent.java
-│   │   │       │   └── Content.java
-│   │   │       └── dto/                  # DTO 클래스
-│   │   │           ├── request/
-│   │   │           └── response/
+│   │   ├── java/com/kobe/koreahistory/
+│   │   │   ├── controller/              # REST API 컨트롤러
+│   │   │   │   └── KoreaHistoryController.java
+│   │   │   ├── service/                 # 비즈니스 로직
+│   │   │   │   ├── ChapterService.java
+│   │   │   │   ├── LessonService.java
+│   │   │   │   ├── SectionService.java
+│   │   │   │   ├── SubsectionService.java
+│   │   │   │   └── KeywordService.java
+│   │   │   ├── repository/              # JPA 리포지토리
+│   │   │   │   ├── ChapterRepository.java
+│   │   │   │   ├── LessonRepository.java
+│   │   │   │   ├── SectionRepository.java
+│   │   │   │   ├── SubsectionRepository.java
+│   │   │   │   ├── TopicRepository.java
+│   │   │   │   └── KeywordRepository.java
+│   │   │   ├── domain/entity/           # JPA 엔티티
+│   │   │   │   ├── Chapter.java
+│   │   │   │   ├── Lesson.java
+│   │   │   │   ├── Section.java
+│   │   │   │   ├── Subsection.java
+│   │   │   │   ├── Topic.java
+│   │   │   │   ├── Keyword.java
+│   │   │   │   └── Content.java
+│   │   │   └── dto/                     # DTO 클래스
+│   │   │       ├── request/
+│   │   │       │   ├── chapter/
+│   │   │       │   ├── lesson/
+│   │   │       │   ├── section/
+│   │   │       │   ├── subsection/
+│   │   │       │   ├── topic/
+│   │   │       │   ├── keyword/
+│   │   │       │   └── content/
+│   │   │       └── response/
+│   │   │           ├── chapter/
+│   │   │           ├── lesson/
+│   │   │           ├── section/
+│   │   │           ├── subsection/
+│   │   │           ├── topic/
+│   │   │           ├── keyword/
+│   │   │           └── content/
 │   │   └── resources/
-│   │       ├── application.yml           # 애플리케이션 설정
-│   │       └── data.sql                  # 초기 데이터
+│   │       ├── application.yml          # 애플리케이션 설정
+│   │       └── data.sql                 # 초기 데이터
 │   └── test/
-│       └── java/
-│           └── com/kobe/koreahistory/
-│               └── KoreaHistoryApplicationTests.java
-├── build.gradle                          # Gradle 빌드 설정
+│       └── java/com/kobe/koreahistory/
+│           └── KoreaHistoryApplicationTests.java
+├── build.gradle                         # Gradle 빌드 설정
 ├── settings.gradle
-├── gradlew                               # Gradle Wrapper (Linux/Mac)
-├── gradlew.bat                           # Gradle Wrapper (Windows)
-├── LICENCE                               # MIT 라이센스
-└── README.md                             # 프로젝트 문서
+├── gradlew                              # Gradle Wrapper
+├── gradlew.bat
+├── LICENCE                              # MIT 라이센스
+└── README.md                            # 프로젝트 문서
 ```
 
 ---
@@ -542,16 +547,23 @@ KoreaHistory/
 1. 프로젝트를 IntelliJ IDEA로 엽니다
 2. Gradle 프로젝트로 인식되면 자동으로 의존성을 다운로드합니다
 3. Lombok 플러그인이 설치되어 있는지 확인합니다
-4. `KoreaHistoryApplication.java`를 실행합니다
+   - `File` → `Settings` → `Plugins` → `Lombok` 검색 및 설치
+4. Annotation Processing 활성화
+   - `File` → `Settings` → `Build, Execution, Deployment` → `Compiler` → `Annotation Processors`
+   - `Enable annotation processing` 체크
+5. `KoreaHistoryApplication.java`를 실행합니다
 
 ### 데이터베이스 초기화
 
 애플리케이션 시작 시 `data.sql` 파일이 자동으로 실행되어 초기 데이터가 생성됩니다:
 
-- 1개의 Chapter (선사시대)
-- 2개의 Lesson (구석기 시대 ~ 철기 시대, 고조선과 여러 나라의 성장)
-- 3개의 Keyword (뗀석기, 숨베찌르개, 주요 뗀석기)
-- 관련 Content 데이터
+- **Chapter**: 선사시대, 고대
+- **Lesson**: 구석기 시대 ~ 철기 시대, 고조선과 여러 나라의 성장
+- **Section**: 구석기 시대와 신석기 시대, 청동기 시대와 철기 시대
+- **Subsection**: 구석기 시대
+- **Topic**: 도구, 생활 모습, 사회, 주요 유적
+- **Keyword**: 6개 그룹 (37개 키워드 문자열)
+- **Content**: 각 키워드별 상세 내용
 
 ---
 
@@ -571,9 +583,20 @@ KoreaHistory/
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+### Commit Convention
+
+이 프로젝트는 Conventional Commits를 따릅니다:
+
+- `feat`: 새로운 기능 추가
+- `fix`: 버그 수정
+- `refactor`: 코드 리팩토링
+- `docs`: 문서 수정
+- `test`: 테스트 코드
+- `chore`: 빌드 설정, 기타
 
 이슈나 PR은 언제나 환영합니다!
 
@@ -595,10 +618,31 @@ KoreaHistory/
 
 ## 🗺️ 로드맵
 
+### 단기 목표
+- [ ] RESTful API 문서화 (Swagger/OpenAPI)
+- [ ] 단위 테스트 및 통합 테스트 확대
+- [ ] 예외 처리 개선 및 표준화
+
+### 중기 목표
 - [ ] 사용자 인증 및 권한 관리
+- [ ] 검색 기능 고도화 (전문 검색)
+- [ ] 페이징 및 정렬 기능
+
+### 장기 목표
 - [ ] 학습 진도 추적 기능
 - [ ] 퀴즈 및 테스트 기능
 - [ ] 이미지 및 멀티미디어 지원
-- [ ] 검색 기능 고도화
-- [ ] RESTful API 문서화 (Swagger/OpenAPI)
-- [ ] 단위 테스트 및 통합 테스트 확대
+- [ ] 모바일 앱 연동
+
+---
+
+## 📚 참고 자료
+
+- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [RESTful API Design](https://restfulapi.net/)
+
+---
+
+**Built with ❤️ for Korean History Education**
