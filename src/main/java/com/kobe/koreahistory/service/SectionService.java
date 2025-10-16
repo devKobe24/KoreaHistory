@@ -3,7 +3,11 @@ package com.kobe.koreahistory.service;
 import com.kobe.koreahistory.domain.entity.Lesson;
 import com.kobe.koreahistory.domain.entity.Section;
 import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
+import com.kobe.koreahistory.dto.request.section.PatchSectionNumberRequestDto;
+import com.kobe.koreahistory.dto.request.section.PatchSectionTitleRequestDto;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
+import com.kobe.koreahistory.dto.response.section.PatchSectionNumberResponseDto;
+import com.kobe.koreahistory.dto.response.section.PatchSectionTitleResponseDto;
 import com.kobe.koreahistory.dto.response.section.ReadSectionResponseDto;
 import com.kobe.koreahistory.repository.LessonRepository;
 import com.kobe.koreahistory.repository.SectionRepository;
@@ -53,6 +57,31 @@ public class SectionService {
 		Section section = sectionRepository.findById(sectionId)
 			.orElseThrow(() -> new IllegalArgumentException("section not found"));
 
-		return  new ReadSectionResponseDto(section);
+		return new ReadSectionResponseDto(section);
+	}
+
+	@Transactional
+	public PatchSectionNumberResponseDto updateSectionNumber(Long sectionId, PatchSectionNumberRequestDto requestDto) {
+		Section section = sectionRepository.findById(sectionId)
+			.orElseThrow(() -> new IllegalArgumentException("section not found"));
+
+		section.updateSectionNumber(requestDto.getSectionNumber());
+
+		return new PatchSectionNumberResponseDto(section);
+	}
+
+	@Transactional
+	public PatchSectionTitleResponseDto updateSectionTitle(Long sectionId, PatchSectionTitleRequestDto requestDto) {
+		Section section = sectionRepository.findById(sectionId)
+			.orElseThrow(() -> new IllegalArgumentException("section not found"));
+
+		section.updateSectionTitle(requestDto.getSectionTitle());
+
+		return new PatchSectionTitleResponseDto(section);
+	}
+
+	@Transactional
+	public void deleteSection(Long sectionId) {
+		sectionRepository.deleteById(sectionId);
 	}
 }
