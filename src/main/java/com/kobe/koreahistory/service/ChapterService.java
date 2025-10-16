@@ -10,6 +10,7 @@ import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
 import com.kobe.koreahistory.repository.ChapterRepository;
 import com.kobe.koreahistory.repository.KeywordRepository;
+import com.kobe.koreahistory.repository.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ public class ChapterService {
 
 	private final ChapterRepository chapterRepository;
 	private final KeywordRepository keywordRepository;
+	private final LessonRepository lessonRepository;
 
 	@Transactional(readOnly = true)
 	public List<ChapterResponseDto> findAll() {
