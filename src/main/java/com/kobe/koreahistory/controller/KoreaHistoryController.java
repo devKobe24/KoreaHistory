@@ -6,25 +6,27 @@ import com.kobe.koreahistory.dto.request.chapter.PatchChapterNumberRequestDto;
 import com.kobe.koreahistory.dto.request.chapter.PatchChapterTitleRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.CreateKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.DeleteKeywordRequestDto;
+import com.kobe.koreahistory.dto.request.keyword.PatchKeywordNumberRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.PatchKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonNumberRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
 import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
+import com.kobe.koreahistory.dto.request.section.PatchSectionNumberRequestDto;
+import com.kobe.koreahistory.dto.request.section.PatchSectionTitleRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
 import com.kobe.koreahistory.dto.response.chapter.ChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.CreateKeywordResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.DeleteKeywordResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.PatchKeywordResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.ReadKeywordResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.*;
 import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.PatchLessonNumberResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
 import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
+import com.kobe.koreahistory.dto.response.section.PatchSectionNumberResponseDto;
+import com.kobe.koreahistory.dto.response.section.PatchSectionTitleResponseDto;
 import com.kobe.koreahistory.dto.response.section.ReadSectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
 import com.kobe.koreahistory.service.*;
@@ -124,12 +126,21 @@ public class KoreaHistoryController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); // 생성 성공을 의미하는 201 Created 응답.
 	}
 
-	@PatchMapping("/keyword/update/{keywordId}")
+	@PatchMapping("/keywords/{keywordId}/update")
 	public ResponseEntity<PatchKeywordResponseDto> updateKeyword(
 		@PathVariable Long keywordId,
 		@RequestBody PatchKeywordRequestDto requestDto
 	) {
 		PatchKeywordResponseDto response = keywordService.updateKeyword(keywordId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
+	@PatchMapping("/keyword/number/{keywordId}/update")
+	public ResponseEntity<PatchKeywordNumberResponseDto> updateKeywordNumber(
+		@PathVariable Long keywordId,
+		@RequestBody PatchKeywordNumberRequestDto requestDto
+	) {
+		PatchKeywordNumberResponseDto response = keywordService.updateKeywordNumber(keywordId, requestDto);
 		return ResponseEntity.ok(response);
 	}
 
@@ -169,6 +180,24 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@PatchMapping("/section/{sectionId}/number")
+	public ResponseEntity<PatchSectionNumberResponseDto> patchSectionNumber(
+		@PathVariable Long sectionId,
+		@RequestBody PatchSectionNumberRequestDto requestDto
+	) {
+		PatchSectionNumberResponseDto response = sectionService.updateSectionNumber(sectionId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
+	@PatchMapping("/section/{sectionId}/title")
+	public ResponseEntity<PatchSectionTitleResponseDto> patchSectionTitle(
+		@PathVariable Long sectionId,
+		@RequestBody PatchSectionTitleRequestDto requestDto
+	) {
+		PatchSectionTitleResponseDto response = sectionService.updateSectionTitle(sectionId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
 	@PostMapping("/create/section/{lessonId}")
 	public ResponseEntity<CreateSectionResponseDto> createSection(
 		@PathVariable Long lessonId,
@@ -201,5 +230,29 @@ public class KoreaHistoryController {
 	) {
 		DeleteKeywordResponseDto response = keywordService.deleteKeyword(keywordId, requestDto);
 		return ResponseEntity.ok(response);
+	}
+
+	@DeleteMapping("/lesson/{lessonId}")
+	public ResponseEntity<Void> deleteLesson(
+		@PathVariable Long lessonId
+	) {
+		lessonService.deleteLesson(lessonId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@DeleteMapping("/keyword/group/{id}")
+	public ResponseEntity<Void> deleteKeywordGroup(
+		@PathVariable Long id
+	) {
+		keywordService.deleteKeywordGroup(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@DeleteMapping("/section/{sectionId}")
+	public ResponseEntity<Void> deleteSection(
+		@PathVariable Long sectionId
+	) {
+		sectionService.deleteSection(sectionId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
