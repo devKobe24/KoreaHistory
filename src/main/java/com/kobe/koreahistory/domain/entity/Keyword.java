@@ -53,6 +53,10 @@ public class Keyword {
 		this.topic = topic;
 	}
 
+	public void updateKeywordNumber(Integer newKeywordNumber) {
+		this.keywordNumber = newKeywordNumber;
+	}
+
 	public void updateKeyword(String newKeyword) {
 		this.keywords.add(newKeyword);
 	}
