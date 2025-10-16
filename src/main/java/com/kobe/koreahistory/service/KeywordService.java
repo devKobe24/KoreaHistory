@@ -4,11 +4,9 @@ import com.kobe.koreahistory.domain.entity.Keyword;
 import com.kobe.koreahistory.domain.entity.Topic;
 import com.kobe.koreahistory.dto.request.keyword.CreateKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.DeleteKeywordRequestDto;
+import com.kobe.koreahistory.dto.request.keyword.PatchKeywordNumberRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.PatchKeywordRequestDto;
-import com.kobe.koreahistory.dto.response.keyword.CreateKeywordResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.DeleteKeywordResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.PatchKeywordResponseDto;
-import com.kobe.koreahistory.dto.response.keyword.ReadKeywordResponseDto;
+import com.kobe.koreahistory.dto.response.keyword.*;
 import com.kobe.koreahistory.repository.KeywordRepository;
 import com.kobe.koreahistory.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +74,16 @@ public class KeywordService {
 	}
 
 	@Transactional
+	public PatchKeywordNumberResponseDto updateKeywordNumber(Long keywordId, PatchKeywordNumberRequestDto requestDto) {
+		Keyword keyword = keywordRepository.findById(keywordId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 Keyword를 찾을 수 없습니다."));
+
+		keyword.updateKeywordNumber(requestDto.getKeywordNumber());
+
+		return new PatchKeywordNumberResponseDto(keyword);
+	}
+
+	@Transactional
 	public DeleteKeywordResponseDto deleteKeyword(Long keywordId, DeleteKeywordRequestDto requestDto) {
 		Keyword keyword = keywordRepository.findById(keywordId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 Keyword를 찾읗 수 없습니다."));
@@ -83,5 +91,10 @@ public class KeywordService {
 		keyword.deleteKeyword(requestDto.getTargetKeyword());
 
 		return new DeleteKeywordResponseDto(keyword);
+	}
+
+	@Transactional
+	public void deleteKeywordGroup(Long id) {
+		keywordRepository.deleteById(id);
 	}
 }
