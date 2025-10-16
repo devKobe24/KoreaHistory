@@ -21,6 +21,7 @@ import java.util.Optional;
  */
 public interface LessonRepository extends JpaRepository<Lesson, Integer> {
 	Optional<Lesson> findById(Long id);
+	Lesson deleteById(Long id);
 
 	/**
 	 * number 또는 title로 DetailChapter를 동적으로 검색합니다.
