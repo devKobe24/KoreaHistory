@@ -47,4 +47,12 @@ public class Section {
 		this.sectionTitle = sectionTitle;
 		this.lesson = lesson;
 	}
+
+	public void updateSectionNumber(Integer newSectionNumber) {
+		this.sectionNumber = newSectionNumber;
+	}
+
+	public void updateSectionTitle(String newSectionTitle) {
+		this.sectionTitle = newSectionTitle;
+	}
 }
