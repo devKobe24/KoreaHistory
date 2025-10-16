@@ -87,4 +87,10 @@ public class LessonService {
 			.map(ReadLessonResponseDto::new)
 			.collect(Collectors.toList());
 	}
+
+
+	@Transactional
+	public void deleteLesson(Long lessonId) {
+		lessonRepository.deleteById(lessonId);
+	}
 }
