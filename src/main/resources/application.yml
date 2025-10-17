@@ -1,6 +1,11 @@
 spring:
   application:
     name: KoreaHistory
+  datasource:
+    url: jdbc:h2:mem:koreahistory
+  h2:
+    console:
+      enabled: true
   jpa:
     hibernate:
       ddl-auto: update
