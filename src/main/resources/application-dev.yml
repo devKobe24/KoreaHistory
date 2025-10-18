@@ -1,14 +1,15 @@
 spring:
-  application:
-    name: KoreaHistory
   datasource:
     url: jdbc:h2:mem:koreahistory
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
   h2:
     console:
       enabled: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update # 개발 시에는 update나 create를 사용하여 스키마 자동 변경
     defer-datasource-initialization: true
   sql:
     init:
