@@ -25,6 +25,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.core:jackson-annotations'
 
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
     implementation 'com.h2database:h2'
 
     compileOnly 'org.projectlombok:lombok'
