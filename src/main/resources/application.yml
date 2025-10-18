@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: KoreaHistory
+  # 기본적으로 'dev' 프로필을 활성화
+  # 이 설정을 통해 별도 지정 없이 실행하면 application-dev.yml이 로드됨.
+  profiles:
+    active: dev
+
+  # --- 구분자를 사용하여 여러 프로필을 한 파일에 작성할 수도 있지만,
+  # 파일을 분리하는 것이 관리에 더 용이함.
