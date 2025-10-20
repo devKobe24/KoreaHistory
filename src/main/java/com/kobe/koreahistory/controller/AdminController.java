@@ -22,10 +22,14 @@ public class AdminController {
 	 * '/admin' 경로로 GET 요청이 오면 '/admin/index.html' 정적 리소스로 포워딩합니다.
 	 * 사용자의 브라우저 URL은 '/admin'으로 유지됩니다.
 	 */
-	@GetMapping("") // '/admin' 경로 매핑
+	@GetMapping("")
 	public String adminHome() {
-		// "forward:" 접두사를 사용하여 Spring Boot가 처리할 다른 경로로 요청을 넘깁니다.
-		// 여기서는 static 리소스 핸들러가 처리할 /admin/index.html 경로로 넘깁니다.
+		return "redirect:/admin/";
+	}
+
+	@GetMapping("/") // '/admin' 경로 매핑
+	public String indexPage() {
+		// /admin/index.html로 포워딩
 		return "forward:/admin/index.html";
 	}
 
@@ -62,5 +66,10 @@ public class AdminController {
 	@GetMapping("/content") // 'admin/content'
 	public String contentPage() {
 		return "forward:/admin/pages/content.html";
+	}
+
+	@GetMapping("/dashboard") // 'admin/dashboard'
+	public String dashboardPage() {
+		return "forward:/admin/pages/dashboard.html";
 	}
 }

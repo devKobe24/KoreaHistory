@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 주제 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/user.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+    <style>
+        .lesson-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .lesson-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .lesson-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .lesson-description {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .lesson-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .meta-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .meta-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fbbf24;
+        }
+
+        .content-section {
+            padding: 4rem 0;
+            background: var(--background-color);
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .section-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 50%;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .subsections-list {
+            margin-top: 1rem;
+        }
+
+        .subsection-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--background-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .subsection-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .subsection-icon {
+            font-size: 0.875rem;
+        }
+
+        .subsection-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .keywords-section {
+            padding: 4rem 0;
+            background: var(--surface-color);
+        }
+
+        .keywords-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .keyword-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .keyword-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .progress-section {
+            background: var(--background-color);
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .progress-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-lesson {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary-lesson {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary-lesson:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary-lesson {
+            background: var(--surface-color);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary-lesson:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>🇰🇷 KoreaHistory</h1>
+                <span>한국사 학습 플랫폼</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">홈</a></li>
+                <li><a href="chapter.html" class="nav-link">시대별 학습</a></li>
+                <li><a href="../index.html#search" class="nav-link">검색</a></li>
+                <li><a href="../index.html#about" class="nav-link">소개</a></li>
+                <li><a href="../admin/index.html" class="nav-link admin-link">관리자</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 브레드크럼 -->
+    <div class="breadcrumb">
+        <div class="container">
+            <div class="breadcrumb-content">
+                <a href="../index.html">홈</a>
+                <span>›</span>
+                <a href="chapter.html">시대별 학습</a>
+                <span>›</span>
+                <span id="breadcrumbLesson">학습 주제</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 레슨 헤더 -->
+    <section class="lesson-header" id="lessonHeader">
+        <div class="container">
+            <div class="lesson-info">
+                <h1 class="lesson-title" id="lessonTitle">학습 주제</h1>
+                <p class="lesson-description" id="lessonDescription">
+                    선택한 주제에 대한 상세한 학습 자료를 제공합니다.
+                </p>
+                <div class="lesson-meta" id="lessonMeta">
+                    <div class="meta-item">
+                        <div class="meta-label">세부 주제</div>
+                        <div class="meta-value" id="totalSections">0</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">키워드</div>
+                        <div class="meta-value" id="totalKeywords">0</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">학습 내용</div>
+                        <div class="meta-value" id="totalContents">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 컨텐츠 -->
+    <section class="content-section">
+        <div class="container">
+            <h2 class="section-title">📖 학습 내용</h2>
+            <p class="section-description">주제별로 구성된 상세한 학습 자료를 확인하세요</p>
+
+            <div class="sections-grid" id="sectionsGrid">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>학습 자료를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 키워드 섹션 -->
+    <section class="keywords-section">
+        <div class="container">
+            <h2 class="section-title">🏷️ 관련 키워드</h2>
+            <p class="section-description">이 주제와 관련된 주요 키워드들을 확인하세요</p>
+
+            <div class="keywords-grid" id="keywordsGrid">
+                <!-- 동적으로 로드될 키워드들 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 학습 진행률 -->
+    <section class="progress-section">
+        <div class="container">
+            <div class="progress-container">
+                <h3>📊 학습 진행률</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text" id="progressText">학습을 시작해보세요!</p>
+                <div class="action-buttons">
+                    <button class="btn-lesson btn-primary-lesson" onclick="startLearning()">
+                        🚀 학습 시작하기
+                    </button>
+                    <button class="btn-lesson btn-secondary-lesson" onclick="markAsCompleted()">
+                        ✅ 완료 표시
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🇰🇷 KoreaHistory</h3>
+                    <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
+                </div>
+                <div class="footer-section">
+                    <h4>학습 자료</h4>
+                    <ul>
+                        <li><a href="../index.html#chapters">시대별 학습</a></li>
+                        <li><a href="../index.html#search">자료 검색</a></li>
+                        <li><a href="../index.html#about">플랫폼 소개</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>관리자</h4>
+                    <ul>
+                        <li><a href="../admin/index.html">관리자 페이지</a></li>
+                        <li><a href="../admin/pages/login.html">관리자 로그인</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>기술 정보</h4>
+                    <ul>
+                        <li>Spring Boot + JPA</li>
+                        <li>H2 Database</li>
+                        <li>RESTful API</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KoreaHistory. 한국사 학습을 위한 모든 것.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 스크롤 투 탑 버튼 -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <span>↑</span>
+    </button>
+
+    <script src="../js/user.js"></script>
+    <script>
+        // 페이지별 JavaScript
+        let currentLesson = null;
+        let learningProgress = 0;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadLessonData();
+            setupEventListeners();
+            updateProgress();
+        });
+
+        async function loadLessonData() {
+            try {
+                // URL 파라미터에서 레슨 ID 가져오기
+                const urlParams = new URLSearchParams(window.location.search);
+                const lessonId = urlParams.get('id');
+
+                if (lessonId) {
+                    await loadSpecificLesson(lessonId);
+                } else {
+                    await loadAllLessons();
+                }
+            } catch (error) {
+                console.error('레슨 데이터 로드 오류:', error);
+                showError();
+            }
+        }
+
+        async function loadSpecificLesson(lessonId) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/v1/lessons/${lessonId}`);
+                if (!response.ok) throw new Error('레슨을 불러올 수 없습니다.');
+
+                const lesson = await response.json();
+                currentLesson = lesson;
+                displayLessonHeader(lesson);
+                displaySections(lesson.sections || []);
+                displayKeywords(lesson);
+            } catch (error) {
+                console.error('특정 레슨 로드 오류:', error);
+                showError();
+            }
+        }
+
+        async function loadAllLessons() {
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/lessons/search/all');
+                if (!response.ok) throw new Error('레슨 목록을 불러올 수 없습니다.');
+
+                const lessons = await response.json();
+                displayAllLessons(lessons);
+            } catch (error) {
+                console.error('레슨 목록 로드 오류:', error);
+                showError();
+            }
+        }
+
+        function displayLessonHeader(lesson) {
+            document.getElementById('lessonTitle').textContent = lesson.title;
+            document.getElementById('lessonDescription').textContent =
+                lesson.description || '이 주제에 대한 상세한 학습 자료를 제공합니다.';
+            document.getElementById('breadcrumbLesson').textContent = lesson.title;
+
+            // 메타 정보 업데이트
+            const totalSections = lesson.sections?.length || 0;
+            const totalKeywords = getTotalKeywords(lesson);
+            const totalContents = getTotalContents(lesson);
+
+            document.getElementById('totalSections').textContent = totalSections;
+            document.getElementById('totalKeywords').textContent = totalKeywords;
+            document.getElementById('totalContents').textContent = totalContents;
+        }
+
+        function displayAllLessons(lessons) {
+            document.getElementById('lessonTitle').textContent = '모든 학습 주제';
+            document.getElementById('lessonDescription').textContent =
+                '모든 학습 주제를 한눈에 보고 원하는 주제를 선택하여 학습하세요.';
+            document.getElementById('breadcrumbLesson').textContent = '모든 주제';
+
+            // 전체 통계 계산
+            let totalSections = 0;
+            let totalKeywords = 0;
+            let totalContents = 0;
+
+            lessons.forEach(lesson => {
+                totalSections += lesson.sections?.length || 0;
+                totalKeywords += getTotalKeywords(lesson);
+                totalContents += getTotalContents(lesson);
+            });
+
+            document.getElementById('totalSections').textContent = totalSections;
+            document.getElementById('totalKeywords').textContent = totalKeywords;
+            document.getElementById('totalContents').textContent = totalContents;
+
+            displaySections(lessons);
+        }
+
+        function displaySections(sections) {
+            const sectionsGrid = document.getElementById('sectionsGrid');
+            if (!sectionsGrid) return;
+
+            if (!sections || sections.length === 0) {
+                sectionsGrid.innerHTML = `
+                    <div class="no-search">
+                        <div class="no-search-icon">📚</div>
+                        <p>아직 등록된 학습 자료가 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            sectionsGrid.innerHTML = '';
+
+            sections.forEach((section, index) => {
+                const sectionCard = createSectionCard(section, index);
+                sectionsGrid.appendChild(sectionCard);
+            });
+
+            // 애니메이션 효과
+            animateCards(sectionsGrid.children);
+        }
+
+        function createSectionCard(section, index) {
+            const card = document.createElement('div');
+            card.className = 'section-card';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+
+            const sectionIcon = getSectionIcon(section.title);
+
+            card.innerHTML = `
+                <div class="section-header">
+                    <div class="section-icon">${sectionIcon}</div>
+                    <div>
+                        <h3 class="section-title">${section.title}</h3>
+                        <p class="section-description">${section.description || '이 섹션에 대한 상세한 내용을 제공합니다.'}</p>
+                    </div>
+                </div>
+                <div class="subsections-list">
+                    ${section.subsections?.map(subsection => `
+                        <div class="subsection-item" onclick="openSubsection('${subsection.id}')">
+                            <span class="subsection-icon">📄</span>
+                            <span class="subsection-title">${subsection.title}</span>
+                        </div>
+                    `).join('') || '<p style="color: var(--text-muted); font-size: 0.875rem;">세부 내용이 없습니다.</p>'}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function getSectionIcon(title) {
+            const iconMap = {
+                '정치': '🏛️',
+                '경제': '💰',
+                '사회': '👥',
+                '문화': '🎭',
+                '종교': '⛪',
+                '과학': '🔬',
+                '기술': '⚙️',
+                '예술': '🎨',
+                '문학': '📚',
+                '철학': '🤔'
+            };
+
+            for (const [keyword, icon] of Object.entries(iconMap)) {
+                if (title.includes(keyword)) {
+                    return icon;
+                }
+            }
+
+            return '📖';
+        }
+
+        function displayKeywords(lesson) {
+            const keywordsGrid = document.getElementById('keywordsGrid');
+            if (!keywordsGrid) return;
+
+            const keywords = extractKeywords(lesson);
+
+            if (keywords.length === 0) {
+                keywordsGrid.innerHTML = '<p style="color: var(--text-muted);">관련 키워드가 없습니다.</p>';
+                return;
+            }
+
+            keywordsGrid.innerHTML = '';
+
+            keywords.forEach(keyword => {
+                const keywordTag = document.createElement('div');
+                keywordTag.className = 'keyword-tag';
+                keywordTag.textContent = keyword;
+                keywordTag.addEventListener('click', () => searchKeyword(keyword));
+                keywordsGrid.appendChild(keywordTag);
+            });
+        }
+
+        function extractKeywords(lesson) {
+            const keywords = [];
+
+            if (lesson.sections) {
+                lesson.sections.forEach(section => {
+                    if (section.subsections) {
+                        section.subsections.forEach(subsection => {
+                            if (subsection.topics) {
+                                subsection.topics.forEach(topic => {
+                                    if (topic.keywords) {
+                                        keywords.push(...topic.keywords.map(k => k.name || k));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            return [...new Set(keywords)]; // 중복 제거
+        }
+
+        function getTotalKeywords(lesson) {
+            return extractKeywords(lesson).length;
+        }
+
+        function getTotalContents(lesson) {
+            let total = 0;
+            if (lesson.sections) {
+                lesson.sections.forEach(section => {
+                    if (section.subsections) {
+                        section.subsections.forEach(subsection => {
+                            if (subsection.topics) {
+                                subsection.topics.forEach(topic => {
+                                    total += topic.contents?.length || 0;
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            return total;
+        }
+
+        function openSubsection(subsectionId) {
+            alert(`"${subsectionId}" 상세 내용을 표시합니다.\n\n(실제 구현에서는 상세 모달 또는 페이지 표시)`);
+        }
+
+        function searchKeyword(keyword) {
+            // 검색 페이지로 이동하거나 검색 결과 표시
+            window.location.href = `../index.html#search&q=${encodeURIComponent(keyword)}`;
+        }
+
+        function startLearning() {
+            learningProgress = 10;
+            updateProgress();
+            alert('학습을 시작합니다! 차근차근 따라해보세요.');
+        }
+
+        function markAsCompleted() {
+            learningProgress = 100;
+            updateProgress();
+            alert('학습을 완료했습니다! 수고하셨습니다.');
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            if (progressFill && progressText) {
+                progressFill.style.width = `${learningProgress}%`;
+
+                if (learningProgress === 0) {
+                    progressText.textContent = '학습을 시작해보세요!';
+                } else if (learningProgress < 50) {
+                    progressText.textContent = `학습 진행 중... ${learningProgress}%`;
+                } else if (learningProgress < 100) {
+                    progressText.textContent = `거의 다 왔어요! ${learningProgress}%`;
+                } else {
+                    progressText.textContent = '학습 완료! 🎉';
+                }
+            }
+        }
+
+        function showError() {
+            const sectionsGrid = document.getElementById('sectionsGrid');
+            if (sectionsGrid) {
+                sectionsGrid.innerHTML = `
+                    <div class="no-search">
+                        <div class="no-search-icon">⚠️</div>
+                        <p>데이터를 불러오는데 실패했습니다. 다시 시도해주세요.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function setupEventListeners() {
+            // 스크롤 이벤트
+            window.addEventListener('scroll', handleScroll);
+        }
+
+        function handleScroll() {
+            const scrollBtn = document.getElementById('scrollToTop');
+            if (scrollBtn) {
+                if (window.scrollY > 300) {
+                    scrollBtn.classList.add('visible');
+                } else {
+                    scrollBtn.classList.remove('visible');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

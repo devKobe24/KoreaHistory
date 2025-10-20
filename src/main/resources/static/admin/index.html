@@ -4,235 +4,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KoreaHistory 관리자 페이지</title>
+    <title>KoreaHistory - 한국사 학습 시스템</title>
     <link rel="stylesheet" href="./css/admin.css">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-hero {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary-hero {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary-hero:hover {
+            background: #f8f9fa;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary-hero {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary-hero:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .features-section {
+            padding: 4rem 2rem;
+            background: #f8f9fa;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .stats-section {
+            background: #333;
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .footer {
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-hero {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <!-- 헤더 -->
-    <header class="header">
-        <h1>🇰🇷 KoreaHistory 관리자</h1>
-        <p>한국사 학습 데이터 관리 시스템</p>
-    </header>
+    <!-- 히어로 섹션 -->
+    <section class="hero-section">
+        <h1 class="hero-title">🇰🇷 KoreaHistory</h1>
+        <p class="hero-subtitle">한국사 학습 데이터 관리 시스템</p>
+        <p class="hero-description">
+            체계적이고 효율적인 한국사 학습을 위한 7단계 계층적 데이터 관리 시스템입니다.
+            선사시대부터 현대까지, 모든 한국사 학습 자료를 체계적으로 관리하고 학습할 수 있습니다.
+        </p>
+        <div class="cta-buttons">
+            <a href="pages/login.html" class="btn-hero btn-primary-hero">
+                🔐 관리자 로그인
+            </a>
+            <a href="pages/dashboard.html" class="btn-hero btn-secondary-hero">
+                📊 대시보드 보기
+            </a>
+        </div>
+    </section>
 
-    <!-- 네비게이션 -->
-    <nav class="nav">
-        <ul class="nav-list">
-            <li class="nav-item">
-                <a href="index.html" class="active">대시보드</a>
-            </li>
-            <li class="nav-item">
-                <a href="pages/chapter.html">대분류 (Chapter)</a>
-            </li>
-            <li class="nav-item">
-                <a href="pages/lesson.html">중분류 (Lesson)</a>
-            </li>
-            <li class="nav-item">
-                <a href="pages/section.html">소분류 (Section)</a>
-            </li>
-            <li class="nav-item">
-                <a href="pages/subsection.html">상세분류 (Subsection)</a>
-            </li>
-            <li class="nav-item">
-                <a href="pages/topic.html">주제 (Topic)</a>
-            </li>
-            <li class="nav-item">
-                <a href="pages/keyword.html">키워드 (Keyword)</a>
-            </li>
-            <li class="nav-item">
-                <a href="pages/content.html">내용 (Content)</a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- 메인 컨텐츠 -->
-    <main class="container">
-        <!-- 대시보드 개요 -->
-        <div class="card fade-in">
-            <h2>📊 시스템 개요</h2>
-            <div class="hierarchy">
-                <p><strong>KoreaHistory</strong>는 한국사 학습을 위한 7단계 계층적 데이터 관리 시스템입니다.</p>
-                <div class="hierarchy-item">
-                    <span class="hierarchy-level">1단계</span>
-                    <strong>Chapter (대분류)</strong> - 선사시대, 고대, 중세 등 시대별 대분류
+    <!-- 기능 소개 섹션 -->
+    <section class="features-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 3rem; font-size: 2.5rem; color: #333;">
+                🚀 주요 기능
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3 class="feature-title">계층적 데이터 구조</h3>
+                    <p class="feature-description">
+                        Chapter → Lesson → Section → Subsection → Topic → Keyword → Content의
+                        7단계 계층적 구조로 체계적인 학습 자료 관리
+                    </p>
                 </div>
-                <div class="hierarchy-item">
-                    <span class="hierarchy-level">2단계</span>
-                    <strong>Lesson (중분류)</strong> - 각 시대 내 세부 주제
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">강력한 검색 기능</h3>
+                    <p class="feature-description">
+                        키워드 기반 부분 검색으로 원하는 학습 자료를 빠르게 찾을 수 있습니다.
+                        다중 키워드 검색도 지원합니다.
+                    </p>
                 </div>
-                <div class="hierarchy-item">
-                    <span class="hierarchy-level">3단계</span>
-                    <strong>Section (소분류)</strong> - 주제별 세부 분류
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">완전한 CRUD 지원</h3>
+                    <p class="feature-description">
+                        생성, 조회, 수정, 삭제의 모든 기능을 지원하며,
+                        Cascade 삭제로 데이터 일관성을 보장합니다.
+                    </p>
                 </div>
-                <div class="hierarchy-item">
-                    <span class="hierarchy-level">4단계</span>
-                    <strong>Subsection (상세분류)</strong> - 더욱 세분화된 주제
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">직관적인 관리 인터페이스</h3>
+                    <p class="feature-description">
+                        사용자 친화적인 웹 인터페이스로 쉬운 데이터 관리가 가능합니다.
+                        실시간 데이터 업데이트를 지원합니다.
+                    </p>
                 </div>
-                <div class="hierarchy-item">
-                    <span class="hierarchy-level">5단계</span>
-                    <strong>Topic (주제)</strong> - 구체적인 학습 주제
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3 class="feature-title">RESTful API</h3>
+                    <p class="feature-description">
+                        표준 REST API를 제공하여 다른 시스템과의 연동이 가능합니다.
+                        JSON 형태의 데이터 교환을 지원합니다.
+                    </p>
                 </div>
-                <div class="hierarchy-item">
-                    <span class="hierarchy-level">6단계</span>
-                    <strong>Keyword (키워드)</strong> - 핵심 키워드 그룹
-                </div>
-                <div class="hierarchy-item">
-                    <span class="hierarchy-level">7단계</span>
-                    <strong>Content (내용)</strong> - 상세 학습 내용
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3 class="feature-title">안정적인 데이터 저장</h3>
+                    <p class="feature-description">
+                        H2 데이터베이스를 사용하여 빠르고 안정적인 데이터 저장을 제공합니다.
+                        메모리 기반으로 빠른 성능을 보장합니다.
+                    </p>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- 빠른 액션 -->
-        <div class="card fade-in">
-            <h2>⚡ 빠른 액션</h2>
-            <div class="grid grid-3">
-                <div class="text-center">
-                    <a href="pages/chapter.html" class="btn btn-primary">대분류 관리</a>
-                    <p class="mt-1">Chapter 생성 및 수정</p>
-                </div>
-                <div class="text-center">
-                    <a href="pages/lesson.html" class="btn btn-success">중분류 관리</a>
-                    <p class="mt-1">Lesson 생성 및 수정</p>
-                </div>
-                <div class="text-center">
-                    <a href="pages/keyword.html" class="btn btn-warning">키워드 관리</a>
-                    <p class="mt-1">Keyword 검색 및 수정</p>
-                </div>
+    <!-- 통계 섹션 -->
+    <section class="stats-section">
+        <h2 style="margin-bottom: 2rem; font-size: 2rem;">📈 시스템 현황</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">7</div>
+                <div class="stat-label">계층 단계</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">확장 가능한 데이터</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">CRUD 지원</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">⚡</div>
+                <div class="stat-label">실시간 처리</div>
             </div>
         </div>
-
-        <!-- API 엔드포인트 정보 -->
-        <div class="card fade-in">
-            <h2>🔗 API 엔드포인트</h2>
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>메서드</th>
-                            <th>엔드포인트</th>
-                            <th>설명</th>
-                            <th>관리 페이지</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="btn btn-success btn-small">GET</span></td>
-                            <td>/api/v1/chapters/search/all</td>
-                            <td>모든 대분류 조회</td>
-                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="btn btn-primary btn-small">POST</span></td>
-                            <td>/api/v1/create/chapter</td>
-                            <td>대분류 생성</td>
-                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="btn btn-warning btn-small">PATCH</span></td>
-                            <td>/api/v1/chapters/{id}/title</td>
-                            <td>대분류 제목 수정</td>
-                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="btn btn-danger btn-small">DELETE</span></td>
-                            <td>/api/v1/chapters/{id}</td>
-                            <td>대분류 삭제</td>
-                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="btn btn-success btn-small">GET</span></td>
-                            <td>/api/v1/search/keywords</td>
-                            <td>키워드 검색</td>
-                            <td><a href="pages/keyword.html">Keyword 관리</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="btn btn-primary btn-small">POST</span></td>
-                            <td>/api/v1/create/keyword</td>
-                            <td>키워드 생성</td>
-                            <td><a href="pages/keyword.html">Keyword 관리</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="btn btn-primary btn-small">POST</span></td>
-                            <td>/api/v1/create/section/{lessonId}</td>
-                            <td>소분류 생성</td>
-                            <td><a href="pages/section.html">Section 관리</a></td>
-                        </tr>
-                        <tr>
-                            <td><span class="btn btn-primary btn-small">POST</span></td>
-                            <td>/api/v1/create/subsection/{sectionId}</td>
-                            <td>상세분류 생성</td>
-                            <td><a href="pages/subsection.html">Subsection 관리</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 시스템 상태 -->
-        <div class="card fade-in">
-            <h2>📈 시스템 상태</h2>
-            <div class="grid grid-2">
-                <div>
-                    <h3>서버 정보</h3>
-                    <ul>
-                        <li><strong>서버 주소:</strong> http://localhost:8080</li>
-                        <li><strong>API 베이스:</strong> /api/v1</li>
-                        <li><strong>데이터베이스:</strong> H2 (In-Memory)</li>
-                        <li><strong>H2 콘솔:</strong> <a href="http://localhost:8080/h2-console"
-                                target="_blank">http://localhost:8080/h2-console</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3>데이터베이스 접속 정보</h3>
-                    <ul>
-                        <li><strong>JDBC URL:</strong> jdbc:h2:mem:koreahistory</li>
-                        <li><strong>Username:</strong> sa</li>
-                        <li><strong>Password:</strong> (공백)</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- 사용 가이드 -->
-        <div class="card fade-in">
-            <h2>📖 사용 가이드</h2>
-            <div class="grid grid-2">
-                <div>
-                    <h3>1. 데이터 생성 순서</h3>
-                    <ol>
-                        <li>Chapter (대분류) 생성</li>
-                        <li>Lesson (중분류) 생성</li>
-                        <li>Section (소분류) 생성</li>
-                        <li>Subsection (상세분류) 생성</li>
-                        <li>Topic (주제) 생성</li>
-                        <li>Keyword (키워드) 생성</li>
-                        <li>Content (내용) 생성</li>
-                    </ol>
-                </div>
-                <div>
-                    <h3>2. 주요 기능</h3>
-                    <ul>
-                        <li>✅ 계층적 데이터 구조 관리</li>
-                        <li>✅ 완전한 CRUD 지원</li>
-                        <li>✅ 다중 키워드 관리</li>
-                        <li>✅ Cascade 삭제</li>
-                        <li>✅ 부분 검색 지원</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </main>
+    </section>
 
     <!-- 푸터 -->
-    <footer style="background: #333; color: white; text-align: center; padding: 2rem; margin-top: 4rem;">
-        <p>&copy; 2025 KoreaHistory 관리자 페이지. 한국사 학습 데이터 관리 시스템.</p>
-        <p>Spring Boot + JPA + H2 Database</p>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="pages/login.html">관리자 로그인</a>
+                <a href="pages/dashboard.html">대시보드</a>
+                <a href="http://localhost:8080/h2-console" target="_blank">데이터베이스 콘솔</a>
+                <a href="http://localhost:8080/api/v1" target="_blank">API 문서</a>
+            </div>
+            <p>&copy; 2025 KoreaHistory. 한국사 학습 데이터 관리 시스템.</p>
+            <p>Spring Boot + JPA + H2 Database | Made with ❤️ for Korean History Education</p>
+        </div>
     </footer>
 
-    <script src="./js/admin.js"></script>
+    <script>
+        // 페이지 로드 시 애니메이션 효과
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // 스크롤 시 통계 애니메이션
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    statNumbers.forEach(stat => {
+                        if (stat.textContent === '∞') {
+                            stat.style.animation = 'pulse 2s infinite';
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+    </script>
+
+    <style>
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
 </body>
 
 </html>
