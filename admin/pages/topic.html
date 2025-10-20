@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 관리 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 Topic (주제) 관리</h1>
+        <p>Subsection 하위의 주제 관리</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="../index.html">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="chapter.html">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="lesson.html">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="section.html">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="subsection.html">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="topic.html" class="active">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="keyword.html">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="content.html">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- Topic 생성 폼 -->
+        <div class="card fade-in">
+            <h2>📝 새 Topic 생성</h2>
+            <form id="createTopicForm">
+                <div class="form-group">
+                    <label for="subsectionId">부모 Subsection ID</label>
+                    <input type="number" id="subsectionId" name="subsectionId" class="form-control"
+                        placeholder="Subsection ID를 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label for="topicNumber">Topic 번호</label>
+                    <input type="number" id="topicNumber" name="topicNumber" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="topicTitle">Topic 제목</label>
+                    <input type="text" id="topicTitle" name="topicTitle" class="form-control"
+                        placeholder="예: 도구, 생활, 사회" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Topic 생성</button>
+            </form>
+        </div>
+
+        <!-- 안내 -->
+        <div class="card fade-in">
+            <h2>📋 Topic 관리</h2>
+            <div class="alert alert-info">
+                <strong>안내:</strong> Topic은 Subsection 하위에 생성됩니다.
+                Subsection ID를 확인하려면 상위 계층을 통해 조회해보세요.
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/topic.js"></script>
+</body>
+
+</html>

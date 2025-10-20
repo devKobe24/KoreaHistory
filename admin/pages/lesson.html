@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 관리 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 Lesson (중분류) 관리</h1>
+        <p>Chapter 하위의 중분류 관리</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="../index.html">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="chapter.html">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="lesson.html" class="active">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="section.html">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="subsection.html">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="topic.html">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="keyword.html">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="content.html">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- Lesson 생성 폼 -->
+        <div class="card fade-in">
+            <h2>📝 새 Lesson 생성</h2>
+            <form id="createLessonForm">
+                <div class="form-group">
+                    <label for="chapterSelect">부모 Chapter</label>
+                    <select id="chapterSelect" name="chapterId" class="form-control" required>
+                        <option value="">Chapter를 선택하세요</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lessonNumber">Lesson 번호</label>
+                    <input type="number" id="lessonNumber" name="lessonNumber" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="lessonTitle">Lesson 제목</label>
+                    <input type="text" id="lessonTitle" name="lessonTitle" class="form-control"
+                        placeholder="예: 구석기~철기 시대" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Lesson 생성</button>
+            </form>
+        </div>
+
+        <!-- Lesson 목록 -->
+        <div class="card fade-in">
+            <h2>📋 Lesson 목록</h2>
+            <div class="mb-2">
+                <button onclick="loadLessons()" class="btn btn-secondary">새로고침</button>
+            </div>
+            <div id="lessonsList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 수정 모달 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Lesson 수정</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editLessonForm">
+                    <input type="hidden" id="editLessonId" name="id">
+                    <div class="form-group">
+                        <label for="editLessonNumber">Lesson 번호</label>
+                        <input type="number" id="editLessonNumber" name="lessonNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLessonTitle">Lesson 제목</label>
+                        <input type="text" id="editLessonTitle" name="lessonTitle" class="form-control" required>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                        <button type="submit" class="btn btn-primary">수정</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/lesson.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KoreaHistory 관리자 페이지</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 KoreaHistory 관리자</h1>
+        <p>한국사 학습 데이터 관리 시스템</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="index.html" class="active">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="pages/chapter.html">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="pages/lesson.html">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="pages/section.html">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="pages/subsection.html">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="pages/topic.html">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="pages/keyword.html">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="pages/content.html">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- 대시보드 개요 -->
+        <div class="card fade-in">
+            <h2>📊 시스템 개요</h2>
+            <div class="hierarchy">
+                <p><strong>KoreaHistory</strong>는 한국사 학습을 위한 7단계 계층적 데이터 관리 시스템입니다.</p>
+                <div class="hierarchy-item">
+                    <span class="hierarchy-level">1단계</span>
+                    <strong>Chapter (대분류)</strong> - 선사시대, 고대, 중세 등 시대별 대분류
+                </div>
+                <div class="hierarchy-item">
+                    <span class="hierarchy-level">2단계</span>
+                    <strong>Lesson (중분류)</strong> - 각 시대 내 세부 주제
+                </div>
+                <div class="hierarchy-item">
+                    <span class="hierarchy-level">3단계</span>
+                    <strong>Section (소분류)</strong> - 주제별 세부 분류
+                </div>
+                <div class="hierarchy-item">
+                    <span class="hierarchy-level">4단계</span>
+                    <strong>Subsection (상세분류)</strong> - 더욱 세분화된 주제
+                </div>
+                <div class="hierarchy-item">
+                    <span class="hierarchy-level">5단계</span>
+                    <strong>Topic (주제)</strong> - 구체적인 학습 주제
+                </div>
+                <div class="hierarchy-item">
+                    <span class="hierarchy-level">6단계</span>
+                    <strong>Keyword (키워드)</strong> - 핵심 키워드 그룹
+                </div>
+                <div class="hierarchy-item">
+                    <span class="hierarchy-level">7단계</span>
+                    <strong>Content (내용)</strong> - 상세 학습 내용
+                </div>
+            </div>
+        </div>
+
+        <!-- 빠른 액션 -->
+        <div class="card fade-in">
+            <h2>⚡ 빠른 액션</h2>
+            <div class="grid grid-3">
+                <div class="text-center">
+                    <a href="pages/chapter.html" class="btn btn-primary">대분류 관리</a>
+                    <p class="mt-1">Chapter 생성 및 수정</p>
+                </div>
+                <div class="text-center">
+                    <a href="pages/lesson.html" class="btn btn-success">중분류 관리</a>
+                    <p class="mt-1">Lesson 생성 및 수정</p>
+                </div>
+                <div class="text-center">
+                    <a href="pages/keyword.html" class="btn btn-warning">키워드 관리</a>
+                    <p class="mt-1">Keyword 검색 및 수정</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- API 엔드포인트 정보 -->
+        <div class="card fade-in">
+            <h2>🔗 API 엔드포인트</h2>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>메서드</th>
+                            <th>엔드포인트</th>
+                            <th>설명</th>
+                            <th>관리 페이지</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="btn btn-success btn-small">GET</span></td>
+                            <td>/api/v1/chapters/search/all</td>
+                            <td>모든 대분류 조회</td>
+                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="btn btn-primary btn-small">POST</span></td>
+                            <td>/api/v1/create/chapter</td>
+                            <td>대분류 생성</td>
+                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="btn btn-warning btn-small">PATCH</span></td>
+                            <td>/api/v1/chapters/{id}/title</td>
+                            <td>대분류 제목 수정</td>
+                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="btn btn-danger btn-small">DELETE</span></td>
+                            <td>/api/v1/chapters/{id}</td>
+                            <td>대분류 삭제</td>
+                            <td><a href="pages/chapter.html">Chapter 관리</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="btn btn-success btn-small">GET</span></td>
+                            <td>/api/v1/search/keywords</td>
+                            <td>키워드 검색</td>
+                            <td><a href="pages/keyword.html">Keyword 관리</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="btn btn-primary btn-small">POST</span></td>
+                            <td>/api/v1/create/keyword</td>
+                            <td>키워드 생성</td>
+                            <td><a href="pages/keyword.html">Keyword 관리</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="btn btn-primary btn-small">POST</span></td>
+                            <td>/api/v1/create/section/{lessonId}</td>
+                            <td>소분류 생성</td>
+                            <td><a href="pages/section.html">Section 관리</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="btn btn-primary btn-small">POST</span></td>
+                            <td>/api/v1/create/subsection/{sectionId}</td>
+                            <td>상세분류 생성</td>
+                            <td><a href="pages/subsection.html">Subsection 관리</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 시스템 상태 -->
+        <div class="card fade-in">
+            <h2>📈 시스템 상태</h2>
+            <div class="grid grid-2">
+                <div>
+                    <h3>서버 정보</h3>
+                    <ul>
+                        <li><strong>서버 주소:</strong> http://localhost:8080</li>
+                        <li><strong>API 베이스:</strong> /api/v1</li>
+                        <li><strong>데이터베이스:</strong> H2 (In-Memory)</li>
+                        <li><strong>H2 콘솔:</strong> <a href="http://localhost:8080/h2-console"
+                                target="_blank">http://localhost:8080/h2-console</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>데이터베이스 접속 정보</h3>
+                    <ul>
+                        <li><strong>JDBC URL:</strong> jdbc:h2:mem:koreahistory</li>
+                        <li><strong>Username:</strong> sa</li>
+                        <li><strong>Password:</strong> (공백)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 사용 가이드 -->
+        <div class="card fade-in">
+            <h2>📖 사용 가이드</h2>
+            <div class="grid grid-2">
+                <div>
+                    <h3>1. 데이터 생성 순서</h3>
+                    <ol>
+                        <li>Chapter (대분류) 생성</li>
+                        <li>Lesson (중분류) 생성</li>
+                        <li>Section (소분류) 생성</li>
+                        <li>Subsection (상세분류) 생성</li>
+                        <li>Topic (주제) 생성</li>
+                        <li>Keyword (키워드) 생성</li>
+                        <li>Content (내용) 생성</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3>2. 주요 기능</h3>
+                    <ul>
+                        <li>✅ 계층적 데이터 구조 관리</li>
+                        <li>✅ 완전한 CRUD 지원</li>
+                        <li>✅ 다중 키워드 관리</li>
+                        <li>✅ Cascade 삭제</li>
+                        <li>✅ 부분 검색 지원</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer style="background: #333; color: white; text-align: center; padding: 2rem; margin-top: 4rem;">
+        <p>&copy; 2025 KoreaHistory 관리자 페이지. 한국사 학습 데이터 관리 시스템.</p>
+        <p>Spring Boot + JPA + H2 Database</p>
+    </footer>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

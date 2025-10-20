@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content 관리 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 Content (내용) 관리</h1>
+        <p>Keyword 하위의 상세 내용 관리</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="../index.html">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="chapter.html">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="lesson.html">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="section.html">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="subsection.html">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="topic.html">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="keyword.html">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="content.html" class="active">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- Content 생성 폼 -->
+        <div class="card fade-in">
+            <h2>📝 새 Content 생성</h2>
+            <form id="createContentForm">
+                <div class="form-group">
+                    <label for="keywordId">부모 Keyword ID</label>
+                    <input type="number" id="keywordId" name="keywordId" class="form-control"
+                        placeholder="Keyword ID를 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label for="details">상세 내용 (줄바꿈으로 구분)</label>
+                    <textarea id="details" name="details" class="form-control" rows="5"
+                        placeholder="각 줄이 하나의 detail이 됩니다&#10;예:&#10;뗀석기의 사용법&#10;뗀석기의 특징&#10;뗀석기의 역사적 의의"
+                        required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Content 생성</button>
+            </form>
+        </div>
+
+        <!-- 안내 -->
+        <div class="card fade-in">
+            <h2>📋 Content 관리</h2>
+            <div class="alert alert-info">
+                <strong>안내:</strong> Content는 Keyword 하위에 생성됩니다.
+                Keyword ID를 확인하려면 <a href="keyword.html">Keyword 관리 페이지</a>에서 키워드를 검색해보세요.
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/content.js"></script>
+</body>
+
+</html>

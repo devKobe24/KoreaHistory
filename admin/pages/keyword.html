@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyword 관리 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 Keyword (키워드) 관리</h1>
+        <p>핵심 키워드 그룹 관리 및 검색</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="../index.html">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="chapter.html">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="lesson.html">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="section.html">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="subsection.html">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="topic.html">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="keyword.html" class="active">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="content.html">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- Keyword 검색 -->
+        <div class="card fade-in">
+            <h2>🔍 Keyword 검색</h2>
+            <form id="searchKeywordForm">
+                <div class="form-group">
+                    <label for="searchKeyword">검색어</label>
+                    <input type="text" id="searchKeyword" name="keyword" class="form-control"
+                        placeholder="키워드를 입력하세요 (예: 뗀석기)" required>
+                </div>
+                <button type="submit" class="btn btn-primary">검색</button>
+            </form>
+        </div>
+
+        <!-- Keyword 생성 폼 -->
+        <div class="card fade-in">
+            <h2>📝 새 Keyword 생성</h2>
+            <form id="createKeywordForm">
+                <div class="form-group">
+                    <label for="topicTitle">부모 Topic 제목</label>
+                    <input type="text" id="topicTitle" name="topicTitle" class="form-control" placeholder="예: 구석기 도구"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="keywordNumber">Keyword 번호</label>
+                    <input type="number" id="keywordNumber" name="keywordNumber" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="keywords">키워드들 (쉼표로 구분)</label>
+                    <input type="text" id="keywords" name="keywords" class="form-control" placeholder="예: 뗀석기, 주먹도끼, 찍개"
+                        required>
+                </div>
+                <button type="submit" class="btn btn-primary">Keyword 생성</button>
+            </form>
+        </div>
+
+        <!-- 검색 결과 및 Keyword 목록 -->
+        <div class="card fade-in">
+            <h2>📋 Keyword 목록</h2>
+            <div class="mb-2">
+                <button onclick="clearResults()" class="btn btn-secondary">결과 초기화</button>
+            </div>
+            <div id="keywordsList">
+                <div class="alert alert-info">키워드를 검색하거나 생성해보세요.</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 수정 모달 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Keyword 수정</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editKeywordForm">
+                    <input type="hidden" id="editKeywordId" name="id">
+                    <div class="form-group">
+                        <label for="editKeywordNumber">Keyword 번호</label>
+                        <input type="number" id="editKeywordNumber" name="keywordNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editKeywords">키워드들 (쉼표로 구분)</label>
+                        <input type="text" id="editKeywords" name="keywords" class="form-control" required>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                        <button type="submit" class="btn btn-primary">수정</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/keyword.js"></script>
+</body>
+
+</html>
