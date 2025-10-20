@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subsection 관리 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 Subsection (상세분류) 관리</h1>
+        <p>Section 하위의 상세분류 관리</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="../index.html">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="chapter.html">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="lesson.html">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="section.html">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="subsection.html" class="active">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="topic.html">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="keyword.html">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="content.html">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- Subsection 생성 폼 -->
+        <div class="card fade-in">
+            <h2>📝 새 Subsection 생성</h2>
+            <form id="createSubsectionForm">
+                <div class="form-group">
+                    <label for="sectionId">부모 Section ID</label>
+                    <input type="number" id="sectionId" name="sectionId" class="form-control"
+                        placeholder="Section ID를 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label for="subsectionNumber">Subsection 번호</label>
+                    <input type="number" id="subsectionNumber" name="subsectionNumber" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="subsectionTitle">Subsection 제목</label>
+                    <input type="text" id="subsectionTitle" name="subsectionTitle" class="form-control"
+                        placeholder="예: 구석기 시대" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Subsection 생성</button>
+            </form>
+        </div>
+
+        <!-- 안내 -->
+        <div class="card fade-in">
+            <h2>📋 Subsection 관리</h2>
+            <div class="alert alert-info">
+                <strong>안내:</strong> Subsection은 Section 하위에 생성됩니다.
+                Section ID를 확인하려면 <a href="section.html">Section 관리 페이지</a>에서 Section을 조회해보세요.
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/subsection.js"></script>
+</body>
+
+</html>

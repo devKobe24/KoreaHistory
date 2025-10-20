@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 관리 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 Chapter (대분류) 관리</h1>
+        <p>한국사 시대별 대분류 관리</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="../index.html">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="chapter.html" class="active">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="lesson.html">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="section.html">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="subsection.html">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="topic.html">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="keyword.html">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="content.html">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- Chapter 생성 폼 -->
+        <div class="card fade-in">
+            <h2>📝 새 Chapter 생성</h2>
+            <form id="createChapterForm">
+                <div class="form-group">
+                    <label for="chapterNumber">Chapter 번호</label>
+                    <input type="number" id="chapterNumber" name="chapterNumber" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="chapterTitle">Chapter 제목</label>
+                    <input type="text" id="chapterTitle" name="chapterTitle" class="form-control"
+                        placeholder="예: 선사시대, 고대" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Chapter 생성</button>
+            </form>
+        </div>
+
+        <!-- Chapter 목록 -->
+        <div class="card fade-in">
+            <h2>📋 Chapter 목록</h2>
+            <div class="mb-2">
+                <button onclick="loadChapters()" class="btn btn-secondary">새로고침</button>
+            </div>
+            <div id="chaptersList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 수정 모달 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chapter 수정</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editChapterForm">
+                    <input type="hidden" id="editChapterId" name="id">
+                    <div class="form-group">
+                        <label for="editChapterNumber">Chapter 번호</label>
+                        <input type="number" id="editChapterNumber" name="chapterNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editChapterTitle">Chapter 제목</label>
+                        <input type="text" id="editChapterTitle" name="chapterTitle" class="form-control" required>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                        <button type="submit" class="btn btn-primary">수정</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/chapter.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 관리 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🇰🇷 Section (소분류) 관리</h1>
+        <p>Lesson 하위의 소분류 관리</p>
+    </header>
+
+    <!-- 네비게이션 -->
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="../index.html">대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a href="chapter.html">대분류 (Chapter)</a>
+            </li>
+            <li class="nav-item">
+                <a href="lesson.html">중분류 (Lesson)</a>
+            </li>
+            <li class="nav-item">
+                <a href="section.html" class="active">소분류 (Section)</a>
+            </li>
+            <li class="nav-item">
+                <a href="subsection.html">상세분류 (Subsection)</a>
+            </li>
+            <li class="nav-item">
+                <a href="topic.html">주제 (Topic)</a>
+            </li>
+            <li class="nav-item">
+                <a href="keyword.html">키워드 (Keyword)</a>
+            </li>
+            <li class="nav-item">
+                <a href="content.html">내용 (Content)</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="container">
+        <!-- Section 생성 폼 -->
+        <div class="card fade-in">
+            <h2>📝 새 Section 생성</h2>
+            <form id="createSectionForm">
+                <div class="form-group">
+                    <label for="lessonSelect">부모 Lesson</label>
+                    <select id="lessonSelect" name="lessonId" class="form-control" required>
+                        <option value="">Lesson을 선택하세요</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sectionNumber">Section 번호</label>
+                    <input type="number" id="sectionNumber" name="sectionNumber" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="sectionTitle">Section 제목</label>
+                    <input type="text" id="sectionTitle" name="sectionTitle" class="form-control"
+                        placeholder="예: 구석기와 신석기" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Section 생성</button>
+            </form>
+        </div>
+
+        <!-- Section 검색 -->
+        <div class="card fade-in">
+            <h2>🔍 Section 상세 조회</h2>
+            <form id="searchSectionForm">
+                <div class="form-group">
+                    <label for="sectionId">Section ID</label>
+                    <input type="number" id="sectionId" name="sectionId" class="form-control"
+                        placeholder="Section ID를 입력하세요" required>
+                </div>
+                <button type="submit" class="btn btn-primary">조회</button>
+            </form>
+        </div>
+
+        <!-- Section 목록 -->
+        <div class="card fade-in">
+            <h2>📋 Section 목록</h2>
+            <div class="mb-2">
+                <button onclick="loadSections()" class="btn btn-secondary">새로고침</button>
+            </div>
+            <div id="sectionsList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 상세 정보 -->
+        <div class="card fade-in" id="sectionDetailCard" style="display: none;">
+            <h2>📄 Section 상세 정보</h2>
+            <div id="sectionDetail">
+                <!-- 상세 정보가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 수정 모달 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Section 수정</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editSectionForm">
+                    <input type="hidden" id="editSectionId" name="id">
+                    <div class="form-group">
+                        <label for="editSectionNumber">Section 번호</label>
+                        <input type="number" id="editSectionNumber" name="sectionNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSectionTitle">Section 제목</label>
+                        <input type="text" id="editSectionTitle" name="sectionTitle" class="form-control" required>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                        <button type="submit" class="btn btn-primary">수정</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/section.js"></script>
+</body>
+
+</html>
