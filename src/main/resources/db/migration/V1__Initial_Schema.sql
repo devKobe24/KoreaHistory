@@ -4,7 +4,7 @@ CREATE TABLE chapter (
     chapter_number INTEGER NOT NULL,
     chapter_title VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHASET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. Lesson (중분류) - Chapter에 종속
 CREATE TABLE lesson (
@@ -73,6 +73,17 @@ CREATE TABLE keyword (
                      FOREIGN KEY (topic_id)
                      REFERENCES topic (id)
                      ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 7. keywords (Keyword의 @ElementCollection) - Keyword에 종속
+CREATE TABLE keywords (
+                          keywords_id BIGINT NOT NULL,
+                          keywords_value VARCHAR(255),
+                          KEY idx_keywords_keyword (keywords_id),
+                          CONSTRAINT fk_keywords_to_keyword
+                              FOREIGN KEY (keywords_id)
+                                  REFERENCES keyword (id)
+                                  ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 8. Content (상세 내용) - Keyword에 종속
