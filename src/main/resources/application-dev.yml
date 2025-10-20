@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:koreahistory
+    url: jdbc:h2:mem:koreahistory;MODE=MySQL;DATABASE_TO_LOWER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -9,8 +9,16 @@ spring:
       enabled: true
   jpa:
     hibernate:
-      ddl-auto: update # 개발 시에는 update나 create를 사용하여 스키마 자동 변경
-    defer-datasource-initialization: true
+      # 1. Flyway가 스키마를 관리하므로, Hibernate의 자동 DDL 기능을 끕니다.
+      ddl-auto: none # 개발 시에는 update나 create를 사용하여 스키마 자동 변경
+      # .2 'defer-datasource-initialization'는 'sprig.sql.init'와 짝이므로
+      #     Flyway 사용 시에는 더 이상 필요 없습니다 (제거)
+    #defer-datasource-initialization: true
   sql:
+    # data.sql 실행도 Flyway가 관리해야 하므로 'never' (사용 안 함)로 변경합니다.
     init:
-      mode: always
+      mode: never
+
+  # Flyway를 활성화합니다 (기본값이 true이긴 합니다).
+  flyway:
+    enabled: true
