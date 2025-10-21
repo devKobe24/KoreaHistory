@@ -175,7 +175,7 @@ function createChapterCard(chapter, index) {
         <div class="chapter-header">
             <div class="chapter-icon">${eraIcon}</div>
             <div>
-                <h3 class="chapter-title">${chapter.title}</h3>
+                <h3 class="chapter-title">${chapter.chapterTitle}</h3>
                 <p class="chapter-description">${chapter.description || "한국사의 중요한 시대입니다."}</p>
             </div>
         </div>
@@ -203,6 +203,8 @@ function createChapterCard(chapter, index) {
 }
 
 function getEraIcon(title) {
+  if (!title) return "📚";
+
   const iconMap = {
     선사시대: "🏺",
     고대: "🏛️",

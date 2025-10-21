@@ -502,10 +502,10 @@
         }
 
         function displayLessonHeader(lesson) {
-            document.getElementById('lessonTitle').textContent = lesson.title;
+            document.getElementById('lessonTitle').textContent = lesson.lessonTitle;
             document.getElementById('lessonDescription').textContent =
                 lesson.description || '이 주제에 대한 상세한 학습 자료를 제공합니다.';
-            document.getElementById('breadcrumbLesson').textContent = lesson.title;
+            document.getElementById('breadcrumbLesson').textContent = lesson.lessonTitle;
 
             // 메타 정보 업데이트
             const totalSections = lesson.sections?.length || 0;
@@ -572,13 +572,13 @@
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px)';
 
-            const sectionIcon = getSectionIcon(section.title);
+            const sectionIcon = getSectionIcon(section.sectionTitle);
 
             card.innerHTML = `
                 <div class="section-header">
                     <div class="section-icon">${sectionIcon}</div>
                     <div>
-                        <h3 class="section-title">${section.title}</h3>
+                        <h3 class="section-title">${section.sectionTitle}</h3>
                         <p class="section-description">${section.description || '이 섹션에 대한 상세한 내용을 제공합니다.'}</p>
                     </div>
                 </div>
@@ -586,7 +586,7 @@
                     ${section.subsections?.map(subsection => `
                         <div class="subsection-item" onclick="openSubsection('${subsection.id}')">
                             <span class="subsection-icon">📄</span>
-                            <span class="subsection-title">${subsection.title}</span>
+                            <span class="subsection-title">${subsection.subsectionTitle}</span>
                         </div>
                     `).join('') || '<p style="color: var(--text-muted); font-size: 0.875rem;">세부 내용이 없습니다.</p>'}
                 </div>

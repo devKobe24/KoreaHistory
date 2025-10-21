@@ -7,22 +7,21 @@ import java.util.List;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.request.content
- * fileName       : CreateContentRequestDto
+ * fileName       : UpdateContentRequestDto
  * author         : kobe
- * date           : 2025. 10. 14.
+ * date           : 2025. 10. 21.
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2025. 10. 14.        kobe       최초 생성
- * 2025. 10. 21.        kobe       수정
+ * 2025. 10. 21.        kobe       최초 생성
  */
 @Getter
 @NoArgsConstructor
-public class CreateContentRequestDto {
+public class UpdateContentRequestDto {
 	private List<String> details;
 
-	public CreateContentRequestDto(List<String> details) {
+	public UpdateContentRequestDto(List<String> details) {
 		this.details = details;
 	}
 }

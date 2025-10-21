@@ -66,12 +66,63 @@ function populateLessonSelect() {
 }
 
 /**
- * Section 목록 로드 (임시 - API가 없으므로 빈 목록 표시)
+ * Section 목록 로드
  */
-function loadSections() {
+async function loadSections() {
   const container = document.getElementById("sectionsList");
-  container.innerHTML =
-    '<div class="alert alert-info">Section 목록 조회 API가 없습니다. 개별 Section ID로 상세 조회해보세요.</div>';
+
+  try {
+    showLoading(container);
+
+    // 새로 추가된 API 엔드포인트 사용
+    const response = await fetch("/api/v1/sections/search/all");
+    if (!response.ok) {
+      throw new Error("Section 목록을 불러오는데 실패했습니다.");
+    }
+
+    const sections = await response.json();
+
+    if (sections && sections.length > 0) {
+      displaySectionsList(sections);
+    } else {
+      container.innerHTML =
+        '<div class="alert alert-info">등록된 Section이 없습니다.</div>';
+    }
+  } catch (error) {
+    console.error("Section 목록 로드 실패:", error);
+    container.innerHTML =
+      '<div class="alert alert-danger">Section 목록을 불러오는데 실패했습니다.</div>';
+  }
+}
+
+/**
+ * Section 목록 표시
+ */
+function displaySectionsList(sections) {
+  const container = document.getElementById("sectionsList");
+
+  let html = '<div class="sections-grid">';
+
+  sections.forEach((section) => {
+    html += `
+      <div class="section-card">
+        <div class="section-header">
+          <h4>${section.sectionNumber}. ${section.sectionTitle}</h4>
+          <div class="section-actions">
+            <button class="btn btn-warning btn-small" onclick="editSection(${section.id})">수정</button>
+            <button class="btn btn-danger btn-small" onclick="deleteSection(${section.id})">삭제</button>
+          </div>
+        </div>
+        <div class="section-info">
+          <p><strong>Lesson:</strong> ${section.lesson ? section.lesson.lessonTitle : "N/A"}</p>
+          <p><strong>Chapter:</strong> ${section.lesson && section.lesson.chapter ? section.lesson.chapter.chapterTitle : "N/A"}</p>
+        </div>
+      </div>
+    `;
+  });
+
+  html += "</div>";
+  container.innerHTML = html;
 }
 
 /**
@@ -107,8 +158,9 @@ async function handleCreateSection(event) {
     // 폼 초기화
     document.getElementById("createSectionForm").reset();
 
-    // Lesson 목록 새로고침
+    // Lesson 목록과 Section 목록 새로고침
     loadLessons();
+    loadSections();
   } catch (error) {
     console.error("Section 생성 실패:", error);
     showAlert("Section 생성에 실패했습니다.", "error");
@@ -273,6 +325,9 @@ async function handleEditSection(event) {
     showAlert("Section이 성공적으로 수정되었습니다.", "success");
     closeEditModal();
 
+    // Section 목록 새로고침
+    loadSections();
+
     // 현재 Section 다시 조회
     document.getElementById("sectionId").value = sectionId;
     document
@@ -297,6 +352,9 @@ function deleteSection(sectionId) {
 
         // 상세 정보 숨기기
         document.getElementById("sectionDetailCard").style.display = "none";
+
+        // Section 목록 새로고침
+        loadSections();
       } catch (error) {
         console.error("Section 삭제 실패:", error);
         showAlert("Section 삭제에 실패했습니다.", "error");

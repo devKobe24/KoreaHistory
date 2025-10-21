@@ -93,4 +93,12 @@ public class LessonService {
 	public void deleteLesson(Long lessonId) {
 		lessonRepository.deleteById(lessonId);
 	}
+
+	@Transactional(readOnly = true)
+	public List<ReadLessonResponseDto> findAllLessons() {
+		List<Lesson> lessons = lessonRepository.findAll();
+		return lessons.stream()
+			.map(ReadLessonResponseDto::new)
+			.collect(Collectors.toList());
+	}
 }

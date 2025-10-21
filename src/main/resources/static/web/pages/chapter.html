@@ -393,7 +393,7 @@
         }
 
         function displayChapterHeader(chapter) {
-            document.getElementById('chapterTitle').textContent = chapter.title;
+            document.getElementById('chapterTitle').textContent = chapter.chapterTitle;
             document.getElementById('chapterDescription').textContent =
                 chapter.description || '이 시대의 주요 특징과 중요 사건들을 학습해보세요.';
 
@@ -461,13 +461,13 @@
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px)';
 
-            const lessonIcon = getLessonIcon(lesson.title);
+            const lessonIcon = getLessonIcon(lesson.lessonTitle);
 
             card.innerHTML = `
                 <div class="lesson-header">
                     <div class="lesson-icon">${lessonIcon}</div>
                     <div>
-                        <h3 class="lesson-title">${lesson.title}</h3>
+                        <h3 class="lesson-title">${lesson.lessonTitle}</h3>
                         <p class="lesson-description">${lesson.description || '이 주제에 대한 상세한 학습 자료를 제공합니다.'}</p>
                     </div>
                 </div>
@@ -475,7 +475,7 @@
                     ${lesson.sections?.map(section => `
                         <div class="section-item">
                             <span class="section-icon">📄</span>
-                            <span>${section.title}</span>
+                            <span>${section.sectionTitle}</span>
                         </div>
                     `).join('') || '<p style="color: var(--text-muted); font-size: 0.875rem;">세부 주제가 없습니다.</p>'}
                 </div>

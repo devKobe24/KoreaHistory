@@ -5,27 +5,22 @@ import lombok.Getter;
 
 /**
  * packageName    : com.kobe.koreahistory.dto.response.topic
- * fileName       : CreateTopicResponseDto
+ * fileName       : PatchTopicNumberResponseDto
  * author         : kobe
- * date           : 2025. 10. 12.
+ * date           : 2025. 10. 21.
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2025. 10. 12.        kobe       최초 생성
- * 2025. 10. 21.        kobe       수정
+ * 2025. 10. 21.        kobe       최초 생성
  */
 @Getter
-public class CreateTopicResponseDto {
+public class PatchTopicNumberResponseDto {
 	private final Long id;
 	private final Integer topicNumber;
-	private final String topicTitle;
-	private final Long subsectionId;
 
-	public CreateTopicResponseDto(Topic entity) {
+	public PatchTopicNumberResponseDto(Topic entity) {
 		this.id = entity.getId();
 		this.topicNumber = entity.getTopicNumber();
-		this.topicTitle = entity.getTopicTitle();
-		this.subsectionId = entity.getSubsection().getId();
 	}
 }

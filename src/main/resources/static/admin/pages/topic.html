@@ -54,9 +54,10 @@
             <h2>📝 새 Topic 생성</h2>
             <form id="createTopicForm">
                 <div class="form-group">
-                    <label for="subsectionId">부모 Subsection ID</label>
-                    <input type="number" id="subsectionId" name="subsectionId" class="form-control"
-                        placeholder="Subsection ID를 입력하세요" required>
+                    <label for="subsectionSelect">부모 Subsection</label>
+                    <select id="subsectionSelect" name="subsectionId" class="form-control" required>
+                        <option value="">Subsection을 선택하세요</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="topicNumber">Topic 번호</label>
@@ -71,12 +72,62 @@
             </form>
         </div>
 
-        <!-- 안내 -->
+        <!-- Topic 검색 -->
         <div class="card fade-in">
-            <h2>📋 Topic 관리</h2>
-            <div class="alert alert-info">
-                <strong>안내:</strong> Topic은 Subsection 하위에 생성됩니다.
-                Subsection ID를 확인하려면 상위 계층을 통해 조회해보세요.
+            <h2>🔍 Topic 상세 조회</h2>
+            <form id="searchTopicForm">
+                <div class="form-group">
+                    <label for="topicId">Topic ID</label>
+                    <input type="number" id="topicId" name="topicId" class="form-control"
+                        placeholder="Topic ID를 입력하세요" required>
+                </div>
+                <button type="submit" class="btn btn-primary">조회</button>
+            </form>
+        </div>
+
+        <!-- Topic 목록 -->
+        <div class="card fade-in">
+            <h2>📋 Topic 목록</h2>
+            <div class="mb-2">
+                <button onclick="loadTopics()" class="btn btn-secondary">새로고침</button>
+            </div>
+            <div id="topicsList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic 상세 정보 -->
+        <div class="card fade-in" id="topicDetailCard" style="display: none;">
+            <h2>📄 Topic 상세 정보</h2>
+            <div id="topicDetail">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic 수정 모달 -->
+        <div id="editModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeEditModal()">&times;</span>
+                <h2>Topic 수정</h2>
+                <form id="editTopicForm">
+                    <input type="hidden" id="editTopicId" name="id">
+                    <div class="form-group">
+                        <label for="editTopicNumber">Topic 번호</label>
+                        <input type="number" id="editTopicNumber" name="topicNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTopicTitle">Topic 제목</label>
+                        <input type="text" id="editTopicTitle" name="topicTitle" class="form-control" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">수정</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>

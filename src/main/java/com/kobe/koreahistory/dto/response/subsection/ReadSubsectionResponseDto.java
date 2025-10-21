@@ -1,32 +1,47 @@
-package com.kobe.koreahistory.dto.response.section;
+package com.kobe.koreahistory.dto.response.subsection;
 
-import com.kobe.koreahistory.domain.entity.Section;
+import com.kobe.koreahistory.domain.entity.Subsection;
 import lombok.Getter;
 
 /**
- * packageName    : com.kobe.koreahistory.dto.response.section
- * fileName       : ReadSectionResponseDto
+ * packageName    : com.kobe.koreahistory.dto.response.subsection
+ * fileName       : ReadSubsectionResponseDto
  * author         : kobe
- * date           : 2025. 10. 11.
+ * date           : 2025. 10. 21.
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2025. 10. 11.        kobe       최초 생성
+ * 2025. 10. 21.        kobe       최초 생성
  */
 @Getter
-public class ReadSectionResponseDto {
+public class ReadSubsectionResponseDto {
 	private final Long id;
-	private final Integer sectionNumber;
-	private final String sectionTitle;
-	private final LessonInfo lesson;
+	private final Integer subsectionNumber;
+	private final String subsectionTitle;
+	private final SectionInfo section;
 
 	// Entity를 인자로 받은 단일 생성자로 변환 로직을 캡슐화
-	public ReadSectionResponseDto(Section entity) {
+	public ReadSubsectionResponseDto(Subsection entity) {
 		this.id = entity.getId();
-		this.sectionNumber = entity.getSectionNumber();
-		this.sectionTitle = entity.getSectionTitle();
-		this.lesson = entity.getLesson() != null ? new LessonInfo(entity.getLesson()) : null;
+		this.subsectionNumber = entity.getSubsectionNumber();
+		this.subsectionTitle = entity.getSubsectionTitle();
+		this.section = entity.getSection() != null ? new SectionInfo(entity.getSection()) : null;
+	}
+
+	@Getter
+	public static class SectionInfo {
+		private final Long id;
+		private final Integer sectionNumber;
+		private final String sectionTitle;
+		private final LessonInfo lesson;
+
+		public SectionInfo(com.kobe.koreahistory.domain.entity.Section section) {
+			this.id = section.getId();
+			this.sectionNumber = section.getSectionNumber();
+			this.sectionTitle = section.getSectionTitle();
+			this.lesson = section.getLesson() != null ? new LessonInfo(section.getLesson()) : null;
+		}
 	}
 
 	@Getter

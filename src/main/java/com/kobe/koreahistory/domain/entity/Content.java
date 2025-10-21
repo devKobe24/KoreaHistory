@@ -45,4 +45,8 @@ public class Content {
 		this.details = details;
 		this.keyword = keyword;
 	}
+
+	public void updateDetails(List<String> details) {
+		this.details = details;
+	}
 }
