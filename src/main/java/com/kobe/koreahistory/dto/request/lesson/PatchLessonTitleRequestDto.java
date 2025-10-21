@@ -18,10 +18,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PatchLessonTitleRequestDto {
-	private String toChangeLessonTitle;
+	private String lessonTitle;
 
 	@Builder
-	public PatchLessonTitleRequestDto(String toChangeLessonTitle) {
-		this.toChangeLessonTitle = toChangeLessonTitle;
+	public PatchLessonTitleRequestDto(String lessonTitle) {
+		this.lessonTitle = lessonTitle;
 	}
 }
