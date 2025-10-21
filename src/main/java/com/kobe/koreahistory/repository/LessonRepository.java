@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * packageName    : com.kobe.koreahistory.repository
@@ -19,9 +18,7 @@ import java.util.Optional;
  * -----------------------------------------------------------
  * 2025. 10. 7.        kobe       최초 생성
  */
-public interface LessonRepository extends JpaRepository<Lesson, Integer> {
-	Optional<Lesson> findById(Long id);
-	Lesson deleteById(Long id);
+public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
 	/**
 	 * number 또는 title로 DetailChapter를 동적으로 검색합니다.
