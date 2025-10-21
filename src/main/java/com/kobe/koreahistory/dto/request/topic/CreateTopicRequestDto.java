@@ -18,6 +18,7 @@ import java.util.List;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 2025. 10. 12.        kobe       최초 생성
+ * 2025. 10. 21.        kobe       스장
  */
 @Getter
 @NoArgsConstructor
@@ -31,5 +32,12 @@ public class CreateTopicRequestDto {
 		this.topicNumber = topicNumber;
 		this.topicTitle = topicTitle;
 		this.keywords = keywords;
+	}
+
+	// 단순 생성자를 위한 추가 생성자
+	public CreateTopicRequestDto(Integer topicNumber, String topicTitle) {
+		this.topicNumber = topicNumber;
+		this.topicTitle = topicTitle;
+		this.keywords = new ArrayList<>();
 	}
 }
