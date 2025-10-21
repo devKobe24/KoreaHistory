@@ -15,6 +15,9 @@ import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import com.kobe.koreahistory.dto.request.section.PatchSectionNumberRequestDto;
 import com.kobe.koreahistory.dto.request.section.PatchSectionTitleRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
+import com.kobe.koreahistory.dto.request.topic.CreateTopicRequestDto;
+import com.kobe.koreahistory.dto.request.topic.PatchTopicTitleRequestDto;
+import com.kobe.koreahistory.dto.request.topic.PatchTopicNumberRequestDto;
 import com.kobe.koreahistory.dto.response.chapter.ChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
@@ -28,7 +31,17 @@ import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
 import com.kobe.koreahistory.dto.response.section.PatchSectionNumberResponseDto;
 import com.kobe.koreahistory.dto.response.section.PatchSectionTitleResponseDto;
 import com.kobe.koreahistory.dto.response.section.ReadSectionResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.ReadSubsectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
+import com.kobe.koreahistory.dto.response.topic.ReadTopicResponseDto;
+import com.kobe.koreahistory.dto.response.topic.CreateTopicResponseDto;
+import com.kobe.koreahistory.dto.response.topic.PatchTopicTitleResponseDto;
+import com.kobe.koreahistory.dto.response.topic.PatchTopicNumberResponseDto;
+import com.kobe.koreahistory.dto.request.content.CreateContentRequestDto;
+import com.kobe.koreahistory.dto.request.content.UpdateContentRequestDto;
+import com.kobe.koreahistory.dto.response.content.ReadContentResponseDto;
+import com.kobe.koreahistory.dto.response.content.CreateContentResponseDto;
+import com.kobe.koreahistory.dto.response.content.UpdateContentResponseDto;
 import com.kobe.koreahistory.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -58,6 +71,8 @@ public class KoreaHistoryController {
 	private final SectionService sectionService;
 	private final SubsectionService subsectionService;
 	private final KeywordService keywordService;
+	private final TopicService topicService;
+	private final ContentService contentService;
 
 	@GetMapping("/detail/search")
 	public ResponseEntity<List<ReadLessonResponseDto>> searchLesson(
@@ -83,6 +98,40 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(responseDto);
 	}
 
+	@GetMapping("/sections/search/all")
+	public ResponseEntity<List<ReadSectionResponseDto>> searchAllSections() {
+		List<ReadSectionResponseDto> response = sectionService.findAllSections();
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/subsections/search/all")
+	public ResponseEntity<List<ReadSubsectionResponseDto>> searchAllSubsections() {
+		List<ReadSubsectionResponseDto> response = subsectionService.findAllSubsections();
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/subsection/{subsectionId}")
+	public ResponseEntity<ReadSubsectionResponseDto> searchSubsection(
+		@PathVariable Long subsectionId
+	) {
+		ReadSubsectionResponseDto responseDto = subsectionService.readSubsection(subsectionId);
+		return ResponseEntity.ok(responseDto);
+	}
+
+	@GetMapping("/topics/search/all")
+	public ResponseEntity<List<ReadTopicResponseDto>> searchAllTopics() {
+		List<ReadTopicResponseDto> response = topicService.findAllTopics();
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/topic/{topicId}")
+	public ResponseEntity<ReadTopicResponseDto> searchTopic(
+		@PathVariable Long topicId
+	) {
+		ReadTopicResponseDto responseDto = topicService.readTopic(topicId);
+		return ResponseEntity.ok(responseDto);
+	}
+
 	@GetMapping("/search/keywords")
 	public ResponseEntity<List<ReadKeywordResponseDto>> searchKeyword(
 		@RequestParam String keyword
@@ -90,6 +139,19 @@ public class KoreaHistoryController {
 		List<ReadKeywordResponseDto> response = keywordService.searchKeywords(keyword);
 		return ResponseEntity.ok(response);
 	}
+
+	@GetMapping("/keywords/search/all")
+	public ResponseEntity<List<ReadKeywordResponseDto>> searchAllKeywords() {
+		List<ReadKeywordResponseDto> response = keywordService.findAllKeywords();
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/lessons/search/all")
+	public ResponseEntity<List<ReadLessonResponseDto>> searchAllLessons() {
+		List<ReadLessonResponseDto> response = lessonService.findAllLessons();
+		return ResponseEntity.ok(response);
+	}
+
 
 	@PostMapping("/create/keyword")
 	public ResponseEntity<CreateKeywordResponseDto> createKeyword(
@@ -216,6 +278,15 @@ public class KoreaHistoryController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
+	@PostMapping("/create/topic/{subsectionId}")
+	public ResponseEntity<CreateTopicResponseDto> createTopic(
+		@PathVariable Long subsectionId,
+		@RequestBody CreateTopicRequestDto requestDto
+	) {
+		CreateTopicResponseDto response = topicService.createTopic(subsectionId, requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+
 	@DeleteMapping("/chapters/{id}")
 	public ResponseEntity<Void> deleteChapter(
 		@PathVariable Long id) {
@@ -253,6 +324,72 @@ public class KoreaHistoryController {
 		@PathVariable Long sectionId
 	) {
 		sectionService.deleteSection(sectionId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@PatchMapping("/topic/{topicId}/title")
+	public ResponseEntity<PatchTopicTitleResponseDto> patchTopicTitle(
+		@PathVariable Long topicId,
+		@RequestBody PatchTopicTitleRequestDto requestDto
+	) {
+		PatchTopicTitleResponseDto response = topicService.updateTopicTitle(topicId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
+	@PatchMapping("/topic/{topicId}/number")
+	public ResponseEntity<PatchTopicNumberResponseDto> patchTopicNumber(
+		@PathVariable Long topicId,
+		@RequestBody PatchTopicNumberRequestDto requestDto
+	) {
+		PatchTopicNumberResponseDto response = topicService.updateTopicNumber(topicId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
+	@DeleteMapping("/topic/{topicId}")
+	public ResponseEntity<Void> deleteTopic(
+		@PathVariable Long topicId
+	) {
+		topicService.deleteTopic(topicId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@GetMapping("/contents/search/all")
+	public ResponseEntity<List<ReadContentResponseDto>> searchAllContents() {
+		List<ReadContentResponseDto> response = contentService.findAllContents();
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/content/{contentId}")
+	public ResponseEntity<ReadContentResponseDto> searchContent(
+		@PathVariable Long contentId
+	) {
+		ReadContentResponseDto responseDto = contentService.readContent(contentId);
+		return ResponseEntity.ok(responseDto);
+	}
+
+	@PostMapping("/create/content/{keywordId}")
+	public ResponseEntity<CreateContentResponseDto> createContent(
+		@PathVariable Long keywordId,
+		@RequestBody CreateContentRequestDto requestDto
+	) {
+		CreateContentResponseDto response = contentService.createContent(keywordId, requestDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+
+	@PatchMapping("/content/{contentId}")
+	public ResponseEntity<UpdateContentResponseDto> updateContent(
+		@PathVariable Long contentId,
+		@RequestBody UpdateContentRequestDto requestDto
+	) {
+		UpdateContentResponseDto response = contentService.updateContent(contentId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
+	@DeleteMapping("/content/{contentId}")
+	public ResponseEntity<Void> deleteContent(
+		@PathVariable Long contentId
+	) {
+		contentService.deleteContent(contentId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
