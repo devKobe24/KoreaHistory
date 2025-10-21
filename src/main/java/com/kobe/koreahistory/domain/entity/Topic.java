@@ -47,4 +47,12 @@ public class Topic {
 		this.topicTitle = topicTitle;
 		this.subsection = subsection;
 	}
+
+	public void updateTitle(String topicTitle) {
+		this.topicTitle = topicTitle;
+	}
+
+	public void updateNumber(Integer topicNumber) {
+		this.topicNumber = topicNumber;
+	}
 }
