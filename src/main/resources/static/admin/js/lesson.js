@@ -190,15 +190,23 @@ async function handleEditLesson(event) {
       });
     }
 
-    // 제목 수정
-    if (
-      formData.lessonTitle !==
-      lessons.find((l) => l.id === lessonId).lessonTitle
-    ) {
-      await ApiEndpoints.lessons.updateTitle(lessonId, {
-        lessonTitle: formData.lessonTitle,
-      });
-    }
+    // 제목 수정 디버깅
+    const currentLesson = lessons.find((l) => l.id === lessonId);
+    console.log("=== 제목 수정 디버깅 ===");
+    console.log("formData.lessonTitle:", formData.lessonTitle);
+    console.log("기존 제목:", currentLesson.lessonTitle);
+    console.log(
+      "제목이 다른가?",
+      formData.lessonTitle !== currentLesson.lessonTitle
+    );
+
+    // 제목 수정 (항상 실행하도록 수정)
+    const titleData = {
+      lessonTitle: formData.lessonTitle,
+    };
+    console.log("제목 수정 데이터:", titleData);
+    console.log("formData.lessonTitle:", formData.lessonTitle);
+    await ApiEndpoints.lessons.updateTitle(lessonId, titleData);
 
     showAlert("Lesson이 성공적으로 수정되었습니다.", "success");
     closeEditModal();
