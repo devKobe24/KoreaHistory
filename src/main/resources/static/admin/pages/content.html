@@ -54,9 +54,10 @@
             <h2>📝 새 Content 생성</h2>
             <form id="createContentForm">
                 <div class="form-group">
-                    <label for="keywordId">부모 Keyword ID</label>
-                    <input type="number" id="keywordId" name="keywordId" class="form-control"
-                        placeholder="Keyword ID를 입력하세요" required>
+                    <label for="keywordSelect">부모 Keyword</label>
+                    <select id="keywordSelect" name="keywordId" class="form-control" required>
+                        <option value="">Keyword를 선택하세요</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="details">상세 내용 (줄바꿈으로 구분)</label>
@@ -68,12 +69,58 @@
             </form>
         </div>
 
-        <!-- 안내 -->
+        <!-- Content 검색 -->
         <div class="card fade-in">
-            <h2>📋 Content 관리</h2>
-            <div class="alert alert-info">
-                <strong>안내:</strong> Content는 Keyword 하위에 생성됩니다.
-                Keyword ID를 확인하려면 <a href="keyword.html">Keyword 관리 페이지</a>에서 키워드를 검색해보세요.
+            <h2>🔍 Content 상세 조회</h2>
+            <form id="searchContentForm">
+                <div class="form-group">
+                    <label for="contentId">Content ID</label>
+                    <input type="number" id="contentId" name="contentId" class="form-control"
+                        placeholder="Content ID를 입력하세요" required>
+                </div>
+                <button type="submit" class="btn btn-primary">조회</button>
+            </form>
+        </div>
+
+        <!-- Content 목록 -->
+        <div class="card fade-in">
+            <h2>📋 Content 목록</h2>
+            <div class="mb-2">
+                <button onclick="loadContents()" class="btn btn-secondary">새로고침</button>
+            </div>
+            <div id="contentsList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content 상세 정보 -->
+        <div class="card fade-in" id="contentDetailCard" style="display: none;">
+            <h2>📄 Content 상세 정보</h2>
+            <div id="contentDetail">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content 수정 모달 -->
+        <div id="editModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeEditModal()">&times;</span>
+                <h2>Content 수정</h2>
+                <form id="editContentForm">
+                    <input type="hidden" id="editContentId" name="id">
+                    <div class="form-group">
+                        <label for="editDetails">상세 내용</label>
+                        <textarea id="editDetails" name="details" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">수정</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>
