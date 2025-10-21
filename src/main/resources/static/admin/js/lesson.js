@@ -54,9 +54,11 @@ async function loadLessons() {
   try {
     showLoading(document.getElementById("lessonsList"));
 
-    // 모든 Chapter를 가져와서 각 Chapter의 Lesson들을 수집
+    // 최신 Chapter 데이터를 다시 가져와서 Lesson들을 수집
+    const latestChapters = await ApiEndpoints.chapters.getAll();
     const allLessons = [];
-    for (const chapter of chapters) {
+
+    for (const chapter of latestChapters) {
       if (chapter.lessons && chapter.lessons.length > 0) {
         chapter.lessons.forEach((lesson) => {
           allLessons.push({
@@ -73,6 +75,38 @@ async function loadLessons() {
   } catch (error) {
     console.error("Lesson 목록 로드 실패:", error);
     showAlert("Lesson 목록을 불러오는데 실패했습니다.", "error");
+  }
+}
+
+/**
+ * 새로 생성된 Lesson을 목록에 추가
+ */
+function addLessonToList(createdLesson, chapterId) {
+  // 생성된 Lesson이 속한 Chapter 정보 찾기
+  const parentChapter = chapters.find((chapter) => chapter.id === chapterId);
+  if (parentChapter) {
+    const newLessonWithChapter = {
+      ...createdLesson,
+      chapterTitle: parentChapter.chapterTitle,
+      chapterNumber: parentChapter.chapterNumber,
+    };
+
+    // 목록에 새 Lesson 추가
+    lessons.push(newLessonWithChapter);
+
+    // 목록 다시 표시
+    displayLessons(lessons);
+  }
+}
+
+/**
+ * Lesson 목록에서 특정 Lesson을 제거
+ */
+function removeLessonFromList(lessonId) {
+  const index = lessons.findIndex((lesson) => lesson.id === lessonId);
+  if (index > -1) {
+    lessons.splice(index, 1);
+    displayLessons(lessons);
   }
 }
 
@@ -131,15 +165,18 @@ async function handleCreateLesson(event) {
       lessonTitle: formData.lessonTitle,
     };
 
-    await ApiEndpoints.lessons.create(parseInt(formData.chapterId), lessonData);
+    const createdLesson = await ApiEndpoints.lessons.create(
+      parseInt(formData.chapterId),
+      lessonData
+    );
     showAlert("Lesson이 성공적으로 생성되었습니다.", "success");
 
     // 폼 초기화
     document.getElementById("createLessonForm").reset();
 
-    // 목록 새로고침
-    loadChapters();
-    loadLessons();
+    // Chapter 목록 업데이트 후 새 Lesson을 목록에 추가
+    await loadChapters();
+    addLessonToList(createdLesson, parseInt(formData.chapterId));
   } catch (error) {
     console.error("Lesson 생성 실패:", error);
     showAlert("Lesson 생성에 실패했습니다.", "error");
@@ -190,28 +227,16 @@ async function handleEditLesson(event) {
       });
     }
 
-    // 제목 수정 디버깅
-    const currentLesson = lessons.find((l) => l.id === lessonId);
-    console.log("=== 제목 수정 디버깅 ===");
-    console.log("formData.lessonTitle:", formData.lessonTitle);
-    console.log("기존 제목:", currentLesson.lessonTitle);
-    console.log(
-      "제목이 다른가?",
-      formData.lessonTitle !== currentLesson.lessonTitle
-    );
-
-    // 제목 수정 (항상 실행하도록 수정)
+    // 제목 수정
     const titleData = {
       lessonTitle: formData.lessonTitle,
     };
-    console.log("제목 수정 데이터:", titleData);
-    console.log("formData.lessonTitle:", formData.lessonTitle);
     await ApiEndpoints.lessons.updateTitle(lessonId, titleData);
 
     showAlert("Lesson이 성공적으로 수정되었습니다.", "success");
     closeEditModal();
-    loadChapters();
-    loadLessons();
+    // 목록 새로고침
+    await loadLessons();
   } catch (error) {
     console.error("Lesson 수정 실패:", error);
     showAlert("Lesson 수정에 실패했습니다.", "error");
@@ -234,8 +259,8 @@ function deleteLesson(lessonId) {
       try {
         await ApiEndpoints.lessons.delete(lessonId);
         showAlert("Lesson이 성공적으로 삭제되었습니다.", "success");
-        loadChapters();
-        loadLessons();
+        // 목록에서 즉시 제거
+        removeLessonFromList(lessonId);
       } catch (error) {
         console.error("Lesson 삭제 실패:", error);
         showAlert("Lesson 삭제에 실패했습니다.", "error");
