@@ -97,4 +97,12 @@ public class KeywordService {
 	public void deleteKeywordGroup(Long id) {
 		keywordRepository.deleteById(id);
 	}
+
+	@Transactional(readOnly = true)
+	public List<ReadKeywordResponseDto> findAllKeywords() {
+		List<Keyword> keywords = keywordRepository.findAll();
+		return keywords.stream()
+			.map(ReadKeywordResponseDto::new)
+			.collect(Collectors.toList());
+	}
 }
