@@ -4,11 +4,15 @@ import com.kobe.koreahistory.domain.entity.Section;
 import com.kobe.koreahistory.domain.entity.Subsection;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.ReadSubsectionResponseDto;
 import com.kobe.koreahistory.repository.SectionRepository;
 import com.kobe.koreahistory.repository.SubsectionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * packageName    : com.kobe.koreahistory.service
@@ -42,5 +46,21 @@ public class SubsectionService {
 		Subsection savedSubsection = subsectionRepository.save(newSubsection);
 
 		return new CreateSubsectionResponseDto(savedSubsection);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ReadSubsectionResponseDto> findAllSubsections() {
+		List<Subsection> subsections = subsectionRepository.findAllWithSectionAndLesson();
+		return subsections.stream()
+			.map(ReadSubsectionResponseDto::new)
+			.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public ReadSubsectionResponseDto readSubsection(Long subsectionId) {
+		Subsection subsection = subsectionRepository.findById(subsectionId)
+			.orElseThrow(() -> new IllegalArgumentException("subsection not found"));
+
+		return new ReadSubsectionResponseDto(subsection);
 	}
 }
