@@ -347,6 +347,34 @@ const ApiEndpoints = {
   subsections: {
     create: (sectionId, data) =>
       ApiClient.post(`${API_BASE_URL}/create/subsection/${sectionId}`, data),
+    getById: (id) => ApiClient.get(`${API_BASE_URL}/search/subsection/${id}`),
+    updateTitle: (id, data) =>
+      ApiClient.patch(`${API_BASE_URL}/subsection/${id}/title`, data),
+    updateNumber: (id, data) =>
+      ApiClient.patch(`${API_BASE_URL}/subsection/${id}/number`, data),
+    delete: (id) => ApiClient.delete(`${API_BASE_URL}/subsection/${id}`),
+  },
+
+  // Topic 관련
+  topics: {
+    create: (subsectionId, data) =>
+      ApiClient.post(`${API_BASE_URL}/create/topic/${subsectionId}`, data),
+    getById: (id) => ApiClient.get(`${API_BASE_URL}/search/topic/${id}`),
+    updateTitle: (id, data) =>
+      ApiClient.patch(`${API_BASE_URL}/topic/${id}/title`, data),
+    updateNumber: (id, data) =>
+      ApiClient.patch(`${API_BASE_URL}/topic/${id}/number`, data),
+    delete: (id) => ApiClient.delete(`${API_BASE_URL}/topic/${id}`),
+  },
+
+  // Content 관련
+  contents: {
+    create: (keywordId, data) =>
+      ApiClient.post(`${API_BASE_URL}/create/content/${keywordId}`, data),
+    getById: (id) => ApiClient.get(`${API_BASE_URL}/search/content/${id}`),
+    update: (id, data) =>
+      ApiClient.patch(`${API_BASE_URL}/content/${id}`, data),
+    delete: (id) => ApiClient.delete(`${API_BASE_URL}/content/${id}`),
   },
 
   // Keyword 관련
