@@ -53,6 +53,9 @@ public class Lesson {
 	}
 
 	public void updateLessonTitle(String newLessonTitle) {
+		if (newLessonTitle == null || newLessonTitle.trim().isEmpty()) {
+			throw new IllegalArgumentException("Lesson 제목은 null이거나 빈 문자열일 수 없습니다.");
+		}
 		this.lessonTitle = newLessonTitle;
 	}
 }
