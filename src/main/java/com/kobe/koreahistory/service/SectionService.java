@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * packageName    : com.kobe.koreahistory.service
  * fileName       : SectionService
@@ -83,5 +86,13 @@ public class SectionService {
 	@Transactional
 	public void deleteSection(Long sectionId) {
 		sectionRepository.deleteById(sectionId);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ReadSectionResponseDto> findAllSections() {
+		List<Section> sections = sectionRepository.findAllWithLessonAndChapter();
+		return sections.stream()
+			.map(ReadSectionResponseDto::new)
+			.collect(Collectors.toList());
 	}
 }
