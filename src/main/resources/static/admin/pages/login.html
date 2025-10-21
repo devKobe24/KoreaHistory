@@ -142,6 +142,7 @@
 </head>
 
 <body>
+    <script src="../js/auth.js"></script>
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -188,11 +189,11 @@
                 return;
             }
 
-            // 실제 로그인 로직 (여기서는 데모용)
-            if (username === 'admin' && password === 'admin123') {
+            // 인증 시스템을 통한 로그인
+            if (login(username, password)) {
                 showMessage('로그인 성공! 대시보드로 이동합니다...', 'success');
                 setTimeout(() => {
-                    window.location.href = '/admin/pages/dashboard.html';
+                    redirectAfterLogin();
                 }, 1500);
             } else {
                 showMessage('잘못된 사용자명 또는 비밀번호입니다.', 'error');
