@@ -1,6 +1,5 @@
 package com.kobe.koreahistory.dto.request.content;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,13 +15,13 @@ import java.util.List;
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
  * 2025. 10. 14.        kobe       최초 생성
+ * 2025. 10. 21.        kobe       수정
  */
 @Getter
 @NoArgsConstructor
 public class CreateContentRequestDto {
 	private List<String> details;
 
-	@Builder
 	public CreateContentRequestDto(List<String> details) {
 		this.details = details;
 	}
