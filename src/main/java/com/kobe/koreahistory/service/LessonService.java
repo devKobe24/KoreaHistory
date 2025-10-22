@@ -62,13 +62,6 @@ public class LessonService {
 		Lesson lesson = lessonRepository.findById(lessonId)
 			.orElseThrow(() -> new IllegalArgumentException("소분류 챕터를 찾을 수 없습니다."));
 
-		// 디버깅 로그 추가
-		System.out.println("=== Lesson 제목 수정 디버깅 ===");
-		System.out.println("lessonId: " + lessonId);
-		System.out.println("requestDto: " + requestDto);
-		System.out.println("lessonTitle: " + requestDto.getLessonTitle());
-		System.out.println("기존 제목: " + lesson.getLessonTitle());
-
 		// 2. Entity의 비즈니스 메서드를 호출하여 상태를 변경함.
 		lesson.updateLessonTitle(requestDto.getLessonTitle());
 
