@@ -32,7 +32,7 @@ async function loadSubsections() {
     if (!response.ok) {
       throw new Error("Subsection 목록을 불러오는데 실패했습니다.");
     }
-    
+
     const subsectionsData = await response.json();
     subsections = subsectionsData;
     populateSubsectionSelect();
@@ -62,18 +62,18 @@ function populateSubsectionSelect() {
  */
 async function loadTopics() {
   const container = document.getElementById("topicsList");
-  
+
   try {
     showLoading(container);
-    
+
     // 새로 추가된 API 엔드포인트 사용
     const response = await fetch("/api/v1/topics/search/all");
     if (!response.ok) {
       throw new Error("Topic 목록을 불러오는데 실패했습니다.");
     }
-    
+
     const topics = await response.json();
-    
+
     if (topics && topics.length > 0) {
       displayTopicsList(topics);
     } else {
@@ -84,38 +84,64 @@ async function loadTopics() {
     console.error("Topic 목록 로드 실패:", error);
     container.innerHTML =
       '<div class="alert alert-danger">Topic 목록을 불러오는데 실패했습니다.</div>';
+  } finally {
+    // 로딩 상태 해제
+    hideLoading(container);
   }
 }
 
 /**
- * Topic 목록 표시
+ * Topic 목록 표시 (계층 구조로 변경)
  */
 function displayTopicsList(topics) {
   const container = document.getElementById("topicsList");
-  
-  let html = '<div class="sections-grid">';
-  
+
+  // 로딩 상태 해제
+  hideLoading(container);
+
+  let html = "";
+
   topics.forEach((topic) => {
     html += `
-      <div class="section-card">
-        <div class="section-header">
-          <h4>${topic.topicNumber}. ${topic.topicTitle}</h4>
-          <div class="section-actions">
+      <div class="hierarchy">
+        <div class="hierarchy-item">
+          <span class="hierarchy-level">Topic</span>
+          <strong>${topic.topicNumber}. ${topic.topicTitle}</strong>
+          <span style="margin-left: 10px; color: #666; font-size: 0.9em;">(ID: ${topic.id})</span>
+          <div style="margin-left: 100px;">
             <button class="btn btn-warning btn-small" onclick="editTopic(${topic.id})">수정</button>
             <button class="btn btn-danger btn-small" onclick="deleteTopic(${topic.id})">삭제</button>
           </div>
         </div>
-        <div class="section-info">
-          <p><strong>Subsection:</strong> ${topic.subsection ? topic.subsection.subsectionTitle : "N/A"}</p>
-          <p><strong>Section:</strong> ${topic.subsection && topic.subsection.section ? topic.subsection.section.sectionTitle : "N/A"}</p>
-          <p><strong>Lesson:</strong> ${topic.subsection && topic.subsection.section && topic.subsection.section.lesson ? topic.subsection.section.lesson.lessonTitle : "N/A"}</p>
-          <p><strong>Chapter:</strong> ${topic.subsection && topic.subsection.section && topic.subsection.section.lesson && topic.subsection.section.lesson.chapter ? topic.subsection.section.lesson.chapter.chapterTitle : "N/A"}</p>
-        </div>
-      </div>
     `;
+
+    // Keywords 표시
+    if (topic.keywords && topic.keywords.length > 0) {
+      topic.keywords.forEach((keyword) => {
+        html += `
+          <div class="hierarchy-item" style="margin-left: 20px;">
+            <span class="hierarchy-level">Keyword</span>
+            <strong>${keyword.keywordNumber}. ${keyword.keywords ? keyword.keywords.join(", ") : ""}</strong>
+          </div>
+        `;
+
+        // Contents 표시
+        if (keyword.contents && keyword.contents.length > 0) {
+          keyword.contents.forEach((content) => {
+            html += `
+              <div class="hierarchy-item" style="margin-left: 40px;">
+                <span class="hierarchy-level">Content</span>
+                <div>${content.details ? content.details.join("<br>") : ""}</div>
+              </div>
+            `;
+          });
+        }
+      });
+    }
+
+    html += "</div>";
   });
-  
-  html += "</div>";
+
   container.innerHTML = html;
 }
 
@@ -177,12 +203,21 @@ async function handleSearchTopic(event) {
     const topicId = parseInt(formData.topicId);
 
     showLoading(document.getElementById("topicDetail"));
-    const topicDetail =
-      await ApiEndpoints.topics.getById(topicId);
+    const topicDetail = await ApiEndpoints.topics.getById(topicId);
     displayTopicDetail(topicDetail);
 
-    // 상세 정보 카드 표시
-    document.getElementById("topicDetailCard").style.display = "block";
+    // 상세 정보 카드 표시 (fade in 애니메이션)
+    const detailCard = document.getElementById("topicDetailCard");
+    detailCard.style.display = "block";
+    detailCard.style.opacity = "0";
+    detailCard.style.transform = "translateY(20px)";
+
+    // 애니메이션 적용
+    setTimeout(() => {
+      detailCard.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      detailCard.style.opacity = "1";
+      detailCard.style.transform = "translateY(0)";
+    }, 10);
   } catch (error) {
     console.error("Topic 조회 실패:", error);
     showAlert("Topic 조회에 실패했습니다.", "error");
@@ -203,42 +238,24 @@ function displayTopicDetail(topicDetail) {
   }
 
   let html = `
-        <div class="hierarchy">
-            <div class="hierarchy-item">
-                <span class="hierarchy-level">Topic</span>
-                <strong>${topicDetail.topicNumber}. ${topicDetail.topicTitle}</strong>
-                <div style="margin-left: 100px;">
-                    <button class="btn btn-warning btn-small" onclick="editTopic(${topicDetail.id})">수정</button>
-                    <button class="btn btn-danger btn-small" onclick="deleteTopic(${topicDetail.id})">삭제</button>
-                </div>
-            </div>
-    `;
+    <div class="section-card">
+      <div class="section-header">
+        <h4>${topicDetail.topicNumber}. ${topicDetail.topicTitle}</h4>
+        <div class="section-actions">
+          <button class="btn btn-warning btn-small" onclick="editTopic(${topicDetail.id})">수정</button>
+          <button class="btn btn-danger btn-small" onclick="deleteTopic(${topicDetail.id})">삭제</button>
+        </div>
+      </div>
+      <div class="section-info">
+        <p><strong>Topic ID:</strong> ${topicDetail.id}</p>
+        <p><strong>Subsection:</strong> ${topicDetail.subsection ? topicDetail.subsection.subsectionTitle : "N/A"}</p>
+        <p><strong>Section:</strong> ${topicDetail.subsection && topicDetail.subsection.section ? topicDetail.subsection.section.sectionTitle : "N/A"}</p>
+        <p><strong>Lesson:</strong> ${topicDetail.subsection && topicDetail.subsection.section && topicDetail.subsection.section.lesson ? topicDetail.subsection.section.lesson.lessonTitle : "N/A"}</p>
+        <p><strong>Chapter:</strong> ${topicDetail.subsection && topicDetail.subsection.section && topicDetail.subsection.section.lesson && topicDetail.subsection.section.lesson.chapter ? topicDetail.subsection.section.lesson.chapter.chapterTitle : "N/A"}</p>
+      </div>
+    </div>
+  `;
 
-  // Keywords 표시
-  if (topicDetail.keywords && topicDetail.keywords.length > 0) {
-    topicDetail.keywords.forEach((keyword) => {
-      html += `
-                <div class="hierarchy-item" style="margin-left: 20px;">
-                    <span class="hierarchy-level">Keyword</span>
-                    <strong>${keyword.keywordNumber}. ${keyword.keywords ? keyword.keywords.join(", ") : ""}</strong>
-                </div>
-            `;
-
-      // Contents 표시
-      if (keyword.contents && keyword.contents.length > 0) {
-        keyword.contents.forEach((content) => {
-          html += `
-                        <div class="hierarchy-item" style="margin-left: 40px;">
-                            <span class="hierarchy-level">Content</span>
-                            <div>${content.details ? content.details.join("<br>") : ""}</div>
-                        </div>
-                    `;
-        });
-      }
-    });
-  }
-
-  html += "</div>";
   container.innerHTML = html;
 }
 
@@ -274,9 +291,7 @@ function editTopic(topicId) {
 async function handleEditTopic(event) {
   event.preventDefault();
 
-  if (
-    !validateForm("editTopicForm", ["topicNumber", "topicTitle"])
-  ) {
+  if (!validateForm("editTopicForm", ["topicNumber", "topicTitle"])) {
     showAlert("모든 필드를 올바르게 입력해주세요.", "error");
     return;
   }
@@ -325,7 +340,7 @@ function deleteTopic(topicId) {
 
         // 상세 정보 숨기기
         document.getElementById("topicDetailCard").style.display = "none";
-        
+
         // Topic 목록 새로고침
         loadTopics();
       } catch (error) {

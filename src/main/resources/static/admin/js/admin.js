@@ -379,10 +379,19 @@ const ApiEndpoints = {
 
   // Keyword 관련
   keywords: {
+    getAll: () => ApiClient.get(`${API_BASE_URL}/keywords/search/all`),
     search: (keyword) =>
       ApiClient.get(
         `${API_BASE_URL}/search/keywords?keyword=${encodeURIComponent(keyword)}`
       ),
+    searchCombination: (keywords) => {
+      const params = keywords
+        .map((k) => `keywords=${encodeURIComponent(k)}`)
+        .join("&");
+      return ApiClient.get(
+        `${API_BASE_URL}/search/keywords/combination?${params}`
+      );
+    },
     create: (topicTitle, data) =>
       ApiClient.post(
         `${API_BASE_URL}/create/keyword?topicTitle=${encodeURIComponent(topicTitle)}`,

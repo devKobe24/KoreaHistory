@@ -1,222 +1,299 @@
 <!DOCTYPE html>
 <html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KoreaHistory 로그인</title>
-    <link rel="stylesheet" href="../css/admin.css">
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
     <style>
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem;
-        }
+      .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+      }
 
-        .login-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 3rem;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+      .login-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+      }
 
-        .login-header {
-            margin-bottom: 2rem;
-        }
+      .login-header {
+        margin-bottom: 2rem;
+      }
 
-        .login-header h1 {
-            color: #333;
-            margin-bottom: 0.5rem;
-            font-size: 2rem;
-        }
+      .login-header h1 {
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+      }
 
-        .login-header p {
-            color: #666;
-            font-size: 1rem;
-        }
+      .login-header p {
+        color: #666;
+        font-size: 1rem;
+      }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
+      .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+      }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
-        }
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+      }
 
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
+      .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+      .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
 
-        .login-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
+      .login-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
 
-        .login-btn:hover {
-            transform: translateY(-2px);
-        }
+      .login-btn:hover {
+        transform: translateY(-2px);
+      }
 
-        .login-btn:active {
-            transform: translateY(0);
-        }
+      .login-btn:active {
+        transform: translateY(0);
+      }
 
-        .forgot-password {
-            margin-top: 1rem;
-            text-align: center;
-        }
+      .forgot-password {
+        margin-top: 1rem;
+        text-align: center;
+      }
 
-        .forgot-password a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
+      .forgot-password a {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
 
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
+      .forgot-password a:hover {
+        text-decoration: underline;
+      }
 
-        .back-to-home {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+      .back-to-home {
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
 
-        .back-to-home:hover {
-            text-decoration: underline;
-        }
+      .back-to-home:hover {
+        text-decoration: underline;
+      }
 
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border: 1px solid #fcc;
-        }
+      .error-message {
+        background: #fee;
+        color: #c33;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid #fcc;
+      }
 
-        .success-message {
-            background: #efe;
-            color: #3c3;
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border: 1px solid #cfc;
-        }
+      .success-message {
+        background: #efe;
+        color: #3c3;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid #cfc;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <script src="../js/auth.js"></script>
     <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <h1>🇰🇷 KoreaHistory</h1>
-                <p>관리자 로그인</p>
-            </div>
-
-            <form id="loginForm">
-                <div id="messageContainer"></div>
-
-                <div class="form-group">
-                    <label for="username">ID</label>
-                    <input type="text" id="username" name="username" required placeholder="관리자 아이디를 입력하세요">
-                </div>
-
-                <div class="form-group">
-                    <label for="password">PASSWORD</label>
-                    <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
-                </div>
-
-                <button type="submit" class="login-btn">
-                    로그인
-                </button>
-
-                <div class="forgot-password">
-                    <a href="#" onclick="showForgotPassword()">비밀번호를 잊으셨나요?</a>
-                </div>
-            </form>
+      <div class="login-card">
+        <div class="login-header">
+          <h1>🇰🇷 KoreaHistory</h1>
+          <p>관리자 로그인</p>
         </div>
+
+        <form id="loginForm">
+          <div id="messageContainer"></div>
+
+          <div class="form-group">
+            <label for="adminId">ID</label>
+            <input
+              type="text"
+              id="adminId"
+              name="adminId"
+              required
+              placeholder="관리자 ID를 입력하세요"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">PASSWORD</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="PASSWORD를 입력하세요"
+            />
+          </div>
+
+          <button type="submit" class="login-btn">로그인</button>
+
+          <div class="forgot-password">
+            <a href="#" onclick="showForgotPassword()"
+              >비밀번호를 잊으셨나요?</a
+            >
+          </div>
+        </form>
+      </div>
     </div>
 
     <script>
-        // 로그인 폼 처리
-        document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+      // 로그인 함수 (auth.js 대신 직접 정의)
+      async function login(adminId, password) {
+        console.log("login 함수 호출됨 - adminId:", adminId, "password:", password);
+        
+        try {
+          console.log("API 요청 시작 - URL: http://localhost:8080/api/v1/auth/login");
+          const response = await fetch("http://localhost:8080/api/v1/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ adminId: adminId, password }),
+          });
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const messageContainer = document.getElementById('messageContainer');
+          console.log("API 응답 상태:", response.status);
+          console.log("API 응답 OK:", response.ok);
 
-            // 간단한 유효성 검사
-            if (!username || !password) {
-                showMessage('사용자명과 비밀번호를 모두 입력해주세요.', 'error');
-                return;
+          if (response.ok) {
+            const authData = {
+              adminId: adminId,
+              loginTime: new Date().getTime(),
+              expiresAt: new Date().getTime() + 24 * 60 * 60 * 1000, // 24시간 후 만료
+            };
+
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+            console.log("로그인 성공 - localStorage 저장됨");
+            return { success: true };
+          } else {
+            const errorData = await response.text();
+            console.error("로그인 실패:", response.status, errorData);
+            try {
+              const errorJson = JSON.parse(errorData);
+              return { success: false, message: errorJson.error || "로그인에 실패했습니다." };
+            } catch (e) {
+              return { success: false, message: "로그인에 실패했습니다." };
             }
+          }
+        } catch (error) {
+          console.error("로그인 요청 오류:", error);
+          return { success: false, message: "서버 연결에 실패했습니다." };
+        }
+      }
 
-            // 인증 시스템을 통한 로그인
-            if (login(username, password)) {
-                showMessage('로그인 성공! 대시보드로 이동합니다...', 'success');
-                setTimeout(() => {
-                    redirectAfterLogin();
-                }, 1500);
-            } else {
-                showMessage('잘못된 사용자명 또는 비밀번호입니다.', 'error');
-            }
+      // 메시지 표시 함수
+      function showMessage(message, type) {
+        const messageContainer = document.getElementById("messageContainer");
+        const messageClass = type === "error" ? "error-message" : "success-message";
+        messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+      }
+
+      // 비밀번호 찾기 함수
+      function showForgotPassword() {
+        alert(
+          "비밀번호 재설정 기능은 관리자에게 문의하세요.\n\n연락처: admin@koreahistory.com"
+        );
+      }
+
+      // 로그인 후 리다이렉트 함수
+      function redirectAfterLogin() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get("redirect") || "dashboard.html";
+        window.location.href = redirectTo;
+      }
+
+      // 로그인 폼 처리
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const adminId = document.getElementById("adminId").value;
+          const password = document.getElementById("password").value;
+          const messageContainer = document.getElementById("messageContainer");
+
+          // 간단한 유효성 검사
+          if (!adminId || !password) {
+            showMessage("관리자 ID와 PASSWORD를 모두 입력해주세요.", "error");
+            return;
+          }
+
+          // 로그인 버튼 비활성화
+          const loginBtn = document.querySelector(".login-btn");
+          loginBtn.disabled = true;
+          loginBtn.textContent = "로그인 중...";
+
+          // 인증 시스템을 통한 로그인 (비동기)
+          const loginResult = await login(adminId, password);
+
+          if (loginResult.success) {
+            showMessage("로그인 성공! 대시보드로 이동합니다...", "success");
+            setTimeout(() => {
+              redirectAfterLogin();
+            }, 1500);
+          } else {
+            showMessage(loginResult.message || "잘못된 관리자 ID 또는 PASSWORD입니다.", "error");
+            loginBtn.disabled = false;
+            loginBtn.textContent = "로그인";
+          }
         });
 
-        function showMessage(message, type) {
-            const messageContainer = document.getElementById('messageContainer');
-            const messageClass = type === 'error' ? 'error-message' : 'success-message';
-            messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+      // 엔터키로 로그인
+      document.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          document.getElementById("loginForm").dispatchEvent(new Event("submit"));
         }
-
-        function showForgotPassword() {
-            alert('비밀번호 재설정 기능은 관리자에게 문의하세요.\n\n연락처: admin@koreahistory.com');
-        }
-
-        // 엔터키로 로그인
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-            }
-        });
+      });
     </script>
-</body>
-
+  </body>
 </html>

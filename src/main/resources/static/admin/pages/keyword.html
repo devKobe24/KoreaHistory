@@ -57,7 +57,11 @@
                 <div class="form-group">
                     <label for="searchKeyword">검색어</label>
                     <input type="text" id="searchKeyword" name="keyword" class="form-control"
-                        placeholder="키워드를 입력하세요 (예: 뗀석기)" required>
+                        placeholder="키워드를 입력하세요 (예: 뗀석기, 뗀석기+주먹도끼, 뗀석기 주먹도끼 찍개)" required>
+                    <small class="form-text text-muted">
+                        💡 조합 검색: 쉼표(,), 공백, + 기호로 구분하여 여러 키워드를 동시에 검색할 수 있습니다.<br>
+                        예시: "뗀석기", "뗀석기,주먹도끼", "뗀석기+주먹도끼+찍개", "뗀석기 주먹도끼 찍개"
+                    </small>
                 </div>
                 <button type="submit" class="btn btn-primary">검색</button>
             </form>
@@ -85,14 +89,26 @@
             </form>
         </div>
 
-        <!-- 검색 결과 및 Keyword 목록 -->
+        <!-- Keyword 목록 섹션 -->
         <div class="card fade-in">
-            <h2>📋 Keyword 목록</h2>
+            <h2>📚 Keyword 목록</h2>
             <div class="mb-2">
-                <button onclick="clearResults()" class="btn btn-secondary">결과 초기화</button>
+                <button onclick="loadAllKeywords()" class="btn btn-primary">전체 목록 새로고침</button>
+                <button onclick="clearKeywordList()" class="btn btn-secondary">목록 초기화</button>
+            </div>
+            <div id="keywordCardsContainer">
+                <div class="alert alert-info">Keyword 목록을 불러오거나 새 Keyword를 생성해보세요.</div>
+            </div>
+        </div>
+
+        <!-- 검색 결과 및 Keyword 검색 결과 목록 -->
+        <div class="card fade-in">
+            <h2>🔍 Keyword 검색 결과</h2>
+            <div class="mb-2">
+                <button onclick="clearResults()" class="btn btn-secondary">검색 결과 초기화</button>
             </div>
             <div id="keywordsList">
-                <div class="alert alert-info">키워드를 검색하거나 생성해보세요.</div>
+                <div class="alert alert-info">키워드를 검색해보세요.</div>
             </div>
         </div>
     </main>

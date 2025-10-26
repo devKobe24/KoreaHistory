@@ -8,6 +8,7 @@ let lessons = [];
 // 페이지 로드 시 실행
 document.addEventListener("DOMContentLoaded", function () {
   loadLessons();
+  loadSections(); // 페이지 로드 시 자동으로 Section 목록 로드
 
   // 폼 이벤트 리스너
   document
@@ -86,42 +87,94 @@ async function loadSections() {
       displaySectionsList(sections);
     } else {
       container.innerHTML =
-        '<div class="alert alert-info">등록된 Section이 없습니다.</div>';
+        '<div class="alert alert-info">등록된 Section이 없습니다. 새 Section을 생성해보세요.</div>';
     }
   } catch (error) {
     console.error("Section 목록 로드 실패:", error);
     container.innerHTML =
       '<div class="alert alert-danger">Section 목록을 불러오는데 실패했습니다.</div>';
+  } finally {
+    // 로딩 상태 해제
+    hideLoading(container);
   }
 }
 
 /**
- * Section 목록 표시
+ * Section 목록 표시 (계층 구조로 변경)
  */
 function displaySectionsList(sections) {
   const container = document.getElementById("sectionsList");
 
-  let html = '<div class="sections-grid">';
+  // 로딩 상태 해제
+  hideLoading(container);
+
+  let html = "";
 
   sections.forEach((section) => {
     html += `
-      <div class="section-card">
-        <div class="section-header">
-          <h4>${section.sectionNumber}. ${section.sectionTitle}</h4>
-          <div class="section-actions">
+      <div class="hierarchy">
+        <div class="hierarchy-item">
+          <span class="hierarchy-level">Section</span>
+          <strong>${section.sectionNumber}. ${section.sectionTitle}</strong>
+          <span style="margin-left: 10px; color: #666; font-size: 0.9em;">(ID: ${section.id})</span>
+          <div style="margin-left: 100px;">
             <button class="btn btn-warning btn-small" onclick="editSection(${section.id})">수정</button>
             <button class="btn btn-danger btn-small" onclick="deleteSection(${section.id})">삭제</button>
           </div>
         </div>
-        <div class="section-info">
-          <p><strong>Lesson:</strong> ${section.lesson ? section.lesson.lessonTitle : "N/A"}</p>
-          <p><strong>Chapter:</strong> ${section.lesson && section.lesson.chapter ? section.lesson.chapter.chapterTitle : "N/A"}</p>
-        </div>
-      </div>
     `;
+
+    // Subsections 표시
+    if (section.subsections && section.subsections.length > 0) {
+      section.subsections.forEach((subsection) => {
+        html += `
+          <div class="hierarchy-item" style="margin-left: 20px;">
+            <span class="hierarchy-level">Subsection</span>
+            <strong>${subsection.subsectionNumber}. ${subsection.subsectionTitle}</strong>
+          </div>
+        `;
+
+        // Topics 표시
+        if (subsection.topics && subsection.topics.length > 0) {
+          subsection.topics.forEach((topic) => {
+            html += `
+              <div class="hierarchy-item" style="margin-left: 40px;">
+                <span class="hierarchy-level">Topic</span>
+                <strong>${topic.topicNumber}. ${topic.topicTitle}</strong>
+              </div>
+            `;
+
+            // Keywords 표시
+            if (topic.keywords && topic.keywords.length > 0) {
+              topic.keywords.forEach((keyword) => {
+                html += `
+                  <div class="hierarchy-item" style="margin-left: 60px;">
+                    <span class="hierarchy-level">Keyword</span>
+                    <strong>${keyword.keywordNumber}. ${keyword.keywords ? keyword.keywords.join(", ") : ""}</strong>
+                  </div>
+                `;
+
+                // Contents 표시
+                if (keyword.contents && keyword.contents.length > 0) {
+                  keyword.contents.forEach((content) => {
+                    html += `
+                      <div class="hierarchy-item" style="margin-left: 80px;">
+                        <span class="hierarchy-level">Content</span>
+                        <div>${content.details ? content.details.join("<br>") : ""}</div>
+                      </div>
+                    `;
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+
+    html += "</div>";
   });
 
-  html += "</div>";
   container.innerHTML = html;
 }
 
@@ -196,7 +249,7 @@ async function handleSearchSection(event) {
 }
 
 /**
- * Section 상세 정보 표시
+ * Section 상세 정보 표시 (간단한 카드 형태로 변경)
  */
 function displaySectionDetail(sectionDetail) {
   const container = document.getElementById("sectionDetail");
@@ -208,66 +261,22 @@ function displaySectionDetail(sectionDetail) {
   }
 
   let html = `
-        <div class="hierarchy">
-            <div class="hierarchy-item">
-                <span class="hierarchy-level">Section</span>
-                <strong>${sectionDetail.sectionNumber}. ${sectionDetail.sectionTitle}</strong>
-                <div style="margin-left: 100px;">
-                    <button class="btn btn-warning btn-small" onclick="editSection(${sectionDetail.id})">수정</button>
-                    <button class="btn btn-danger btn-small" onclick="deleteSection(${sectionDetail.id})">삭제</button>
-                </div>
-            </div>
-    `;
+    <div class="section-card">
+      <div class="section-header">
+        <h4>${sectionDetail.sectionNumber}. ${sectionDetail.sectionTitle}</h4>
+        <div class="section-actions">
+          <button class="btn btn-warning btn-small" onclick="editSection(${sectionDetail.id})">수정</button>
+          <button class="btn btn-danger btn-small" onclick="deleteSection(${sectionDetail.id})">삭제</button>
+        </div>
+      </div>
+      <div class="section-info">
+        <p><strong>Section ID:</strong> ${sectionDetail.id}</p>
+        <p><strong>Lesson:</strong> ${sectionDetail.lesson ? sectionDetail.lesson.lessonTitle : "N/A"}</p>
+        <p><strong>Chapter:</strong> ${sectionDetail.lesson && sectionDetail.lesson.chapter ? sectionDetail.lesson.chapter.chapterTitle : "N/A"}</p>
+      </div>
+    </div>
+  `;
 
-  // Subsections 표시
-  if (sectionDetail.subsections && sectionDetail.subsections.length > 0) {
-    sectionDetail.subsections.forEach((subsection) => {
-      html += `
-                <div class="hierarchy-item" style="margin-left: 20px;">
-                    <span class="hierarchy-level">Subsection</span>
-                    <strong>${subsection.subsectionNumber}. ${subsection.subsectionTitle}</strong>
-                </div>
-            `;
-
-      // Topics 표시
-      if (subsection.topics && subsection.topics.length > 0) {
-        subsection.topics.forEach((topic) => {
-          html += `
-                        <div class="hierarchy-item" style="margin-left: 40px;">
-                            <span class="hierarchy-level">Topic</span>
-                            <strong>${topic.topicNumber}. ${topic.topicTitle}</strong>
-                        </div>
-                    `;
-
-          // Keywords 표시
-          if (topic.keywords && topic.keywords.length > 0) {
-            topic.keywords.forEach((keyword) => {
-              html += `
-                                <div class="hierarchy-item" style="margin-left: 60px;">
-                                    <span class="hierarchy-level">Keyword</span>
-                                    <strong>${keyword.keywordNumber}. ${keyword.keywords ? keyword.keywords.join(", ") : ""}</strong>
-                                </div>
-                            `;
-
-              // Contents 표시
-              if (keyword.contents && keyword.contents.length > 0) {
-                keyword.contents.forEach((content) => {
-                  html += `
-                                        <div class="hierarchy-item" style="margin-left: 80px;">
-                                            <span class="hierarchy-level">Content</span>
-                                            <div>${content.details ? content.details.join("<br>") : ""}</div>
-                                        </div>
-                                    `;
-                });
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-
-  html += "</div>";
   container.innerHTML = html;
 }
 

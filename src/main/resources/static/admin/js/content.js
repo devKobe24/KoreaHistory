@@ -84,40 +84,43 @@ async function loadContents() {
     console.error("Content 목록 로드 실패:", error);
     container.innerHTML =
       '<div class="alert alert-danger">Content 목록을 불러오는데 실패했습니다.</div>';
+  } finally {
+    // 로딩 상태 해제
+    hideLoading(container);
   }
 }
 
 /**
- * Content 목록 표시
+ * Content 목록 표시 (계층 구조로 변경)
  */
 function displayContentsList(contents) {
   const container = document.getElementById("contentsList");
-  
-  let html = '<div class="sections-grid">';
-  
+
+  // 로딩 상태 해제
+  hideLoading(container);
+
+  let html = "";
+
   contents.forEach((content) => {
     html += `
-      <div class="section-card">
-        <div class="section-header">
-          <h4>Content #${content.id}</h4>
-          <div class="section-actions">
+      <div class="hierarchy">
+        <div class="hierarchy-item">
+          <span class="hierarchy-level">Content</span>
+          <strong>Content #${content.id}</strong>
+          <span style="margin-left: 10px; color: #666; font-size: 0.9em;">(ID: ${content.id})</span>
+          <div style="margin-left: 100px;">
             <button class="btn btn-warning btn-small" onclick="editContent(${content.id})">수정</button>
             <button class="btn btn-danger btn-small" onclick="deleteContent(${content.id})">삭제</button>
           </div>
         </div>
-        <div class="section-info">
-          <p><strong>Keyword:</strong> ${content.keyword ? (content.keyword.keywords ? content.keyword.keywords.join(", ") : "N/A") : "N/A"}</p>
-          <p><strong>Topic:</strong> ${content.keyword && content.keyword.topic ? content.keyword.topic.topicTitle : "N/A"}</p>
-          <p><strong>Subsection:</strong> ${content.keyword && content.keyword.topic && content.keyword.topic.subsection ? content.keyword.topic.subsection.subsectionTitle : "N/A"}</p>
-          <p><strong>Section:</strong> ${content.keyword && content.keyword.topic && content.keyword.topic.subsection && content.keyword.topic.subsection.section ? content.keyword.topic.subsection.section.sectionTitle : "N/A"}</p>
-          <p><strong>Lesson:</strong> ${content.keyword && content.keyword.topic && content.keyword.topic.subsection && content.keyword.topic.subsection.section && content.keyword.topic.subsection.section.lesson ? content.keyword.topic.subsection.section.lesson.lessonTitle : "N/A"}</p>
-          <p><strong>Chapter:</strong> ${content.keyword && content.keyword.topic && content.keyword.topic.subsection && content.keyword.topic.subsection.section && content.keyword.topic.subsection.section.lesson && content.keyword.topic.subsection.section.lesson.chapter ? content.keyword.topic.subsection.section.lesson.chapter.chapterTitle : "N/A"}</p>
+        <div class="hierarchy-item" style="margin-left: 20px;">
+          <span class="hierarchy-level">Details</span>
+          <div>${content.details ? content.details.join("<br>") : ""}</div>
         </div>
       </div>
     `;
   });
-  
-  html += "</div>";
+
   container.innerHTML = html;
 }
 
@@ -183,8 +186,18 @@ async function handleSearchContent(event) {
       await ApiEndpoints.contents.getById(contentId);
     displayContentDetail(contentDetail);
 
-    // 상세 정보 카드 표시
-    document.getElementById("contentDetailCard").style.display = "block";
+    // 상세 정보 카드 표시 (fade in 애니메이션)
+    const detailCard = document.getElementById("contentDetailCard");
+    detailCard.style.display = "block";
+    detailCard.style.opacity = "0";
+    detailCard.style.transform = "translateY(20px)";
+    
+    // 애니메이션 적용
+    setTimeout(() => {
+      detailCard.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      detailCard.style.opacity = "1";
+      detailCard.style.transform = "translateY(0)";
+    }, 10);
   } catch (error) {
     console.error("Content 조회 실패:", error);
     showAlert("Content 조회에 실패했습니다.", "error");
@@ -205,30 +218,26 @@ function displayContentDetail(contentDetail) {
   }
 
   let html = `
-        <div class="hierarchy">
-            <div class="hierarchy-item">
-                <span class="hierarchy-level">Content</span>
-                <strong>ID: ${contentDetail.id}</strong>
-                <div style="margin-left: 100px;">
-                    <button class="btn btn-warning btn-small" onclick="editContent(${contentDetail.id})">수정</button>
-                    <button class="btn btn-danger btn-small" onclick="deleteContent(${contentDetail.id})">삭제</button>
-                </div>
-            </div>
-    `;
+    <div class="section-card">
+      <div class="section-header">
+        <h4>Content #${contentDetail.id}</h4>
+        <div class="section-actions">
+          <button class="btn btn-warning btn-small" onclick="editContent(${contentDetail.id})">수정</button>
+          <button class="btn btn-danger btn-small" onclick="deleteContent(${contentDetail.id})">삭제</button>
+        </div>
+      </div>
+      <div class="section-info">
+        <p><strong>Content ID:</strong> ${contentDetail.id}</p>
+        <p><strong>Keyword:</strong> ${contentDetail.keyword ? (contentDetail.keyword.keywords ? contentDetail.keyword.keywords.join(", ") : "N/A") : "N/A"}</p>
+        <p><strong>Topic:</strong> ${contentDetail.keyword && contentDetail.keyword.topic ? contentDetail.keyword.topic.topicTitle : "N/A"}</p>
+        <p><strong>Subsection:</strong> ${contentDetail.keyword && contentDetail.keyword.topic && contentDetail.keyword.topic.subsection ? contentDetail.keyword.topic.subsection.subsectionTitle : "N/A"}</p>
+        <p><strong>Section:</strong> ${contentDetail.keyword && contentDetail.keyword.topic && contentDetail.keyword.topic.subsection && contentDetail.keyword.topic.subsection.section ? contentDetail.keyword.topic.subsection.section.sectionTitle : "N/A"}</p>
+        <p><strong>Lesson:</strong> ${contentDetail.keyword && contentDetail.keyword.topic && contentDetail.keyword.topic.subsection && contentDetail.keyword.topic.subsection.section && contentDetail.keyword.topic.subsection.section.lesson ? contentDetail.keyword.topic.subsection.section.lesson.lessonTitle : "N/A"}</p>
+        <p><strong>Chapter:</strong> ${contentDetail.keyword && contentDetail.keyword.topic && contentDetail.keyword.topic.subsection && contentDetail.keyword.topic.subsection.section && contentDetail.keyword.topic.subsection.section.lesson && contentDetail.keyword.topic.subsection.section.lesson.chapter ? contentDetail.keyword.topic.subsection.section.lesson.chapter.chapterTitle : "N/A"}</p>
+      </div>
+    </div>
+  `;
 
-  // Details 표시
-  if (contentDetail.details && contentDetail.details.length > 0) {
-    contentDetail.details.forEach((detail, index) => {
-      html += `
-                <div class="hierarchy-item" style="margin-left: 20px;">
-                    <span class="hierarchy-level">Detail ${index + 1}</span>
-                    <div>${detail}</div>
-                </div>
-            `;
-    });
-  }
-
-  html += "</div>";
   container.innerHTML = html;
 }
 
