@@ -3,6 +3,7 @@
  */
 
 let keywords = [];
+let allKeywords = []; // 전체 키워드 목록
 
 // 페이지 로드 시 실행
 document.addEventListener("DOMContentLoaded", function () {
@@ -16,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("editKeywordForm")
     .addEventListener("submit", handleEditKeyword);
+
+  // 페이지 로드 시 전체 키워드 목록 불러오기
+  loadAllKeywords();
 });
 
 /**
@@ -32,13 +36,66 @@ async function handleSearchKeyword(event) {
 
   try {
     showLoading(document.getElementById("keywordsList"));
-    keywords = await ApiEndpoints.keywords.search(formData.keyword);
+
+    // 검색어 파싱하여 조합 검색 수행
+    const searchTerms = parseSearchTerms(formData.keyword);
+    keywords = await searchKeywordCombinations(searchTerms);
     displayKeywords(keywords);
   } catch (error) {
     console.error("Keyword 검색 실패:", error);
     showAlert("Keyword 검색에 실패했습니다.", "error");
     document.getElementById("keywordsList").innerHTML =
       '<div class="alert alert-error">검색 중 오류가 발생했습니다.</div>';
+  }
+}
+
+/**
+ * 검색어 파싱 - 쉼표, 공백, + 기호로 구분된 키워드들을 추출
+ */
+function parseSearchTerms(searchInput) {
+  // 쉼표, 공백, + 기호로 구분하여 키워드 추출
+  const terms = searchInput
+    .split(/[,+\s]+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length > 0);
+
+  return terms;
+}
+
+/**
+ * 키워드 조합 검색 수행
+ */
+async function searchKeywordCombinations(searchTerms) {
+  try {
+    // 백엔드의 조합 검색 API 사용
+    if (searchTerms.length > 1) {
+      return await ApiEndpoints.keywords.searchCombination(searchTerms);
+    } else {
+      // 단일 키워드 검색
+      return await ApiEndpoints.keywords.search(searchTerms[0]);
+    }
+  } catch (error) {
+    console.warn("조합 검색 실패, 개별 검색으로 대체:", error);
+
+    // 조합 검색 실패 시 개별 검색으로 대체
+    const allResults = [];
+    const seenIds = new Set();
+
+    for (const term of searchTerms) {
+      try {
+        const results = await ApiEndpoints.keywords.search(term);
+        results.forEach((result) => {
+          if (!seenIds.has(result.id)) {
+            allResults.push(result);
+            seenIds.add(result.id);
+          }
+        });
+      } catch (error) {
+        console.warn(`검색어 "${term}" 검색 실패:`, error);
+      }
+    }
+
+    return allResults;
   }
 }
 
@@ -74,6 +131,7 @@ async function handleCreateKeyword(event) {
     };
 
     await ApiEndpoints.keywords.create(formData.topicTitle, keywordData);
+
     showAlert("Keyword가 성공적으로 생성되었습니다.", "success");
 
     // 폼 초기화
@@ -81,7 +139,14 @@ async function handleCreateKeyword(event) {
 
     // 생성된 키워드로 자동 검색
     document.getElementById("searchKeyword").value = keywordsArray[0];
-    handleSearchKeyword({ preventDefault: () => {} });
+
+    // 검색 폼 제출 이벤트 트리거
+    document
+      .getElementById("searchKeywordForm")
+      .dispatchEvent(new Event("submit"));
+
+    // 전체 키워드 목록 새로고침
+    loadAllKeywords();
   } catch (error) {
     console.error("Keyword 생성 실패:", error);
     showAlert("Keyword 생성에 실패했습니다.", "error");
@@ -190,6 +255,9 @@ async function handleEditKeyword(event) {
         .getElementById("searchKeywordForm")
         .dispatchEvent(new Event("submit"));
     }
+
+    // 전체 키워드 목록 새로고침
+    loadAllKeywords();
   } catch (error) {
     console.error("Keyword 수정 실패:", error);
     showAlert("Keyword 수정에 실패했습니다.", "error");
@@ -224,6 +292,9 @@ function deleteKeyword(keywordId) {
             .getElementById("searchKeywordForm")
             .dispatchEvent(new Event("submit"));
         }
+
+        // 전체 키워드 목록 새로고침
+        loadAllKeywords();
       } catch (error) {
         console.error("Keyword 삭제 실패:", error);
         showAlert("Keyword 삭제에 실패했습니다.", "error");
@@ -234,12 +305,93 @@ function deleteKeyword(keywordId) {
 }
 
 /**
+ * 전체 키워드 목록 불러오기
+ */
+async function loadAllKeywords() {
+  try {
+    showLoading(document.getElementById("keywordCardsContainer"));
+    allKeywords = await ApiEndpoints.keywords.getAll();
+    displayKeywordCards(allKeywords);
+  } catch (error) {
+    console.error("전체 키워드 목록 불러오기 실패:", error);
+    showAlert("키워드 목록을 불러오는데 실패했습니다.", "error");
+    document.getElementById("keywordCardsContainer").innerHTML =
+      '<div class="alert alert-error">키워드 목록을 불러오는 중 오류가 발생했습니다.</div>';
+  }
+}
+
+/**
+ * 키워드 카드 표시
+ */
+function displayKeywordCards(keywordsData) {
+  const container = document.getElementById("keywordCardsContainer");
+
+  if (!keywordsData || keywordsData.length === 0) {
+    container.innerHTML =
+      '<div class="alert alert-info">등록된 Keyword가 없습니다.</div>';
+    return;
+  }
+
+  const cardsHtml = keywordsData
+    .map((keyword) => {
+      const keywordsText = keyword.keywords ? keyword.keywords.join(", ") : "-";
+      const topicTitle =
+        keyword.topic && keyword.topic.topicTitle
+          ? keyword.topic.topicTitle
+          : "Topic 정보 없음";
+
+      return `
+      <div class="keyword-card" data-keyword-id="${keyword.id}">
+        <div class="keyword-card-header">
+          <h3 class="keyword-card-title">
+            <span class="keyword-number">#${keyword.keywordNumber}</span>
+            ${topicTitle}
+          </h3>
+          <div class="keyword-card-actions">
+            <button class="btn btn-sm btn-warning" onclick="editKeyword(${keyword.id})">
+              ✏️ 수정
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteKeyword(${keyword.id})">
+              🗑️ 삭제
+            </button>
+          </div>
+        </div>
+        <div class="keyword-card-body">
+          <div class="keyword-tags">
+            ${keyword.keywords ? keyword.keywords.map((k) => `<span class="keyword-tag">${k}</span>`).join("") : ""}
+          </div>
+        </div>
+        <div class="keyword-card-footer">
+          <small class="text-muted">ID: ${keyword.id}</small>
+        </div>
+      </div>
+    `;
+    })
+    .join("");
+
+  container.innerHTML = `
+    <div class="keyword-cards-grid">
+      ${cardsHtml}
+    </div>
+  `;
+}
+
+/**
+ * 키워드 목록 초기화
+ */
+function clearKeywordList() {
+  allKeywords = [];
+  document.getElementById("keywordCardsContainer").innerHTML =
+    '<div class="alert alert-info">Keyword 목록을 불러오거나 새 Keyword를 생성해보세요.</div>';
+}
+
+/**
  * 결과 초기화
  */
 function clearResults() {
   keywords = [];
   document.getElementById("keywordsList").innerHTML =
-    '<div class="alert alert-info">키워드를 검색하거나 생성해보세요.</div>';
+    '<div class="alert alert-info">키워드를 검색해보세요.</div>';
   document.getElementById("searchKeyword").value = "";
 }
 
