@@ -23,5 +23,12 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 	@Query("SELECT k FROM Keyword k JOIN k.keywords keywordValue WHERE keywordValue LIKE %:keyword%")
 	Optional<List<Keyword>> findByKeywordsContaining(@Param("keyword") String keyword);
 
-	Optional<Keyword> findById(Long id);
+	@Query("SELECT DISTINCT k FROM Keyword k JOIN k.keywords keywordValue WHERE keywordValue IN :keywords")
+	Optional<List<Keyword>> findByKeywordsIn(@Param("keywords") List<String> keywords);
+
+	@Query("SELECT DISTINCT k FROM Keyword k JOIN k.keywords keywordValue WHERE keywordValue LIKE %:keyword%")
+	Optional<List<Keyword>> findByKeywordsContainingIgnoreCase(@Param("keyword") String keyword);
+
+	@Query("SELECT k FROM Keyword k LEFT JOIN FETCH k.topic")
+	List<Keyword> findAllWithTopic();
 }
