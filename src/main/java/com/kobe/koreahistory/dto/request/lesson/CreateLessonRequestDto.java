@@ -1,6 +1,5 @@
 package com.kobe.koreahistory.dto.request.lesson;
 
-import com.kobe.koreahistory.domain.entity.Lesson;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,13 +25,5 @@ public class CreateLessonRequestDto {
 	public CreateLessonRequestDto(Integer lessonNumber, String lessonTitle) {
 		this.lessonNumber = lessonNumber;
 		this.lessonTitle = lessonTitle;
-	}
-
-	// Request DTO의 핵심 역할 : DTO -> Entity 변환
-	public static Lesson toEntity(CreateLessonRequestDto requestDto) {
-		return Lesson.builder()
-			.lessonNumber(requestDto.getLessonNumber())
-			.lessonTitle(requestDto.getLessonTitle())
-			.build();
 	}
 }
