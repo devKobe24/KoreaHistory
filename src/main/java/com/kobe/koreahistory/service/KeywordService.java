@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +63,48 @@ public class KeywordService {
 			.collect(Collectors.toList());
 	}
 
+	@Transactional(readOnly = true)
+	public List<ReadKeywordResponseDto> searchKeywordsByCombination(List<String> keywords) {
+		// 각 키워드에 대해 검색 수행
+		List<Keyword> allResults = new ArrayList<>();
+		Set<Long> seenIds = new HashSet<>();
+		
+		for (String keyword : keywords) {
+			List<Keyword> results = keywordRepository.findByKeywordsContaining(keyword)
+				.orElse(new ArrayList<>());
+			
+			for (Keyword result : results) {
+				if (!seenIds.contains(result.getId())) {
+					allResults.add(result);
+					seenIds.add(result.getId());
+				}
+			}
+		}
+		
+		// 조합 검색: 모든 키워드가 포함된 결과만 필터링
+		List<Keyword> combinationResults = allResults.stream()
+			.filter(keyword -> {
+				if (keyword.getKeywords() == null || keyword.getKeywords().isEmpty()) {
+					return false;
+				}
+				
+				// 모든 검색 키워드가 포함되어 있는지 확인
+				return keywords.stream().allMatch(searchKeyword ->
+					keyword.getKeywords().stream().anyMatch(keywordItem ->
+						keywordItem.toLowerCase().contains(searchKeyword.toLowerCase())
+					)
+				);
+			})
+			.collect(Collectors.toList());
+		
+		// 조합 검색 결과가 있으면 반환, 없으면 개별 검색 결과 반환
+		List<Keyword> finalResults = combinationResults.isEmpty() ? allResults : combinationResults;
+		
+		return finalResults.stream()
+			.map(ReadKeywordResponseDto::new)
+			.collect(Collectors.toList());
+	}
+
 	@Transactional
 	public PatchKeywordResponseDto updateKeyword(Long keywordId, PatchKeywordRequestDto requestDto) {
 		// ID로 Update할 Keyword 조회
@@ -100,7 +145,7 @@ public class KeywordService {
 
 	@Transactional(readOnly = true)
 	public List<ReadKeywordResponseDto> findAllKeywords() {
-		List<Keyword> keywords = keywordRepository.findAll();
+		List<Keyword> keywords = keywordRepository.findAllWithTopic();
 		return keywords.stream()
 			.map(ReadKeywordResponseDto::new)
 			.collect(Collectors.toList());
