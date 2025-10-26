@@ -140,6 +140,14 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/search/keywords/combination")
+	public ResponseEntity<List<ReadKeywordResponseDto>> searchKeywordCombination(
+		@RequestParam List<String> keywords
+	) {
+		List<ReadKeywordResponseDto> response = keywordService.searchKeywordsByCombination(keywords);
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/keywords/search/all")
 	public ResponseEntity<List<ReadKeywordResponseDto>> searchAllKeywords() {
 		List<ReadKeywordResponseDto> response = keywordService.findAllKeywords();
