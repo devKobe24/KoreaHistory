@@ -1,6 +1,7 @@
 package com.kobe.koreahistory.dto.response.keyword;
 
 import com.kobe.koreahistory.domain.entity.Keyword;
+import com.kobe.koreahistory.dto.response.topic.TopicInfoResponseDto;
 import lombok.Getter;
 
 import java.util.List;
@@ -21,10 +22,12 @@ public class ReadKeywordResponseDto {
 	private Long id;
 	private Integer keywordNumber;
 	private List<String> keywords;
+	private TopicInfoResponseDto topic;
 
 	public ReadKeywordResponseDto(Keyword entity) {
 		this.id = entity.getId();
 		this.keywordNumber = entity.getKeywordNumber();
 		this.keywords = entity.getKeywords();
+		this.topic = entity.getTopic() != null ? new TopicInfoResponseDto(entity.getTopic()) : null;
 	}
 }
