@@ -1,220 +1,246 @@
 <!DOCTYPE html>
 <html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KoreaHistory - 한국사 학습 플랫폼</title>
-    <link rel="stylesheet" href="css/user.css">
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
-        rel="stylesheet">
-</head>
+    <link rel="stylesheet" href="css/user.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<body>
+  <body class="page-transition">
     <!-- 헤더 -->
     <header class="header">
-        <nav class="navbar">
-            <div class="nav-brand">
-                <h1>🇰🇷 KoreaHistory</h1>
-                <span>한국사 학습 플랫폼</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link active">홈</a></li>
-                <li><a href="#chapters" class="nav-link">시대별 학습</a></li>
-                <li><a href="#search" class="nav-link">검색</a></li>
-                <li><a href="#about" class="nav-link">소개</a></li>
-                <li><a href="../admin/index.html" class="nav-link admin-link">관리자</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+      <nav class="navbar">
+        <div class="nav-brand">
+          <h1>🇰🇷 KoreaHistory</h1>
+          <span>한국사 학습 플랫폼</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="#home" class="nav-link active">홈</a></li>
+          <li><a href="pages/chapter.html" class="nav-link">학습 시작하기</a></li>
+          <li><a href="#chapters" class="nav-link">시대별 학습</a></li>
+          <li><a href="#search" class="nav-link">검색</a></li>
+          <li><a href="#about" class="nav-link">소개</a></li>
+          <li>
+            <a href="../admin/index.html" class="nav-link admin-link">관리자</a>
+          </li>
+        </ul>
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
     </header>
 
     <!-- 메인 히어로 섹션 -->
     <section id="home" class="hero">
-        <div class="hero-content hero-centered">
-            <h1 class="hero-title">한국사와 함께하는<br><span class="highlight">역사 여행</span></h1>
-            <p class="hero-description">
-                선사시대부터 현대까지, 체계적이고 흥미로운 한국사 학습을 시작해보세요.<br>
-                시대별, 주제별로 구성된 풍부한 학습 자료를 통해 한국사를 깊이 있게 이해할 수 있습니다.
-            </p>
-            <div class="hero-buttons">
-                <button class="btn btn-primary" onclick="window.location.href='pages/chapter.html'">
-                    🚀 학습 시작하기
-                </button>
-                <button class="btn btn-secondary" onclick="scrollToSection('search')">
-                    🔍 자료 검색하기
-                </button>
-            </div>
+      <div class="hero-content hero-centered">
+        <h1 class="hero-title">
+          한국사와 함께하는<br /><span class="highlight">역사 여행</span>
+        </h1>
+        <p class="hero-description">
+          선사시대부터 현대까지, 체계적이고 흥미로운 한국사 학습을
+          시작해보세요.<br />
+          시대별, 주제별로 구성된 풍부한 학습 자료를 통해 한국사를 깊이 있게
+          이해할 수 있습니다.
+        </p>
+        <div class="hero-buttons">
+          <button
+            class="btn btn-primary"
+            onclick="navigateToChapter()"
+          >
+            🚀 학습 시작하기
+          </button>
+          <button class="btn btn-secondary" onclick="scrollToSection('search')">
+            🔍 자료 검색하기
+          </button>
         </div>
+      </div>
     </section>
 
     <!-- 시대별 학습 섹션 -->
     <section id="chapters" class="chapters-section">
-        <div class="container">
-            <h2 class="section-title">📚 시대별 학습</h2>
-            <p class="section-description">체계적인 시대 구분으로 한국사를 단계별로 학습해보세요</p>
+      <div class="container">
+        <h2 class="section-title">📚 시대별 학습</h2>
+        <p class="section-description">
+          체계적인 시대 구분으로 한국사를 단계별로 학습해보세요
+        </p>
 
-            <div class="chapters-grid" id="chaptersGrid">
-                <!-- 동적으로 로드될 챕터들 -->
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                    <p>학습 자료를 불러오는 중...</p>
-                </div>
-            </div>
+        <div class="chapters-grid" id="chaptersGrid">
+          <!-- 동적으로 로드될 챕터들 -->
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>학습 자료를 불러오는 중...</p>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- 검색 섹션 -->
     <section id="search" class="search-section">
-        <div class="container">
-            <h2 class="section-title">🔍 학습 자료 검색</h2>
-            <p class="section-description">원하는 키워드로 관련 학습 자료를 빠르게 찾아보세요</p>
+      <div class="container">
+        <h2 class="section-title">🔍 학습 자료 검색</h2>
+        <p class="section-description">
+          원하는 키워드로 관련 학습 자료를 빠르게 찾아보세요
+        </p>
 
-            <div class="search-container">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="검색어를 입력하세요 (예: 조선, 고려, 삼국시대...)" />
-                    <button class="search-btn" onclick="performSearch()">
-                        <span class="search-icon">🔍</span>
-                    </button>
-                </div>
-                <div class="search-filters">
-                    <button class="filter-btn active" data-filter="all">전체</button>
-                    <button class="filter-btn" data-filter="chapter">시대</button>
-                    <button class="filter-btn" data-filter="lesson">주제</button>
-                    <button class="filter-btn" data-filter="keyword">키워드</button>
-                </div>
-            </div>
-
-            <div class="search-results" id="searchResults">
-                <div class="no-search">
-                    <div class="no-search-icon">🔍</div>
-                    <p>검색어를 입력하여 관련 학습 자료를 찾아보세요</p>
-                </div>
-            </div>
+        <div class="search-container">
+          <div class="search-box">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="검색어를 입력하세요 (예: 조선, 고려, 삼국시대...)"
+            />
+            <button class="search-btn" onclick="performSearch()">
+              <span class="search-icon">🔍</span>
+            </button>
+          </div>
+          <div class="search-filters">
+            <button class="filter-btn active" data-filter="all">전체</button>
+            <button class="filter-btn" data-filter="chapter">시대</button>
+            <button class="filter-btn" data-filter="lesson">주제</button>
+            <button class="filter-btn" data-filter="keyword">키워드</button>
+          </div>
         </div>
+
+        <div class="search-results" id="searchResults">
+          <div class="no-search">
+            <div class="no-search-icon">🔍</div>
+            <p>검색어를 입력하여 관련 학습 자료를 찾아보세요</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- 학습 통계 섹션 -->
+    <!-- Content List 섹션 -->
     <section class="stats-section">
-        <div class="container">
-            <h2 class="section-title">📊 학습 현황</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📚</div>
-                    <div class="stat-number" id="totalChapters">0</div>
-                    <div class="stat-label">총 시대</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📖</div>
-                    <div class="stat-number" id="totalLessons">0</div>
-                    <div class="stat-label">총 주제</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🏷️</div>
-                    <div class="stat-number" id="totalKeywords">0</div>
-                    <div class="stat-label">총 키워드</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📄</div>
-                    <div class="stat-number" id="totalContents">0</div>
-                    <div class="stat-label">총 내용</div>
-                </div>
-            </div>
+      <div class="container">
+        <h2 class="section-title">📊 Content List</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-number" id="totalChapters">0</div>
+            <div class="stat-label">총 시대</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-number" id="totalLessons">0</div>
+            <div class="stat-label">총 주제</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏷️</div>
+            <div class="stat-number" id="totalKeywords">0</div>
+            <div class="stat-label">총 키워드</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📄</div>
+            <div class="stat-number" id="totalContents">0</div>
+            <div class="stat-label">총 내용</div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- 소개 섹션 -->
     <section id="about" class="about-section">
-        <div class="container">
-            <h2 class="section-title">ℹ️ KoreaHistory 소개</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <h3>🎯 목표</h3>
-                    <p>KoreaHistory는 한국사를 체계적이고 효율적으로 학습할 수 있는 온라인 플랫폼입니다.
-                        시대별, 주제별로 구성된 풍부한 학습 자료를 통해 한국사를 깊이 있게 이해할 수 있습니다.</p>
+      <div class="container">
+        <h2 class="section-title">ℹ️ KoreaHistory 소개</h2>
+        <div class="about-content">
+          <div class="about-text">
+            <h3>🎯 목표</h3>
+            <p>
+              KoreaHistory는 한국사를 체계적이고 효율적으로 학습할 수 있는
+              온라인 플랫폼입니다. 시대별, 주제별로 구성된 풍부한 학습 자료를
+              통해 한국사를 깊이 있게 이해할 수 있습니다.
+            </p>
 
-                    <h3>✨ 특징</h3>
-                    <ul>
-                        <li>📚 7단계 계층적 학습 구조</li>
-                        <li>🔍 강력한 검색 및 필터링 기능</li>
-                        <li>📱 반응형 디자인으로 모든 기기 지원</li>
-                        <li>🎨 직관적이고 아름다운 사용자 인터페이스</li>
-                        <li>⚡ 빠른 로딩과 부드러운 사용자 경험</li>
-                    </ul>
-                </div>
-                <div class="about-visual">
-                    <div class="feature-showcase">
-                        <div class="feature-item">
-                            <div class="feature-icon">🏗️</div>
-                            <h4>체계적 구조</h4>
-                            <p>Chapter → Lesson → Section → Subsection → Topic → Keyword → Content</p>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">🔍</div>
-                            <h4>스마트 검색</h4>
-                            <p>키워드 기반 부분 검색으로 원하는 자료를 빠르게 찾기</p>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">📱</div>
-                            <h4>반응형 디자인</h4>
-                            <p>모든 기기에서 최적화된 학습 경험</p>
-                        </div>
-                    </div>
-                </div>
+            <h3>✨ 특징</h3>
+            <ul>
+              <li>📚 7단계 계층적 학습 구조</li>
+              <li>🔍 강력한 검색 및 필터링 기능</li>
+              <li>📱 반응형 디자인으로 모든 기기 지원</li>
+              <li>🎨 직관적이고 아름다운 사용자 인터페이스</li>
+              <li>⚡ 빠른 로딩과 부드러운 사용자 경험</li>
+            </ul>
+          </div>
+          <div class="about-visual">
+            <div class="feature-showcase">
+              <div class="feature-item">
+                <div class="feature-icon">🏗️</div>
+                <h4>체계적 구조</h4>
+                <p>
+                  Chapter → Lesson → Section → Subsection → Topic → Keyword →
+                  Content
+                </p>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">🔍</div>
+                <h4>스마트 검색</h4>
+                <p>키워드 기반 부분 검색으로 원하는 자료를 빠르게 찾기</p>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <h4>반응형 디자인</h4>
+                <p>모든 기기에서 최적화된 학습 경험</p>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- 푸터 -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>🇰🇷 KoreaHistory</h3>
-                    <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
-                </div>
-                <div class="footer-section">
-                    <h4>학습 자료</h4>
-                    <ul>
-                        <li><a href="pages/chapter.html">시대별 학습</a></li>
-                        <li><a href="#search">자료 검색</a></li>
-                        <li><a href="#about">플랫폼 소개</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>관리자</h4>
-                    <ul>
-                        <li><a href="../admin/index.html">관리자 페이지</a></li>
-                        <li><a href="../admin/pages/login.html">관리자 로그인</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>기술 정보</h4>
-                    <ul>
-                        <li>Spring Boot + JPA</li>
-                        <li>H2 Database</li>
-                        <li>RESTful API</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 KoreaHistory. 한국사 학습을 위한 모든 것.</p>
-            </div>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>🇰🇷 KoreaHistory</h3>
+            <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
+          </div>
+          <div class="footer-section">
+            <h4>학습 자료</h4>
+            <ul>
+              <li><a href="pages/chapter.html">시대별 학습</a></li>
+              <li><a href="#search">자료 검색</a></li>
+              <li><a href="#about">플랫폼 소개</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>관리자</h4>
+            <ul>
+              <li><a href="../admin/index.html">관리자 페이지</a></li>
+              <li><a href="../admin/pages/login.html">관리자 로그인</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>기술 정보</h4>
+            <ul>
+              <li>Spring Boot + JPA</li>
+              <li>H2 Database</li>
+              <li>RESTful API</li>
+            </ul>
+          </div>
         </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 KoreaHistory. 한국사 학습을 위한 모든 것.</p>
+        </div>
+      </div>
     </footer>
 
     <!-- 스크롤 투 탑 버튼 -->
     <button class="scroll-to-top" id="scrollToTop">
-        <span>↑</span>
+      <span>↑</span>
     </button>
 
     <script src="js/user.js"></script>
-</body>
-
+  </body>
 </html>
