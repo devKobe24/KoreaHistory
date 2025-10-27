@@ -520,10 +520,18 @@ function scrollToSection(sectionId) {
 
 // ===== 상세 페이지 열기 =====
 function openChapterDetail(chapter) {
-  // 실제 구현에서는 상세 페이지로 이동
-  alert(
-    `"${chapter.title}" 상세 페이지로 이동합니다.\n\n(실제 구현에서는 별도 페이지로 이동)`
-  );
+  // Chapter 상세 페이지로 이동
+  navigateToChapterDetail(chapter.id);
+}
+
+function navigateToChapterDetail(chapterId) {
+  // 페이드 아웃 애니메이션
+  document.body.classList.add('page-fade-out');
+  
+  // 애니메이션 완료 후 페이지 이동
+  setTimeout(() => {
+    window.location.href = `pages/chapter-detail.html?id=${chapterId}`;
+  }, 300);
 }
 
 function openResultDetail(result) {
