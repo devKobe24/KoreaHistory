@@ -47,6 +47,13 @@ public class ChapterService {
 	}
 
 	@Transactional(readOnly = true)
+	public ChapterResponseDto findById(Long id) {
+		Chapter chapter = chapterRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("해당 챕터를 찾을 수 없습니다. id = " + id));
+		return new ChapterResponseDto(chapter);
+	}
+
+	@Transactional(readOnly = true)
 	public ChapterResponseDto findChapterWithDetails(String chapterTitle) {
 		Chapter chapter = chapterRepository.findByChapterTitleWithDetails(chapterTitle)
 			.orElseThrow(() -> new IllegalArgumentException("해당 챕터를 찾을 수 없습니다. name =" + chapterTitle));
