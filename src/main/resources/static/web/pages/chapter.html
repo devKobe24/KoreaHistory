@@ -39,6 +39,7 @@
             font-weight: 700;
             margin-bottom: 1rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            color: white;
         }
 
         .chapter-description {
@@ -47,6 +48,7 @@
             max-width: 600px;
             margin: 0 auto 2rem;
             line-height: 1.6;
+            color: white;
         }
 
         .chapter-stats {
@@ -218,7 +220,7 @@
     </style>
 </head>
 
-<body>
+<body class="page-transition">
     <!-- 헤더 -->
     <header class="header">
         <nav class="navbar">
@@ -228,7 +230,8 @@
             </div>
             <ul class="nav-menu">
                 <li><a href="../index.html" class="nav-link">홈</a></li>
-                <li><a href="chapter.html" class="nav-link active">시대별 학습</a></li>
+                <li><a href="chapter.html" class="nav-link active">학습 시작하기</a></li>
+                <li><a href="../index.html#chapters" class="nav-link">시대별 학습</a></li>
                 <li><a href="../index.html#search" class="nav-link">검색</a></li>
                 <li><a href="../index.html#about" class="nav-link">소개</a></li>
                 <li><a href="../admin/index.html" class="nav-link admin-link">관리자</a></li>
@@ -343,6 +346,11 @@
         let currentChapter = null;
 
         document.addEventListener('DOMContentLoaded', function () {
+            // 페이지 로드 애니메이션
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 100);
+            
             loadChapterData();
             setupEventListeners();
         });

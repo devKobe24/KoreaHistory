@@ -5,6 +5,24 @@
   box-sizing: border-box;
 }
 
+/* ===== 페이지 전환 애니메이션 ===== */
+.page-transition {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.page-transition.loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
 :root {
   --primary-color: #2563eb;
   --primary-dark: #1d4ed8;
@@ -523,6 +541,10 @@ body {
     var(--primary-color),
     var(--primary-dark)
   );
+  color: white;
+}
+
+.stats-section .section-title {
   color: white;
 }
 
