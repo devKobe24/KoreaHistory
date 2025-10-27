@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 상세 - KoreaHistory</title>
+    <link rel="stylesheet" href="../css/user.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
+    <style>
+        .chapter-detail-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chapter-detail-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .chapter-detail-info {
+            position: relative;
+            z-index: 2;
+        }
+
+        .chapter-detail-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .chapter-detail-description {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+            color: white;
+        }
+
+        .chapter-detail-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fbbf24;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .lessons-section {
+            padding: 4rem 0;
+            background: var(--background-color);
+        }
+
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .lesson-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 50%;
+        }
+
+        .lesson-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .lesson-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-sections {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .section-item:hover {
+            color: var(--primary-color);
+        }
+
+        .section-icon {
+            font-size: 0.75rem;
+        }
+
+        .breadcrumb {
+            background: var(--surface-color);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--background-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            margin-bottom: 1rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(-3px);
+        }
+    </style>
+</head>
+
+<body class="page-transition">
+    <!-- 헤더 -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>🇰🇷 KoreaHistory</h1>
+                <span>한국사 학습 플랫폼</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">홈</a></li>
+                <li><a href="chapter.html" class="nav-link">학습 시작하기</a></li>
+                <li><a href="../index.html#chapters" class="nav-link">시대별 학습</a></li>
+                <li><a href="../index.html#search" class="nav-link">검색</a></li>
+                <li><a href="../index.html#about" class="nav-link">소개</a></li>
+                <li><a href="../admin/index.html" class="nav-link admin-link">관리자</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 브레드크럼 -->
+    <div class="breadcrumb">
+        <div class="container">
+            <div class="breadcrumb-content">
+                <a href="../index.html">홈</a>
+                <span>›</span>
+                <a href="chapter.html">학습 시작하기</a>
+                <span>›</span>
+                <span id="breadcrumbChapter">Chapter 상세</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 상세 헤더 -->
+    <section class="chapter-detail-header" id="chapterDetailHeader">
+        <div class="container">
+            <div class="chapter-detail-info">
+                <h1 class="chapter-detail-title" id="chapterDetailTitle">Chapter 상세</h1>
+                <p class="chapter-detail-description" id="chapterDetailDescription">
+                    이 시대의 주요 특징과 중요 사건들을 학습해보세요.
+                </p>
+                <div class="chapter-detail-stats" id="chapterDetailStats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalLessons">0</div>
+                        <div class="stat-label">총 주제</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalSections">0</div>
+                        <div class="stat-label">세부주제</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalKeywords">0</div>
+                        <div class="stat-label">키워드</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lessons 섹션 -->
+    <section class="lessons-section">
+        <div class="container">
+            <h2 class="section-title">📚 학습 주제</h2>
+            <p class="section-description">이 시대의 주요 주제들을 선택하여 학습하세요</p>
+
+            <div class="lessons-grid" id="lessonsGrid">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>학습 자료를 불러오는 중...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>🇰🇷 KoreaHistory</h3>
+                    <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
+                </div>
+                <div class="footer-section">
+                    <h4>학습 자료</h4>
+                    <ul>
+                        <li><a href="../index.html#chapters">시대별 학습</a></li>
+                        <li><a href="../index.html#search">자료 검색</a></li>
+                        <li><a href="../index.html#about">플랫폼 소개</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>관리자</h4>
+                    <ul>
+                        <li><a href="../admin/index.html">관리자 페이지</a></li>
+                        <li><a href="../admin/pages/login.html">관리자 로그인</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>기술 정보</h4>
+                    <ul>
+                        <li>Spring Boot + JPA</li>
+                        <li>H2 Database</li>
+                        <li>RESTful API</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 KoreaHistory. 한국사 학습을 위한 모든 것.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 스크롤 투 탑 버튼 -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <span>↑</span>
+    </button>
+
+    <script src="../js/user.js"></script>
+    <script>
+        // Chapter 상세 페이지 JavaScript
+        let currentChapter = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // 페이지 로드 애니메이션
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 100);
+            
+            loadChapterDetail();
+            setupEventListeners();
+        });
+
+        async function loadChapterDetail() {
+            try {
+                // URL 파라미터에서 챕터 ID 가져오기
+                const urlParams = new URLSearchParams(window.location.search);
+                const chapterId = urlParams.get('id');
+
+                console.log('Chapter ID:', chapterId);
+
+                if (!chapterId) {
+                    showError('Chapter ID가 없습니다.');
+                    return;
+                }
+
+                console.log('API 요청 URL:', `http://localhost:8080/api/v1/chapters/${chapterId}`);
+                const response = await fetch(`http://localhost:8080/api/v1/chapters/${chapterId}`);
+                
+                console.log('API 응답 상태:', response.status);
+                console.log('API 응답 OK:', response.ok);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API 오류 응답:', errorText);
+                    throw new Error(`Chapter를 불러올 수 없습니다. (${response.status})`);
+                }
+
+                const chapter = await response.json();
+                console.log('로드된 Chapter 데이터:', chapter);
+                
+                currentChapter = chapter;
+                displayChapterDetail(chapter);
+            } catch (error) {
+                console.error('Chapter 상세 로드 오류:', error);
+                showError(`Chapter를 불러오는데 실패했습니다: ${error.message}`);
+            }
+        }
+
+        function displayChapterDetail(chapter) {
+            // 페이지 제목 업데이트
+            document.title = `${chapter.chapterTitle} - KoreaHistory`;
+            
+            // 헤더 정보 업데이트
+            document.getElementById('chapterDetailTitle').textContent = chapter.chapterTitle;
+            document.getElementById('chapterDetailDescription').textContent = 
+                chapter.description || '이 시대의 주요 특징과 중요 사건들을 학습해보세요.';
+
+            // 브레드크럼 업데이트
+            document.getElementById('breadcrumbChapter').textContent = chapter.chapterTitle;
+
+            // 통계 업데이트
+            const totalLessons = chapter.lessons?.length || 0;
+            const totalSections = getTotalSections(chapter);
+            const totalKeywords = getTotalKeywords(chapter);
+
+            document.getElementById('totalLessons').textContent = totalLessons;
+            document.getElementById('totalSections').textContent = totalSections;
+            document.getElementById('totalKeywords').textContent = totalKeywords;
+
+            // Lessons 표시
+            displayLessons(chapter.lessons || []);
+        }
+
+        function displayLessons(lessons) {
+            const lessonsGrid = document.getElementById('lessonsGrid');
+            if (!lessonsGrid) return;
+
+            if (!lessons || lessons.length === 0) {
+                lessonsGrid.innerHTML = `
+                    <div class="no-search">
+                        <div class="no-search-icon">📚</div>
+                        <p>아직 등록된 학습 주제가 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            lessonsGrid.innerHTML = '';
+
+            lessons.forEach((lesson, index) => {
+                const lessonCard = createLessonCard(lesson, index);
+                lessonsGrid.appendChild(lessonCard);
+            });
+
+            // 애니메이션 효과
+            animateCards(lessonsGrid.children);
+        }
+
+        function createLessonCard(lesson, index) {
+            const card = document.createElement('div');
+            card.className = 'lesson-card';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+
+            const lessonIcon = getLessonIcon(lesson.lessonTitle);
+
+            card.innerHTML = `
+                <div class="lesson-header">
+                    <div class="lesson-icon">${lessonIcon}</div>
+                    <div>
+                        <h3 class="lesson-title">${lesson.lessonTitle}</h3>
+                        <p class="lesson-description">${lesson.description || '이 주제에 대한 상세한 학습 자료를 제공합니다.'}</p>
+                    </div>
+                </div>
+                <div class="lesson-sections">
+                    ${lesson.sections?.map(section => `
+                        <div class="section-item">
+                            <span class="section-icon">📄</span>
+                            <span>${section.sectionTitle}</span>
+                        </div>
+                    `).join('') || '<p style="color: var(--text-muted); font-size: 0.875rem;">세부 주제가 없습니다.</p>'}
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                openLessonDetail(lesson);
+            });
+
+            return card;
+        }
+
+        function getLessonIcon(title) {
+            const iconMap = {
+                '정치': '🏛️',
+                '경제': '💰',
+                '사회': '👥',
+                '문화': '🎭',
+                '종교': '⛪',
+                '과학': '🔬',
+                '기술': '⚙️',
+                '예술': '🎨',
+                '문학': '📚',
+                '철학': '🤔'
+            };
+
+            for (const [keyword, icon] of Object.entries(iconMap)) {
+                if (title.includes(keyword)) {
+                    return icon;
+                }
+            }
+
+            return '📖';
+        }
+
+        function getTotalSections(chapter) {
+            if (!chapter.lessons) return 0;
+            return chapter.lessons.reduce((total, lesson) => {
+                return total + (lesson.sections?.length || 0);
+            }, 0);
+        }
+
+        function getTotalKeywords(chapter) {
+            if (!chapter.lessons) return 0;
+            let total = 0;
+            chapter.lessons.forEach(lesson => {
+                if (lesson.sections) {
+                    lesson.sections.forEach(section => {
+                        if (section.subsections) {
+                            section.subsections.forEach(subsection => {
+                                if (subsection.topics) {
+                                    subsection.topics.forEach(topic => {
+                                        total += topic.keywords?.length || 0;
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            return total;
+        }
+
+        function openLessonDetail(lesson) {
+            // 실제 구현에서는 레슨 상세 페이지로 이동
+            alert(`"${lesson.lessonTitle}" 상세 페이지로 이동합니다.\n\n(실제 구현에서는 별도 페이지로 이동)`);
+        }
+
+        function showError(message) {
+            const lessonsGrid = document.getElementById('lessonsGrid');
+            if (lessonsGrid) {
+                lessonsGrid.innerHTML = `
+                    <div class="no-search">
+                        <div class="no-search-icon">⚠️</div>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function animateCards(cards) {
+            Array.from(cards).forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        }
+
+        function setupEventListeners() {
+            // 스크롤 이벤트
+            window.addEventListener('scroll', handleScroll);
+        }
+
+        function handleScroll() {
+            const scrollBtn = document.getElementById('scrollToTop');
+            if (scrollBtn) {
+                if (window.scrollY > 300) {
+                    scrollBtn.classList.add('visible');
+                } else {
+                    scrollBtn.classList.remove('visible');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
