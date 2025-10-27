@@ -89,6 +89,12 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/chapters/{id}")
+	public ResponseEntity<ChapterResponseDto> getChapterById(@PathVariable Long id) {
+		ChapterResponseDto response = chapterService.findById(id);
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/search/section/{sectionId}")
 	public ResponseEntity<ReadSectionResponseDto> searchSection(
 		@PathVariable Long sectionId
