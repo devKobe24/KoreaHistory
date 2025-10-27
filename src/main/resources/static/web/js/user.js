@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ===== 앱 초기화 =====
 function initializeApp() {
+  // 페이지 로드 애니메이션
+  setTimeout(() => {
+    document.body.classList.add('loaded');
+  }, 100);
+  
   setupEventListeners();
   loadChapters();
   loadStats();
@@ -240,7 +245,15 @@ function getTotalKeywords(chapter) {
           section.subsections.forEach((subsection) => {
             if (subsection.topics) {
               subsection.topics.forEach((topic) => {
-                total += topic.keywords?.length || 0;
+                // topic.keywords는 키워드 객체 배열
+                if (topic.keywords && Array.isArray(topic.keywords)) {
+                  topic.keywords.forEach((keyword) => {
+                    // keyword.keywords는 문자열 배열
+                    if (keyword.keywords && Array.isArray(keyword.keywords)) {
+                      total += keyword.keywords.length;
+                    }
+                  });
+                }
               });
             }
           });
@@ -404,10 +417,15 @@ async function loadStats() {
     const keywords = keywordsRes.ok ? await keywordsRes.json() : [];
     const contents = contentsRes.ok ? await contentsRes.json() : [];
 
+    // 키워드 총 개수 계산: 각 Keyword 객체의 keywords 배열의 길이 합산
+    const totalKeywords = keywords.reduce((total, keyword) => {
+      return total + (keyword.keywords?.length || 0);
+    }, 0);
+
     updateStats({
       chapters: chapters.length,
       lessons: lessons.length,
-      keywords: keywords.length,
+      keywords: totalKeywords, // 키워드 객체 개수가 아닌 keywords_value 총 개수
       contents: contents.length,
     });
   } catch (error) {
@@ -427,20 +445,24 @@ function updateStats(stats) {
   Object.entries(elements).forEach(([key, element]) => {
     if (element) {
       const statKey = key.replace("total", "").toLowerCase();
-      animateNumber(element, stats[statKey] || 0);
+      const targetNumber = stats[statKey] || 0;
+      // 애니메이션 없이 바로 목표값 표시
+      element.textContent = targetNumber;
     }
   });
 }
 
 function animateNumber(element, targetNumber) {
-  const startNumber = 0;
-  const duration = 2000;
-  const increment = targetNumber / (duration / 16);
+  // 이미 표시된 숫자가 있으면 그 숫자부터 시작
+  const startNumber = parseInt(element.textContent) || 0;
+  const duration = 1000;
+  const increment = (targetNumber - startNumber) / (duration / 16);
   let currentNumber = startNumber;
 
   const timer = setInterval(() => {
     currentNumber += increment;
-    if (currentNumber >= targetNumber) {
+    if ((increment > 0 && currentNumber >= targetNumber) || 
+        (increment < 0 && currentNumber <= targetNumber)) {
       currentNumber = targetNumber;
       clearInterval(timer);
     }
@@ -552,3 +574,17 @@ document.addEventListener("keydown", function (e) {
     }
   }
 });
+
+// ===== 페이지 전환 애니메이션 =====
+function navigateToChapter() {
+  // 페이드 아웃 애니메이션
+  document.body.classList.add('page-fade-out');
+  
+  // 애니메이션 완료 후 페이지 이동
+  setTimeout(() => {
+    window.location.href = 'pages/chapter.html';
+  }, 300);
+}
+
+// 페이지 전환 애니메이션을 위한 전역 함수로 등록
+window.navigateToChapter = navigateToChapter;
