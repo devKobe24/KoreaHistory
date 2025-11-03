@@ -95,4 +95,12 @@ public class SectionService {
 			.map(ReadSectionResponseDto::new)
 			.collect(Collectors.toList());
 	}
+
+	@Transactional(readOnly = true)
+	public List<ReadSectionResponseDto> searchSectionsByTitle(String title) {
+		List<Section> sections = sectionRepository.findBySectionTitleContainingIgnoreCase(title);
+		return sections.stream()
+			.map(ReadSectionResponseDto::new)
+			.collect(Collectors.toList());
+	}
 }

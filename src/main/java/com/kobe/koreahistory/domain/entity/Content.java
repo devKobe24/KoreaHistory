@@ -28,6 +28,12 @@ public class Content {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false)
+	private Integer contentNumber;
+
+	@Column(nullable = false)
+	private String contentTitle;
+
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(
 		name = "details", // 키워드 문자열을 저장할 테이블 이름
@@ -36,17 +42,48 @@ public class Content {
 	@Column(name = "detail_value") // 실제 콘텐츠 타이틀 값이 저장될 컬럼 이름
 	private List<String> details = new ArrayList<>();
 
+	// ContentBlock을 위한 새로운 필드들
+	@Column(name = "content_type")
+	private String contentType; // "TEXT", "TABLE", "TIMELINE", "COMPARISON_TABLE", "HERITAGE", "IMAGE_GALLERY"
+
+	@Lob
+	@Column(name = "block_data", columnDefinition = "TEXT")
+	private String blockData; // JSON 형태의 ContentBlock 데이터
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "keyword_id")
 	private Keyword keyword;
 
 	@Builder
-	public Content(List<String> details, Keyword keyword) {
+	public Content(Integer contentNumber, String contentTitle, List<String> details, Keyword keyword, String contentType, String blockData) {
+		this.contentNumber = contentNumber;
+		this.contentTitle = contentTitle;
 		this.details = details;
 		this.keyword = keyword;
+		this.contentType = contentType;
+		this.blockData = blockData;
+	}
+
+	public void updateContentNumber(Integer contentNumber) {
+		this.contentNumber = contentNumber;
+	}
+
+	public void updateContentTitle(String newContentTitle) {
+		if (newContentTitle == null || newContentTitle.trim().isEmpty()) {
+			throw new IllegalArgumentException("Content의 Title은 null이거나 빈 문자열일 수 없습니다.");
+		}
+		this.contentTitle = newContentTitle;
 	}
 
 	public void updateDetails(List<String> details) {
 		this.details = details;
+	}
+
+	public void updateContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public void updateBlockData(String blockData) {
+		this.blockData = blockData;
 	}
 }

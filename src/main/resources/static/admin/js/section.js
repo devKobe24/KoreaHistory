@@ -283,27 +283,22 @@ function displaySectionDetail(sectionDetail) {
 /**
  * Section 수정 모달 열기
  */
-function editSection(sectionId) {
-  // 현재 상세 정보에서 Section 데이터 추출
-  const sectionDetail = document.querySelector(".hierarchy-item strong");
-  if (!sectionDetail) {
-    showAlert("Section 정보를 찾을 수 없습니다.", "error");
-    return;
+async function editSection(sectionId) {
+  try {
+    // 서버에서 Section 데이터 가져오기
+    const sectionDetail = await ApiEndpoints.sections.getById(sectionId);
+    
+    // 모달 폼에 데이터 설정
+    document.getElementById("editSectionId").value = sectionId;
+    document.getElementById("editSectionNumber").value = sectionDetail.sectionNumber;
+    document.getElementById("editSectionTitle").value = sectionDetail.sectionTitle;
+
+    // 모달 표시
+    document.getElementById("editModal").style.display = "block";
+  } catch (error) {
+    console.error("Section 조회 실패:", error);
+    showAlert("Section 정보를 불러오는데 실패했습니다.", "error");
   }
-
-  // 모달 폼에 데이터 설정 (실제 데이터는 서버에서 가져와야 함)
-  document.getElementById("editSectionId").value = sectionId;
-
-  // 상세 정보에서 현재 값 추출 (임시)
-  const titleText = sectionDetail.textContent;
-  const parts = titleText.split(". ");
-  if (parts.length >= 2) {
-    document.getElementById("editSectionNumber").value = parts[0];
-    document.getElementById("editSectionTitle").value = parts[1];
-  }
-
-  // 모달 표시
-  document.getElementById("editModal").style.display = "block";
 }
 
 /**

@@ -21,4 +21,6 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
     
     @Query("SELECT s FROM Section s LEFT JOIN FETCH s.lesson l LEFT JOIN FETCH l.chapter c")
     List<Section> findAllWithLessonAndChapter();
+
+    List<Section> findBySectionTitleContainingIgnoreCase(String title);
 }

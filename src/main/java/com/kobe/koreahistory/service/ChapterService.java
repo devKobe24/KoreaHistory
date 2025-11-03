@@ -47,19 +47,20 @@ public class ChapterService {
 	}
 
 	@Transactional(readOnly = true)
-	public ChapterResponseDto findById(Long id) {
-		Chapter chapter = chapterRepository.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("해당 챕터를 찾을 수 없습니다. id = " + id));
-		return new ChapterResponseDto(chapter);
-	}
-
-	@Transactional(readOnly = true)
 	public ChapterResponseDto findChapterWithDetails(String chapterTitle) {
 		Chapter chapter = chapterRepository.findByChapterTitleWithDetails(chapterTitle)
 			.orElseThrow(() -> new IllegalArgumentException("해당 챕터를 찾을 수 없습니다. name =" + chapterTitle));
 		// ChapterResponseDto가 LessonResponseDto를,
 		// LessonResponseDto가 SectionResponseDto를 연쇄적으로 호출하여 반환을 완료합니다.
 		return new ChapterResponseDto(chapter);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ChapterResponseDto> searchChaptersByTitle(String title) {
+		List<Chapter> chapters = chapterRepository.findByChapterTitleContainingIgnoreCase(title);
+		return chapters.stream()
+			.map(ChapterResponseDto::new)
+			.collect(Collectors.toList());
 	}
 
 	@Transactional

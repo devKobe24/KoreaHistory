@@ -21,4 +21,6 @@ public interface SubsectionRepository extends JpaRepository<Subsection, Long> {
     
     @Query("SELECT s FROM Subsection s LEFT JOIN FETCH s.section sec LEFT JOIN FETCH sec.lesson l LEFT JOIN FETCH l.chapter c")
     List<Subsection> findAllWithSectionAndLesson();
+
+    List<Subsection> findBySubsectionTitleContainingIgnoreCase(String title);
 }

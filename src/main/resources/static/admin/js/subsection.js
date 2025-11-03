@@ -274,27 +274,22 @@ function displaySubsectionDetail(subsectionDetail) {
 /**
  * Subsection 수정 모달 열기
  */
-function editSubsection(subsectionId) {
-  // 현재 상세 정보에서 Subsection 데이터 추출
-  const subsectionDetail = document.querySelector(".hierarchy-item strong");
-  if (!subsectionDetail) {
-    showAlert("Subsection 정보를 찾을 수 없습니다.", "error");
-    return;
+async function editSubsection(subsectionId) {
+  try {
+    // 서버에서 Subsection 데이터 가져오기
+    const subsectionDetail = await ApiEndpoints.subsections.getById(subsectionId);
+    
+    // 모달 폼에 데이터 설정
+    document.getElementById("editSubsectionId").value = subsectionId;
+    document.getElementById("editSubsectionNumber").value = subsectionDetail.subsectionNumber;
+    document.getElementById("editSubsectionTitle").value = subsectionDetail.subsectionTitle;
+
+    // 모달 표시
+    document.getElementById("editModal").style.display = "block";
+  } catch (error) {
+    console.error("Subsection 조회 실패:", error);
+    showAlert("Subsection 정보를 불러오는데 실패했습니다.", "error");
   }
-
-  // 모달 폼에 데이터 설정 (실제 데이터는 서버에서 가져와야 함)
-  document.getElementById("editSubsectionId").value = subsectionId;
-
-  // 상세 정보에서 현재 값 추출 (임시)
-  const titleText = subsectionDetail.textContent;
-  const parts = titleText.split(". ");
-  if (parts.length >= 2) {
-    document.getElementById("editSubsectionNumber").value = parts[0];
-    document.getElementById("editSubsectionTitle").value = parts[1];
-  }
-
-  // 모달 표시
-  document.getElementById("editModal").style.display = "block";
 }
 
 /**

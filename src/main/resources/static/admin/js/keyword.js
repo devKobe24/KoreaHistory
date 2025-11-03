@@ -4,6 +4,7 @@
 
 let keywords = [];
 let allKeywords = []; // 전체 키워드 목록
+let topics = []; // Topic 목록
 
 // 페이지 로드 시 실행
 document.addEventListener("DOMContentLoaded", function () {
@@ -18,9 +19,39 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("editKeywordForm")
     .addEventListener("submit", handleEditKeyword);
 
-  // 페이지 로드 시 전체 키워드 목록 불러오기
+  // 페이지 로드 시 Topic 목록 및 전체 키워드 목록 불러오기
+  loadTopics();
   loadAllKeywords();
 });
+
+/**
+ * Topic 목록 로드 (드롭다운용)
+ */
+async function loadTopics() {
+  try {
+    // 모든 Topic을 가져와서 드롭다운에 채우기
+    topics = await ApiEndpoints.topics.getAll();
+    populateTopicSelect();
+  } catch (error) {
+    console.error("Topic 목록 로드 실패:", error);
+    showAlert("Topic 목록을 불러오는데 실패했습니다.", "error");
+  }
+}
+
+/**
+ * Topic 드롭다운 채우기
+ */
+function populateTopicSelect() {
+  const select = document.getElementById("topicSelect");
+  select.innerHTML = '<option value="">Topic을 선택하세요</option>';
+
+  topics.forEach((topic) => {
+    const option = document.createElement("option");
+    option.value = topic.topicTitle;
+    option.textContent = `${topic.topicNumber}. ${topic.topicTitle}`;
+    select.appendChild(option);
+  });
+}
 
 /**
  * Keyword 검색 처리
@@ -145,7 +176,8 @@ async function handleCreateKeyword(event) {
       .getElementById("searchKeywordForm")
       .dispatchEvent(new Event("submit"));
 
-    // 전체 키워드 목록 새로고침
+    // Topic 목록과 전체 키워드 목록 새로고침
+    loadTopics();
     loadAllKeywords();
   } catch (error) {
     console.error("Keyword 생성 실패:", error);
@@ -188,7 +220,9 @@ function displayKeywords(keywordsData) {
  * Keyword 수정 모달 열기
  */
 function editKeyword(keywordId) {
-  const keyword = keywords.find((k) => k.id === keywordId);
+  // keywords 또는 allKeywords에서 찾기
+  const keyword = keywords.find((k) => k.id === keywordId) || 
+                  allKeywords.find((k) => k.id === keywordId);
   if (!keyword) {
     showAlert("Keyword를 찾을 수 없습니다.", "error");
     return;
@@ -226,10 +260,14 @@ async function handleEditKeyword(event) {
       .map((k) => k.trim())
       .filter((k) => k.length > 0);
 
+    // keywords 또는 allKeywords에서 찾기
+    const keyword = keywords.find((k) => k.id === keywordId) || 
+                    allKeywords.find((k) => k.id === keywordId);
+
     // 번호 수정
     if (
       formData.keywordNumber !==
-      keywords.find((k) => k.id === keywordId).keywordNumber.toString()
+      keyword.keywordNumber.toString()
     ) {
       await ApiEndpoints.keywords.updateNumber(keywordId, {
         keywordNumber: parseInt(formData.keywordNumber),
@@ -237,8 +275,7 @@ async function handleEditKeyword(event) {
     }
 
     // 키워드 내용 수정
-    const currentKeywords =
-      keywords.find((k) => k.id === keywordId).keywords || [];
+    const currentKeywords = keyword.keywords || [];
     if (JSON.stringify(keywordsArray) !== JSON.stringify(currentKeywords)) {
       await ApiEndpoints.keywords.update(keywordId, {
         keywords: keywordsArray,
@@ -268,7 +305,9 @@ async function handleEditKeyword(event) {
  * Keyword 삭제
  */
 function deleteKeyword(keywordId) {
-  const keyword = keywords.find((k) => k.id === keywordId);
+  // keywords 또는 allKeywords에서 찾기
+  const keyword = keywords.find((k) => k.id === keywordId) || 
+                  allKeywords.find((k) => k.id === keywordId);
   if (!keyword) {
     showAlert("Keyword를 찾을 수 없습니다.", "error");
     return;

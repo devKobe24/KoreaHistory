@@ -68,6 +68,14 @@ public class TopicService {
 		return new ReadTopicResponseDto(topic);
 	}
 
+	@Transactional(readOnly = true)
+	public List<ReadTopicResponseDto> searchTopicsByTitle(String title) {
+		List<Topic> topics = topicRepository.findByTopicTitleContainingIgnoreCase(title);
+		return topics.stream()
+			.map(ReadTopicResponseDto::new)
+			.collect(Collectors.toList());
+	}
+
 	@Transactional
 	public void deleteTopic(Long topicId) {
 		Topic topic = topicRepository.findById(topicId)

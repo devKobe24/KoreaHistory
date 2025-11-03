@@ -15,6 +15,8 @@ import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import com.kobe.koreahistory.dto.request.section.PatchSectionNumberRequestDto;
 import com.kobe.koreahistory.dto.request.section.PatchSectionTitleRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
+import com.kobe.koreahistory.dto.request.subsection.PatchSubsectionNumberRequestDto;
+import com.kobe.koreahistory.dto.request.subsection.PatchSubsectionTitleRequestDto;
 import com.kobe.koreahistory.dto.request.topic.CreateTopicRequestDto;
 import com.kobe.koreahistory.dto.request.topic.PatchTopicTitleRequestDto;
 import com.kobe.koreahistory.dto.request.topic.PatchTopicNumberRequestDto;
@@ -23,16 +25,15 @@ import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
 import com.kobe.koreahistory.dto.response.keyword.*;
-import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
-import com.kobe.koreahistory.dto.response.lesson.PatchLessonNumberResponseDto;
-import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
-import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.*;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
 import com.kobe.koreahistory.dto.response.section.PatchSectionNumberResponseDto;
 import com.kobe.koreahistory.dto.response.section.PatchSectionTitleResponseDto;
 import com.kobe.koreahistory.dto.response.section.ReadSectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.ReadSubsectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionNumberResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionTitleResponseDto;
 import com.kobe.koreahistory.dto.response.topic.ReadTopicResponseDto;
 import com.kobe.koreahistory.dto.response.topic.CreateTopicResponseDto;
 import com.kobe.koreahistory.dto.response.topic.PatchTopicTitleResponseDto;
@@ -42,6 +43,7 @@ import com.kobe.koreahistory.dto.request.content.UpdateContentRequestDto;
 import com.kobe.koreahistory.dto.response.content.ReadContentResponseDto;
 import com.kobe.koreahistory.dto.response.content.CreateContentResponseDto;
 import com.kobe.koreahistory.dto.response.content.UpdateContentResponseDto;
+import com.kobe.koreahistory.dto.response.content.LearningPageResponseDto;
 import com.kobe.koreahistory.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -86,12 +88,6 @@ public class KoreaHistoryController {
 	@GetMapping("/chapters/search/all")
 	public ResponseEntity<List<ChapterResponseDto>> searchAllChapters() {
 		List<ChapterResponseDto> response = chapterService.findAll();
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/chapters/{id}")
-	public ResponseEntity<ChapterResponseDto> getChapterById(@PathVariable Long id) {
-		ChapterResponseDto response = chapterService.findById(id);
 		return ResponseEntity.ok(response);
 	}
 
@@ -143,6 +139,54 @@ public class KoreaHistoryController {
 		@RequestParam String keyword
 	) {
 		List<ReadKeywordResponseDto> response = keywordService.searchKeywords(keyword);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/chapters")
+	public ResponseEntity<List<ChapterResponseDto>> searchChaptersByTitle(
+		@RequestParam String title
+	) {
+		List<ChapterResponseDto> response = chapterService.searchChaptersByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/contents")
+	public ResponseEntity<List<ReadContentResponseDto>> searchContentsByDetail(
+		@RequestParam String detail
+	) {
+		List<ReadContentResponseDto> response = contentService.searchContentsByDetail(detail);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/lessons")
+	public ResponseEntity<List<ReadLessonResponseDto>> searchLessonsByTitle(
+		@RequestParam String title
+	) {
+		List<ReadLessonResponseDto> response = lessonService.searchLessonsByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/sections")
+	public ResponseEntity<List<ReadSectionResponseDto>> searchSectionsByTitle(
+		@RequestParam String title
+	) {
+		List<ReadSectionResponseDto> response = sectionService.searchSectionsByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/subsections")
+	public ResponseEntity<List<ReadSubsectionResponseDto>> searchSubsectionsByTitle(
+		@RequestParam String title
+	) {
+		List<ReadSubsectionResponseDto> response = subsectionService.searchSubsectionsByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/search/topics")
+	public ResponseEntity<List<ReadTopicResponseDto>> searchTopicsByTitle(
+		@RequestParam String title
+	) {
+		List<ReadTopicResponseDto> response = topicService.searchTopicsByTitle(title);
 		return ResponseEntity.ok(response);
 	}
 
@@ -359,6 +403,32 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@PatchMapping("/subsection/{subsectionId}/number")
+	public ResponseEntity<PatchSubsectionNumberResponseDto> patchSubsectionNumber(
+		@PathVariable Long subsectionId,
+		@RequestBody PatchSubsectionNumberRequestDto requestDto
+	) {
+		PatchSubsectionNumberResponseDto response = subsectionService.updateSubsectionNumber(subsectionId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
+	@PatchMapping("/subsection/{subsectionId}/title")
+	public ResponseEntity<PatchSubsectionTitleResponseDto> patchSubsectionTitle(
+		@PathVariable Long subsectionId,
+		@RequestBody PatchSubsectionTitleRequestDto requestDto
+	) {
+		PatchSubsectionTitleResponseDto response = subsectionService.updateSubsectionTitle(subsectionId, requestDto);
+		return ResponseEntity.ok(response);
+	}
+
+	@DeleteMapping("/subsection/{subsectionId}")
+	public ResponseEntity<Void> deleteSubsection(
+		@PathVariable Long subsectionId
+	) {
+		subsectionService.deleteSubsection(subsectionId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
 	@DeleteMapping("/topic/{topicId}")
 	public ResponseEntity<Void> deleteTopic(
 		@PathVariable Long topicId
@@ -405,5 +475,21 @@ public class KoreaHistoryController {
 	) {
 		contentService.deleteContent(contentId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@GetMapping("/learning/topic/{topicId}")
+	public ResponseEntity<LearningPageResponseDto> getLearningPageByTopic(
+		@PathVariable Long topicId
+	) {
+		LearningPageResponseDto response = contentService.getLearningPageByTopicId(topicId);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/learning/subsection/{subsectionId}")
+	public ResponseEntity<LearningPageResponseDto> getLearningPageBySubsection(
+		@PathVariable Long subsectionId
+	) {
+		LearningPageResponseDto response = contentService.getLearningPageBySubsectionId(subsectionId);
+		return ResponseEntity.ok(response);
 	}
 }

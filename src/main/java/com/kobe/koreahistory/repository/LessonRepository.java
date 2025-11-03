@@ -34,4 +34,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 		@Param("number") Integer number,
 		@Param("title") String title
 	);
+
+	List<Lesson> findByLessonTitleContainingIgnoreCase(String title);
 }

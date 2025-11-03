@@ -89,6 +89,8 @@ CREATE TABLE keywords (
 -- 8. Content (상세 내용) - Keyword에 종속
 CREATE TABLE content (
     id BIGINT NOT NULL AUTO_INCREMENT,
+    content_number INTEGER NOT NULL,
+    content_title VARCHAR(255) NOT NULL,
     keyword_id BIGINT,
     PRIMARY KEY (id),
     KEY idx_content_keyword (keyword_id),

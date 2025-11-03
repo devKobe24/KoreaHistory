@@ -68,12 +68,12 @@ INSERT INTO keywords (keywords_id, keywords_value) VALUES ((SELECT id FROM keywo
 INSERT INTO keywords (keywords_id, keywords_value) VALUES ((SELECT id FROM keyword WHERE keyword_number = 6), '단양 수양개 유적');
 
 -- ########## 7. Content(부모) 생성 ##########
-INSERT INTO content (keyword_id) VALUES (1);
-INSERT INTO content (keyword_id) VALUES (2);
-INSERT INTO content (keyword_id) VALUES (3);
-INSERT INTO content (keyword_id) VALUES (4);
-INSERT INTO content (keyword_id) VALUES (5);
-INSERT INTO content (keyword_id) VALUES (6);
+INSERT INTO content (content_number, content_title, keyword_id) VALUES (1, '뗀석기', 1);
+INSERT INTO content (content_number, content_title, keyword_id) VALUES (2, '주요 뗀석기', 2);
+INSERT INTO content (content_number, content_title, keyword_id) VALUES (3, 'Content 3', 3);
+INSERT INTO content (content_number, content_title, keyword_id) VALUES (4, 'Content 4', 4);
+INSERT INTO content (content_number, content_title, keyword_id) VALUES (5, 'Content 5', 5);
+INSERT INTO content (content_number, content_title, keyword_id) VALUES (6, 'Content 6', 6);
 
 -- ########## 7-1. Details (자식) 생성 ##########
 INSERT INTO details (detail_id, detail_value) VALUES ((SELECT id FROM content WHERE keyword_id = 1), '뗀석기 : 돌을 깨뜨리고 떼어내러 날을 만든 도구인 뗀석기를 주로 사용하였다.');

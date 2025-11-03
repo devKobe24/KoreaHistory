@@ -112,9 +112,9 @@ public class KeywordService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 Keyword를 찾을 수 없습니다."));
 
 		// Entity의 비즈니스 메서드를 호출하여 상태 변경
-		keyword.updateKeyword(requestDto.getKeyword());
+		keyword.updateKeywords(requestDto.getKeywords());
 
-		// 변경된 Chapter 엔티티를 DTO로 변환하여 반환
+		// 변경된 Keyword 엔티티를 DTO로 변환하여 반환
 		return new PatchKeywordResponseDto(keyword);
 	}
 

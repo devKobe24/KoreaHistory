@@ -4,6 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * packageName    : com.kobe.koreahistory.dto.request.keyword
  * fileName       : PatchKeywordRequestDto
@@ -18,10 +21,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PatchKeywordRequestDto {
-	private String keyword;
+	private List<String> keywords = new ArrayList<>();
 
 	@Builder
-	public PatchKeywordRequestDto(String keyword) {
-		this.keyword = keyword;
+	public PatchKeywordRequestDto(List<String> keywords) {
+		this.keywords = keywords;
 	}
 }

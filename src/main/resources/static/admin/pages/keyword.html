@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keyword 관리 - KoreaHistory</title>
+    <title>Keyword 관리 - 한국사 아띠</title>
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
@@ -72,9 +72,10 @@
             <h2>📝 새 Keyword 생성</h2>
             <form id="createKeywordForm">
                 <div class="form-group">
-                    <label for="topicTitle">부모 Topic 제목</label>
-                    <input type="text" id="topicTitle" name="topicTitle" class="form-control" placeholder="예: 구석기 도구"
-                        required>
+                    <label for="topicSelect">부모 Topic</label>
+                    <select id="topicSelect" name="topicTitle" class="form-control" required>
+                        <option value="">Topic을 선택하세요</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="keywordNumber">Keyword 번호</label>

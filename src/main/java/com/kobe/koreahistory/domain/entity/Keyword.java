@@ -57,6 +57,11 @@ public class Keyword {
 		this.keywordNumber = newKeywordNumber;
 	}
 
+	public void updateKeywords(List<String> newKeywords) {
+		this.keywords.clear();
+		this.keywords.addAll(newKeywords);
+	}
+
 	public void updateKeyword(String newKeyword) {
 		this.keywords.add(newKeyword);
 	}

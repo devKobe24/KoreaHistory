@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>결과 - 한국사 아띠</title>
+    <link rel="stylesheet" href="../css/user.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="page-transition">
+    <!-- 헤더 -->
+    <header class="header">
+      <nav class="navbar">
+        <div class="nav-brand">
+          <h1 id="navTitle">🇰🇷 한국사 아띠</h1>
+          <span>한국사 학습 플랫폼</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="../index.html" class="nav-link">홈</a></li>
+          <li><a href="../index.html#search" class="nav-link">검색</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+        </ul>
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="result-main-content">
+      <div class="result-container">
+        <!-- 페이지 타이틀 섹션 -->
+        <div class="result-hero">
+          <div class="result-breadcrumb">
+            <a href="../index.html">홈</a>
+            <span class="breadcrumb-separator">›</span>
+            <span id="resultCategory">검색 결과</span>
+          </div>
+          <h1 class="result-page-title" id="sectionTitle">결과 제목</h1>
+          <p class="result-page-description" id="sectionDescription">
+            관련 학습 자료 및 콘텐츠를 확인하세요
+          </p>
+        </div>
+
+        <!-- 필터 및 정렬 -->
+        <div class="result-controls">
+          <div class="result-filter-group">
+            <button class="filter-pill active" data-filter="all">
+              전체 <span class="filter-count" id="countAll">0</span>
+            </button>
+            <button class="filter-pill" data-filter="chapter">
+              시대 <span class="filter-count" id="countChapter">0</span>
+            </button>
+            <button class="filter-pill" data-filter="lesson">
+              강의 <span class="filter-count" id="countLesson">0</span>
+            </button>
+            <button class="filter-pill" data-filter="section">
+              소분류 <span class="filter-count" id="countSection">0</span>
+            </button>
+            <button class="filter-pill" data-filter="content">
+              내용 <span class="filter-count" id="countContent">0</span>
+            </button>
+          </div>
+          <div class="result-sort">
+            <!-- View Switcher -->
+            <div class="view-switcher">
+              <button class="view-btn active" data-view="grid">
+                <span class="view-icon">▦</span>
+                그리드
+              </button>
+              <button class="view-btn" data-view="list">
+                <span class="view-icon">☰</span>
+                리스트
+              </button>
+              <button class="view-btn" data-view="timeline">
+                <span class="view-icon">⋮</span>
+                타임라인
+              </button>
+            </div>
+            <select id="sortSelect" class="sort-select">
+              <option value="date">최신순</option>
+              <option value="title">제목순</option>
+              <option value="relevance">관련도순</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 메인 콘텐츠 그리드 -->
+        <div class="result-grid" id="resultContentGrid">
+          <!-- 동적으로 콘텐츠가 추가됩니다 -->
+          <div class="result-empty-state">
+            <div class="empty-icon">🔍</div>
+            <p>콘텐츠를 불러오는 중...</p>
+          </div>
+        </div>
+
+        <!-- 타임라인 뷰 -->
+        <div class="result-timeline-view" id="resultTimelineView">
+          <div class="timeline-section">
+            <div class="timeline-period">2025</div>
+            <div class="timeline-items" id="timelineItems">
+              <!-- 동적으로 타임라인 아이템이 추가됩니다 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 리스트 뷰 (테이블 형태) -->
+        <div
+          class="result-list-container"
+          id="resultListContainer"
+          style="display: none"
+        >
+          <div class="result-table">
+            <div class="result-table-header">
+              <div class="table-col col-number">#</div>
+              <div class="table-col col-thumbnail">미리보기</div>
+              <div class="table-col col-title">제목</div>
+              <div class="table-col col-category">분류</div>
+              <div class="table-col col-date">날짜</div>
+            </div>
+            <div class="result-table-body" id="resultTableBody">
+              <!-- 동적으로 행이 추가됩니다 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 관련 항목 섹션 -->
+        <div
+          class="result-related-section"
+          id="resultRelatedSection"
+          style="display: none"
+        >
+          <div class="related-header">
+            <h2 class="related-title">관련 항목</h2>
+            <p class="related-description">
+              이 주제와 연관된 다른 학습 자료들입니다
+            </p>
+          </div>
+          <div class="related-grid" id="relatedGrid">
+            <!-- 동적으로 관련 항목이 추가됩니다 -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>🇰🇷 한국사 아띠</h3>
+            <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
+          </div>
+          <div class="footer-section">
+            <h4>학습 자료</h4>
+            <ul>
+              <li><a href="../index.html#search">자료 검색</a></li>
+              <li><a href="about.html">플랫폼 소개</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>기술 정보</h4>
+            <ul>
+              <li>Spring Boot + JPA</li>
+              <li>H2 Database</li>
+              <li>RESTful API</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 한국사 아띠. 한국사 학습을 위한 모든 것.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 스크롤 투 탑 버튼 -->
+    <button class="scroll-to-top" id="scrollToTop">
+      <span>↑</span>
+    </button>
+
+    <script src="../js/user.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        try {
+          const API_BASE_URL = "/api/v1";
+          let currentView = "grid"; // grid or list
+          let currentFilter = "all";
+          let allResults = [];
+
+          // URL 파라미터 가져오기
+          function getUrlParameter(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            const regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+            const results = regex.exec(location.search);
+            return results === null
+              ? ""
+              : decodeURIComponent(results[1].replace(/\+/g, " "));
+          }
+
+          // 타입별 아이콘
+          function getTypeIcon(type) {
+            const icons = {
+              chapter: "📚",
+              lesson: "📖",
+              section: "📑",
+              subsection: "📋",
+              topic: "🎯",
+              keyword: "🏷️",
+              content: "📄",
+            };
+            return icons[type] || "📝";
+          }
+
+          // 타입별 라벨
+          function getTypeLabel(type) {
+            const labels = {
+              chapter: "시대",
+              lesson: "강의",
+              section: "소분류",
+              subsection: "상세분류",
+              topic: "주제",
+              keyword: "키워드",
+              content: "내용",
+            };
+            return labels[type] || "학습 자료";
+          }
+
+          // 카드 생성
+          function createResultCard(result, index) {
+            const type = result.type || "content";
+            const card = document.createElement("div");
+            card.className = "result-card";
+            card.dataset.type = type;
+            card.style.opacity = "0";
+            card.style.transform = "translateY(20px)";
+
+            const icon = getTypeIcon(type);
+            const typeLabel = getTypeLabel(type);
+            const title = result.title || result.name || "제목 없음";
+            const description =
+              result.description || result.content || "설명이 없습니다.";
+
+            card.innerHTML = `
+              <div class="result-card-header">
+                <span class="result-card-icon">${icon}</span>
+                <span class="result-card-type">${typeLabel}</span>
+              </div>
+              <h3 class="result-card-title">${title}</h3>
+              <p class="result-card-description">${truncateText(
+                description,
+                100
+              )}</p>
+              <div class="result-card-footer">
+                <span class="result-card-date">최근 업데이트</span>
+                <button class="result-card-action">자세히 보기 →</button>
+              </div>
+            `;
+
+            card.addEventListener("click", () => {
+              openDetailPage(result);
+            });
+
+            // 애니메이션
+            setTimeout(() => {
+              card.style.opacity = "1";
+              card.style.transform = "translateY(0)";
+            }, index * 50);
+
+            return card;
+          }
+
+          // 테이블 행 생성
+          function createTableRow(result, index) {
+            const type = result.type || "content";
+            const row = document.createElement("div");
+            row.className = "result-table-row";
+            row.dataset.type = type;
+
+            const icon = getTypeIcon(type);
+            const typeLabel = getTypeLabel(type);
+            const title = result.title || result.name || "제목 없음";
+
+            row.innerHTML = `
+              <div class="table-col col-number">${index + 1}</div>
+              <div class="table-col col-thumbnail">
+                <div class="thumbnail-icon">${icon}</div>
+              </div>
+              <div class="table-col col-title">${title}</div>
+              <div class="table-col col-category">
+                <span class="category-badge">${typeLabel}</span>
+              </div>
+              <div class="table-col col-date">최근</div>
+            `;
+
+            row.addEventListener("click", () => {
+              openDetailPage(result);
+            });
+
+            return row;
+          }
+
+          // 텍스트 자르기
+          function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + "...";
+          }
+
+          // 상세 페이지 열기
+          function openDetailPage(result) {
+            const title = encodeURIComponent(
+              result.title || result.name || "제목 없음"
+            );
+            const type = result.type || "default";
+            // detail.html 페이지로 이동
+            window.location.href = `detail.html?title=${title}&type=${type}`;
+          }
+
+          // 필터 적용
+          function applyFilter(filter) {
+            currentFilter = filter;
+
+            // 필터 버튼 활성화
+            document.querySelectorAll(".filter-pill").forEach((btn) => {
+              btn.classList.remove("active");
+              if (btn.dataset.filter === filter) {
+                btn.classList.add("active");
+              }
+            });
+
+            // 결과 필터링
+            const filteredResults =
+              filter === "all"
+                ? allResults
+                : allResults.filter((r) => r.type === filter);
+
+            displayResults(filteredResults);
+          }
+
+          // 결과 표시
+          function displayResults(results) {
+            if (results.length === 0) {
+              const grid = document.getElementById("resultContentGrid");
+              grid.innerHTML = `
+                <div class="result-empty-state">
+                  <div class="empty-icon">😔</div>
+                  <p>결과가 없습니다</p>
+                </div>
+              `;
+              return;
+            }
+
+            // 현재 뷰에 따라 적절한 표시 함수 호출
+            switch (currentView) {
+              case "grid":
+                displayGridView(results);
+                break;
+              case "list":
+                displayListView(results);
+                break;
+              case "timeline":
+                displayTimelineView(results);
+                break;
+            }
+          }
+
+          // 그리드 뷰 표시
+          function displayGridView(results) {
+            const grid = document.getElementById("resultContentGrid");
+            if (!grid) return;
+
+            grid.innerHTML = "";
+            results.forEach((result, index) => {
+              grid.appendChild(createResultCard(result, index));
+            });
+          }
+
+          // 카운트 업데이트
+          function updateCounts() {
+            const counts = {
+              all: allResults.length,
+              chapter: allResults.filter((r) => r.type === "chapter").length,
+              lesson: allResults.filter((r) => r.type === "lesson").length,
+              section: allResults.filter((r) => r.type === "section").length,
+              content: allResults.filter((r) => r.type === "content").length,
+            };
+
+            Object.keys(counts).forEach((key) => {
+              const el = document.getElementById(
+                "count" + key.charAt(0).toUpperCase() + key.slice(1)
+              );
+              if (el) el.textContent = counts[key];
+            });
+          }
+
+          // 페이지 초기화
+          function setupPage() {
+            try {
+              const title = getUrlParameter("title");
+              const type = getUrlParameter("type");
+
+              console.log("Title:", title, "Type:", type);
+
+              if (title) {
+                document.title = title + " - 한국사 아띠";
+
+                const navTitle = document.getElementById("navTitle");
+                if (navTitle) navTitle.textContent = "🇰🇷 " + title;
+
+                const sectionTitle = document.getElementById("sectionTitle");
+                if (sectionTitle) sectionTitle.textContent = title;
+
+                const categoryEl = document.getElementById("resultCategory");
+                if (categoryEl && type)
+                  categoryEl.textContent = getTypeLabel(type);
+              }
+
+              // 실제 데이터 로드
+              loadResultData(type, title);
+
+              // 이벤트 리스너
+              setupEventListeners();
+            } catch (error) {
+              console.error("Error in setupPage:", error);
+            }
+          }
+
+          // 이벤트 리스너 설정
+          function setupEventListeners() {
+            // 필터 버튼
+            document.querySelectorAll(".filter-pill").forEach((btn) => {
+              btn.addEventListener("click", () => {
+                applyFilter(btn.dataset.filter);
+              });
+            });
+
+            // 뷰 전환 버튼
+            document.querySelectorAll(".view-btn").forEach((btn) => {
+              btn.addEventListener("click", () => {
+                switchView(btn.dataset.view);
+              });
+            });
+
+            // 정렬
+            const sortSelect = document.getElementById("sortSelect");
+            if (sortSelect) {
+              sortSelect.addEventListener("change", (e) => {
+                sortResults(e.target.value);
+              });
+            }
+          }
+
+          // 뷰 전환
+          function switchView(viewType) {
+            currentView = viewType;
+
+            // 버튼 활성화
+            document.querySelectorAll(".view-btn").forEach((btn) => {
+              btn.classList.remove("active");
+              if (btn.dataset.view === viewType) {
+                btn.classList.add("active");
+              }
+            });
+
+            // 뷰 전환
+            const grid = document.getElementById("resultContentGrid");
+            const list = document.getElementById("resultListContainer");
+            const timeline = document.getElementById("resultTimelineView");
+
+            grid.style.display = "none";
+            list.style.display = "none";
+            timeline.classList.remove("active");
+
+            const filteredResults =
+              currentFilter === "all"
+                ? allResults
+                : allResults.filter((r) => r.type === currentFilter);
+
+            switch (viewType) {
+              case "grid":
+                grid.style.display = "grid";
+                displayResults(filteredResults);
+                break;
+              case "list":
+                list.style.display = "block";
+                displayListView(filteredResults);
+                break;
+              case "timeline":
+                timeline.classList.add("active");
+                displayTimelineView(filteredResults);
+                break;
+            }
+          }
+
+          // 타임라인 뷰 표시
+          function displayTimelineView(results) {
+            const timelineItems = document.getElementById("timelineItems");
+            if (!timelineItems) return;
+
+            timelineItems.innerHTML = "";
+
+            results.forEach((result, index) => {
+              const item = createTimelineItem(result, index);
+              timelineItems.appendChild(item);
+            });
+          }
+
+          // 타임라인 아이템 생성
+          function createTimelineItem(result, index) {
+            const type = result.type || "content";
+            const item = document.createElement("div");
+            item.className = "timeline-item";
+            item.dataset.type = type;
+
+            const icon = getTypeIcon(type);
+            const typeLabel = getTypeLabel(type);
+            const title = result.title || result.name || "제목 없음";
+            const description =
+              result.description || result.content || "설명이 없습니다.";
+
+            // 날짜 생성 (더미)
+            const day = String(index + 1).padStart(2, "0");
+            const month = "10";
+
+            item.innerHTML = `
+              <div class="timeline-thumbnail">
+                <span>${icon}</span>
+              </div>
+              <div class="timeline-date">
+                <div class="timeline-day">${day}</div>
+                <div class="timeline-month">${month}.23</div>
+              </div>
+              <div class="timeline-content">
+                <h3 class="timeline-title">${title}</h3>
+                <div class="timeline-badges">
+                  <span class="timeline-badge">${typeLabel}</span>
+                </div>
+                <p class="timeline-description">${truncateText(
+                  description,
+                  150
+                )}</p>
+                <div class="timeline-location">한국사 아띠</div>
+              </div>
+            `;
+
+            item.addEventListener("click", () => {
+              openDetailPage(result);
+            });
+
+            return item;
+          }
+
+          // 리스트 뷰 표시
+          function displayListView(results) {
+            const tableBody = document.getElementById("resultTableBody");
+            if (!tableBody) return;
+
+            tableBody.innerHTML = "";
+
+            results.forEach((result, index) => {
+              tableBody.appendChild(createTableRow(result, index));
+            });
+          }
+
+          // 정렬
+          function sortResults(sortType) {
+            let sorted = [...allResults];
+
+            switch (sortType) {
+              case "title":
+                sorted.sort((a, b) => {
+                  const titleA = a.title || a.name || "";
+                  const titleB = b.title || b.name || "";
+                  return titleA.localeCompare(titleB);
+                });
+                break;
+              case "date":
+                // 날짜 정렬 로직
+                break;
+              case "relevance":
+                // 관련도 정렬 로직
+                break;
+            }
+
+            displayResults(
+              sorted.filter(
+                (r) => currentFilter === "all" || r.type === currentFilter
+              )
+            );
+          }
+
+          // 실제 데이터 로드
+          async function loadResultData(type, title) {
+            try {
+              console.log("Loading data for type:", type, "title:", title);
+              
+              // 로딩 상태 표시
+              const contentGrid = document.getElementById("resultContentGrid");
+              if (contentGrid) {
+                contentGrid.innerHTML = '<div class="result-empty-state"><p>데이터를 불러오는 중...</p></div>';
+              }
+
+              let response;
+              let data = [];
+
+              // 타입에 따라 적절한 API 호출
+              switch (type) {
+                case "chapter":
+                  // Chapter의 모든 하위 항목들을 재귀적으로 수집
+                  response = await fetch(`${API_BASE_URL}/chapters/search/all`);
+                  if (response.ok) {
+                    const chapters = await response.json();
+                    console.log("Chapters received:", chapters);
+                    const chapter = chapters.find(c => c.chapterTitle === title);
+                    console.log("Found chapter:", chapter);
+                    if (chapter) {
+                      const collectedData = [];
+                      
+                      // Chapter 자체 추가
+                      collectedData.push({
+                        type: "chapter",
+                        id: chapter.id,
+                        title: chapter.chapterTitle,
+                        description: `Chapter ${chapter.chapterNumber}: ${chapter.chapterTitle}`,
+                        number: chapter.chapterNumber
+                      });
+                      
+                      // Lesson, Section, Subsection, Topic을 재귀적으로 수집
+                      if (chapter.lessons && chapter.lessons.length > 0) {
+                        for (const lesson of chapter.lessons) {
+                          // Lesson 추가
+                          collectedData.push({
+                            type: "lesson",
+                            id: lesson.id,
+                            title: lesson.lessonTitle,
+                            description: `Lesson ${lesson.lessonNumber}: ${lesson.lessonTitle}`,
+                            number: lesson.lessonNumber
+                          });
+                          
+                          // Section 수집
+                          if (lesson.sections && lesson.sections.length > 0) {
+                            for (const section of lesson.sections) {
+                              // Section 추가
+                              collectedData.push({
+                                type: "section",
+                                id: section.id,
+                                title: section.sectionTitle,
+                                description: `Section ${section.sectionNumber}: ${section.sectionTitle}`,
+                                number: section.sectionNumber
+                              });
+                              
+                              // Subsection 수집
+                              if (section.subsections && section.subsections.length > 0) {
+                                for (const subsection of section.subsections) {
+                                  // Subsection 추가
+                                  collectedData.push({
+                                    type: "subsection",
+                                    id: subsection.id,
+                                    title: subsection.subsectionTitle,
+                                    description: `Subsection ${subsection.subsectionNumber}: ${subsection.subsectionTitle}`,
+                                    number: subsection.subsectionNumber
+                                  });
+                                  
+                                  // Topic 수집
+                                  if (subsection.topics && subsection.topics.length > 0) {
+                                    for (const topic of subsection.topics) {
+                                      // Topic 추가
+                                      collectedData.push({
+                                        type: "topic",
+                                        id: topic.id,
+                                        title: topic.topicTitle,
+                                        description: `Topic ${topic.topicNumber}: ${topic.topicTitle}`,
+                                        number: topic.topicNumber
+                                      });
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      
+                      // Keyword와 Content 추가 검색
+                      try {
+                        const keywordResponse = await fetch(`${API_BASE_URL}/keywords/search/all`);
+                        if (keywordResponse.ok) {
+                          const allKeywords = await keywordResponse.json();
+                          allKeywords.forEach(keyword => {
+                            collectedData.push({
+                              type: "keyword",
+                              id: keyword.id,
+                              title: keyword.keywords ? keyword.keywords.join(", ") : "키워드",
+                              description: "키워드 그룹"
+                            });
+                          });
+                        }
+                      } catch (e) {
+                        console.warn("Failed to load keywords:", e);
+                      }
+                      
+                      try {
+                        const contentResponse = await fetch(`${API_BASE_URL}/contents/search/all`);
+                        if (contentResponse.ok) {
+                          const allContents = await contentResponse.json();
+                          allContents.forEach(content => {
+                            collectedData.push({
+                              type: "content",
+                              id: content.id,
+                              title: content.details ? content.details.join(", ") : "내용",
+                              description: "상세 내용"
+                            });
+                          });
+                        }
+                      } catch (e) {
+                        console.warn("Failed to load contents:", e);
+                      }
+                      
+                      data = collectedData;
+                      console.log("Chapter collected data:", data);
+                    }
+                  }
+                  break;
+
+                case "lesson":
+                  // Lesson의 하위 Section들을 가져오기
+                  let lesson = null;
+                  
+                  // 먼저 Chapter API에서 찾기
+                  const chaptersResponse = await fetch(`${API_BASE_URL}/chapters/search/all`);
+                  if (chaptersResponse.ok) {
+                    const chapters = await chaptersResponse.json();
+                    for (const chapter of chapters) {
+                      if (chapter.lessons) {
+                        const foundLesson = chapter.lessons.find(l => l.lessonTitle === title);
+                        if (foundLesson) {
+                          lesson = foundLesson;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  
+                  // Chapter에서 못 찾으면 직접 API 호출
+                  if (!lesson) {
+                    const lessonsResponse = await fetch(`${API_BASE_URL}/lessons/search/all`);
+                    if (lessonsResponse.ok) {
+                      const lessons = await lessonsResponse.json();
+                      lesson = lessons.find(l => l.lessonTitle === title);
+                    }
+                  }
+                  
+                  if (lesson && lesson.sections && lesson.sections.length > 0) {
+                    data = lesson.sections.map(section => ({
+                      type: "section",
+                      id: section.id,
+                      title: section.sectionTitle,
+                      description: `Section ${section.sectionNumber}: ${section.sectionTitle}`,
+                      number: section.sectionNumber
+                    }));
+                  }
+                  break;
+
+                case "section":
+                  // Section의 하위 Subsection들을 가져오기
+                  let section = null;
+                  
+                  // Chapter API를 통해 찾기
+                  const chaptersResponseForSection = await fetch(`${API_BASE_URL}/chapters/search/all`);
+                  if (chaptersResponseForSection.ok) {
+                    const chapters = await chaptersResponseForSection.json();
+                    for (const chapter of chapters) {
+                      if (chapter.lessons) {
+                        for (const lesson of chapter.lessons) {
+                          if (lesson.sections) {
+                            const foundSection = lesson.sections.find(s => s.sectionTitle === title);
+                            if (foundSection) {
+                              section = foundSection;
+                              break;
+                            }
+                          }
+                        }
+                        if (section) break;
+                      }
+                    }
+                  }
+                  
+                  if (section && section.subsections && section.subsections.length > 0) {
+                    data = section.subsections.map(subsection => ({
+                      type: "subsection",
+                      id: subsection.id,
+                      title: subsection.subsectionTitle,
+                      description: `Subsection ${subsection.subsectionNumber}: ${subsection.subsectionTitle}`,
+                      number: subsection.subsectionNumber
+                    }));
+                  }
+                  break;
+
+                case "subsection":
+                  // Subsection의 하위 Topic들을 가져오기
+                  let subsection = null;
+                  
+                  // Chapter API를 통해 찾기
+                  const chaptersResponseForSubsection = await fetch(`${API_BASE_URL}/chapters/search/all`);
+                  if (chaptersResponseForSubsection.ok) {
+                    const chapters = await chaptersResponseForSubsection.json();
+                    for (const chapter of chapters) {
+                      if (chapter.lessons) {
+                        for (const lesson of chapter.lessons) {
+                          if (lesson.sections) {
+                            for (const section of lesson.sections) {
+                              if (section.subsections) {
+                                const foundSubsection = section.subsections.find(sub => sub.subsectionTitle === title);
+                                if (foundSubsection) {
+                                  subsection = foundSubsection;
+                                  break;
+                                }
+                              }
+                            }
+                            if (subsection) break;
+                          }
+                        }
+                        if (subsection) break;
+                      }
+                    }
+                  }
+                  
+                  if (subsection && subsection.topics && subsection.topics.length > 0) {
+                    data = subsection.topics.map(topic => ({
+                      type: "topic",
+                      id: topic.id,
+                      title: topic.topicTitle,
+                      description: `Topic ${topic.topicNumber}: ${topic.topicTitle}`,
+                      number: topic.topicNumber
+                    }));
+                  }
+                  break;
+
+                default:
+                  // 기본적으로 제목으로 검색
+                  const searchPromises = [
+                    fetch(`${API_BASE_URL}/search/chapters?title=${encodeURIComponent(title)}`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/search/lessons?title=${encodeURIComponent(title)}`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/search/sections?title=${encodeURIComponent(title)}`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/search/subsections?title=${encodeURIComponent(title)}`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/search/topics?title=${encodeURIComponent(title)}`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/search/keywords?keyword=${encodeURIComponent(title)}`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/search/contents?detail=${encodeURIComponent(title)}`).then(r => r.ok ? r.json() : [])
+                  ];
+
+                  const results = await Promise.all(searchPromises);
+                  data = [
+                    ...results[0].map(ch => ({ type: "chapter", id: ch.id, title: ch.chapterTitle, description: `Chapter ${ch.chapterNumber}: ${ch.chapterTitle}` })),
+                    ...results[1].map(le => ({ type: "lesson", id: le.id, title: le.lessonTitle, description: `Lesson ${le.lessonNumber}: ${le.lessonTitle}` })),
+                    ...results[2].map(se => ({ type: "section", id: se.id, title: se.sectionTitle, description: `Section ${se.sectionNumber}: ${se.sectionTitle}` })),
+                    ...results[3].map(su => ({ type: "subsection", id: su.id, title: su.subsectionTitle, description: `Subsection ${su.subsectionNumber}: ${su.subsectionTitle}` })),
+                    ...results[4].map(to => ({ type: "topic", id: to.id, title: to.topicTitle, description: `Topic ${to.topicNumber}: ${to.topicTitle}` })),
+                    ...results[5].map(ke => ({ type: "keyword", id: ke.id, title: ke.keywords ? ke.keywords.join(", ") : "키워드", description: "키워드 그룹" })),
+                    ...results[6].map(co => ({ type: "content", id: co.id, title: co.details ? co.details.join(", ") : "내용", description: "상세 내용" }))
+                  ];
+                  break;
+              }
+
+              // 데이터 처리
+              console.log("Final data:", data);
+              if (data && data.length > 0) {
+                allResults = data;
+                console.log("Setting allResults:", allResults);
+                updateCounts();
+                displayResults(allResults);
+              } else {
+                // 데이터가 없을 경우
+                console.warn("No data found for type:", type, "title:", title);
+                if (contentGrid) {
+                  contentGrid.innerHTML = '<div class="result-empty-state"><p>관련 콘텐츠를 찾을 수 없습니다.</p></div>';
+                }
+              }
+            } catch (error) {
+              console.error("Error loading result data:", error);
+              const contentGrid = document.getElementById("resultContentGrid");
+              if (contentGrid) {
+                contentGrid.innerHTML = '<div class="result-empty-state"><p>데이터를 불러오는 중 오류가 발생했습니다.</p></div>';
+              }
+            }
+          }
+
+          // 초기화 실행
+          function init() {
+            if (document.readyState === "loading") {
+              document.addEventListener("DOMContentLoaded", function () {
+                setupPage();
+                document.body.classList.add("loaded");
+              });
+            } else {
+              setupPage();
+              document.body.classList.add("loaded");
+            }
+          }
+
+          init();
+        } catch (error) {
+          console.error("Fatal error in result page script:", error);
+          document.body.style.display = "block";
+        }
+      })();
+    </script>
+  </body>
+</html>

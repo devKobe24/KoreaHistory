@@ -3,7 +3,11 @@ package com.kobe.koreahistory.service;
 import com.kobe.koreahistory.domain.entity.Section;
 import com.kobe.koreahistory.domain.entity.Subsection;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
+import com.kobe.koreahistory.dto.request.subsection.PatchSubsectionNumberRequestDto;
+import com.kobe.koreahistory.dto.request.subsection.PatchSubsectionTitleRequestDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionNumberResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionTitleResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.ReadSubsectionResponseDto;
 import com.kobe.koreahistory.repository.SectionRepository;
 import com.kobe.koreahistory.repository.SubsectionRepository;
@@ -62,5 +66,41 @@ public class SubsectionService {
 			.orElseThrow(() -> new IllegalArgumentException("subsection not found"));
 
 		return new ReadSubsectionResponseDto(subsection);
+	}
+
+	@Transactional(readOnly = true)
+	public List<ReadSubsectionResponseDto> searchSubsectionsByTitle(String title) {
+		List<Subsection> subsections = subsectionRepository.findBySubsectionTitleContainingIgnoreCase(title);
+		return subsections.stream()
+			.map(ReadSubsectionResponseDto::new)
+			.collect(Collectors.toList());
+	}
+
+	@Transactional
+	public PatchSubsectionNumberResponseDto updateSubsectionNumber(Long subsectionId, PatchSubsectionNumberRequestDto requestDto) {
+		Subsection subsection = subsectionRepository.findById(subsectionId)
+			.orElseThrow(() -> new IllegalArgumentException("subsection not found"));
+
+		subsection.updateSubsectionNumber(requestDto.getSubsectionNumber());
+
+		return new PatchSubsectionNumberResponseDto(subsection);
+	}
+
+	@Transactional
+	public PatchSubsectionTitleResponseDto updateSubsectionTitle(Long subsectionId, PatchSubsectionTitleRequestDto requestDto) {
+		Subsection subsection = subsectionRepository.findById(subsectionId)
+			.orElseThrow(() -> new IllegalArgumentException("subsection not found"));
+
+		subsection.updateSubsectionTitle(requestDto.getSubsectionTitle());
+
+		return new PatchSubsectionTitleResponseDto(subsection);
+	}
+
+	@Transactional
+	public void deleteSubsection(Long subsectionId) {
+		Subsection subsection = subsectionRepository.findById(subsectionId)
+			.orElseThrow(() -> new IllegalArgumentException("subsection not found"));
+
+		subsectionRepository.delete(subsection);
 	}
 }

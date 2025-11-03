@@ -5,10 +5,7 @@ import com.kobe.koreahistory.domain.entity.Lesson;
 import com.kobe.koreahistory.dto.request.lesson.CreateLessonRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonNumberRequestDto;
 import com.kobe.koreahistory.dto.request.lesson.PatchLessonTitleRequestDto;
-import com.kobe.koreahistory.dto.response.lesson.CreateLessonResponseDto;
-import com.kobe.koreahistory.dto.response.lesson.PatchLessonNumberResponseDto;
-import com.kobe.koreahistory.dto.response.lesson.PatchLessonTitleResponseDto;
-import com.kobe.koreahistory.dto.response.lesson.ReadLessonResponseDto;
+import com.kobe.koreahistory.dto.response.lesson.*;
 import com.kobe.koreahistory.repository.ChapterRepository;
 import com.kobe.koreahistory.repository.LessonRepository;
 import lombok.RequiredArgsConstructor;
@@ -97,6 +94,14 @@ public class LessonService {
 	@Transactional(readOnly = true)
 	public List<ReadLessonResponseDto> findAllLessons() {
 		List<Lesson> lessons = lessonRepository.findAll();
+		return lessons.stream()
+			.map(ReadLessonResponseDto::new)
+			.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public List<ReadLessonResponseDto> searchLessonsByTitle(String title) {
+		List<Lesson> lessons = lessonRepository.findByLessonTitleContainingIgnoreCase(title);
 		return lessons.stream()
 			.map(ReadLessonResponseDto::new)
 			.collect(Collectors.toList());
