@@ -57,7 +57,7 @@ function handleContentTypeChange() {
       "TABLE": '{\n  "title": "제목",\n  "rows": [\n    {"key": "항목1", "value": "내용1"},\n    {"key": "항목2", "value": "내용2"}\n  ]\n}',
       "COMPARISON_TABLE": '{\n  "title": "제목",\n  "headers": ["항목1", "항목2"],\n  "rows": [\n    {"category": "구분", "items": ["내용1", "내용2"]}\n  ]\n}',
       "TIMELINE": '{\n  "title": "제목",\n  "rows": [\n    {"events": [{"year": "시작", "description": "내용"}]}\n  ]\n}',
-      "HERITAGE": '{\n  "title": "제목",\n  "categories": [{"categoryTitle": "카테고리", "items": [{"name": "문화재명", "imageUrl": "이미지URL"}]}]\n}',
+      "HERITAGE": '{\n  "heritage": [\n    {\n      "site": "문화재 장소 1",\n      "period": "문화재 시기 1",\n      "item": "문화재 이름 1",\n      "imageUrl": "https://example.com/image1.png"\n    },\n    {\n      "site": "문화재 장소 2",\n      "period": "문화재 시기 2",\n      "item": "문화재 이름 2",\n      "imageUrl": "https://example.com/image2.png"\n    }\n  ]\n}',
       "IMAGE_GALLERY": '{\n  "title": "제목",\n  "items": [{"imageUrl": "이미지URL", "caption": "설명"}]\n}'
     };
     if (blockDataTextarea && placeholders[contentType]) {
@@ -97,7 +97,7 @@ function handleEditContentTypeChange() {
       "TABLE": '{\n  "title": "제목",\n  "rows": [\n    {"key": "항목1", "value": "내용1"},\n    {"key": "항목2", "value": "내용2"}\n  ]\n}',
       "COMPARISON_TABLE": '{\n  "title": "제목",\n  "headers": ["항목1", "항목2"],\n  "rows": [\n    {"category": "구분", "items": ["내용1", "내용2"]}\n  ]\n}',
       "TIMELINE": '{\n  "title": "제목",\n  "rows": [\n    {"events": [{"year": "시작", "description": "내용"}]}\n  ]\n}',
-      "HERITAGE": '{\n  "title": "제목",\n  "categories": [{"categoryTitle": "카테고리", "items": [{"name": "문화재명", "imageUrl": "이미지URL"}]}]\n}',
+      "HERITAGE": '{\n  "heritage": [\n    {\n      "site": "문화재 장소 1",\n      "period": "문화재 시기 1",\n      "item": "문화재 이름 1",\n      "imageUrl": "https://example.com/image1.png"\n    },\n    {\n      "site": "문화재 장소 2",\n      "period": "문화재 시기 2",\n      "item": "문화재 이름 2",\n      "imageUrl": "https://example.com/image2.png"\n    }\n  ]\n}',
       "IMAGE_GALLERY": '{\n  "title": "제목",\n  "items": [{"imageUrl": "이미지URL", "caption": "설명"}]\n}'
     };
     if (blockDataTextarea && placeholders[contentType]) {
@@ -140,10 +140,35 @@ function populateKeywordSelect() {
   const select = document.getElementById("keywordSelect");
   select.innerHTML = '<option value="">Keyword를 선택하세요</option>';
 
+  // keyword_id별로 그룹화하여 각 keyword당 하나의 option 생성
   keywords.forEach((keyword) => {
     const option = document.createElement("option");
     option.value = keyword.id;
-    option.textContent = `${keyword.keywordNumber}. ${keyword.keywords ? keyword.keywords.join(", ") : ""}`;
+    
+    // 형식: "keywords_value1, keywords_value2, ... (ID: keyword_id, Subsection: subsection_title (ID: subsection_id), Topic: topic_title (ID: topic_id))"
+    const keywordId = keyword.id || "N/A";
+    const subsectionTitle = keyword.topic?.subsection?.subsectionTitle || "N/A";
+    const subsectionId = keyword.topic?.subsection?.id || "N/A";
+    const topicTitle = keyword.topic?.topicTitle || "N/A";
+    const topicId = keyword.topic?.id || "N/A";
+    
+    // keywords 배열을 정렬하고 쉼표로 구분
+    let keywordsText = "";
+    if (keyword.keywords && keyword.keywords.length > 0) {
+      // keywords 배열을 정렬하여 일관된 순서로 표시
+      const sortedKeywords = [...keyword.keywords].sort();
+      keywordsText = sortedKeywords.join(", ");
+    } else {
+      keywordsText = "";
+    }
+    
+    // keywords가 있는 경우와 없는 경우 모두 처리
+    if (keywordsText) {
+      option.textContent = `${keywordsText} (ID: ${keywordId}, Subsection: ${subsectionTitle} (ID: ${subsectionId}), Topic: ${topicTitle} (ID: ${topicId}))`;
+    } else {
+      option.textContent = `(ID: ${keywordId}, Subsection: ${subsectionTitle} (ID: ${subsectionId}), Topic: ${topicTitle} (ID: ${topicId}))`;
+    }
+    
     select.appendChild(option);
   });
 }
@@ -666,20 +691,18 @@ function generateJSONTemplate(mode = 'create') {
       ]
     },
     "HERITAGE": {
-      "title": "문화재 제목",
-      "categories": [
+      "heritage": [
         {
-          "categoryTitle": "카테고리1",
-          "items": [
-            {"name": "문화재명1", "imageUrl": "https://example.com/image1.png"},
-            {"name": "문화재명2", "imageUrl": "https://example.com/image2.png"}
-          ]
+          "site": null,
+          "period": null,
+          "item": "문화재 이름 1",
+          "imageUrl": "https://example.com/image1.png"
         },
         {
-          "categoryTitle": "카테고리2",
-          "items": [
-            {"name": "문화재명3", "imageUrl": "https://example.com/image3.png"}
-          ]
+          "site": null,
+          "period": null,
+          "item": "문화재 이름 2",
+          "imageUrl": "https://example.com/image2.png"
         }
       ]
     },

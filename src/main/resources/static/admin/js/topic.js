@@ -106,8 +106,15 @@ function displayTopicsList(topics) {
       <div class="hierarchy">
         <div class="hierarchy-item">
           <span class="hierarchy-level">Topic</span>
-          <strong>${topic.topicNumber}. ${topic.topicTitle}</strong>
-          <span style="margin-left: 10px; color: #666; font-size: 0.9em;">(ID: ${topic.id})</span>
+          <strong>${topic.topicNumber ?? ""}. ${topic.topicTitle ?? ""}</strong>
+          <span style="margin-left: 10px; color: #666; font-size: 0.9em;">
+            (ID: ${topic.id ?? "-"})
+            ${
+              topic.subsection && (topic.subsection.subsectionNumber !== undefined || topic.subsection.subsectionTitle)
+                ? ` - ${topic.subsection.subsectionNumber ?? ""}.${topic.subsection.subsectionTitle ?? ""}`
+                : ""
+            }
+          </span>
           <div style="margin-left: 100px;">
             <button class="btn btn-warning btn-small" onclick="editTopic(${topic.id})">수정</button>
             <button class="btn btn-danger btn-small" onclick="deleteTopic(${topic.id})">삭제</button>

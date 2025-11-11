@@ -1,14 +1,21 @@
 package com.kobe.koreahistory.service;
 
+import com.kobe.koreahistory.domain.entity.Chapter;
+import com.kobe.koreahistory.domain.entity.Content;
+import com.kobe.koreahistory.domain.entity.Keyword;
+import com.kobe.koreahistory.domain.entity.Lesson;
 import com.kobe.koreahistory.domain.entity.Section;
 import com.kobe.koreahistory.domain.entity.Subsection;
+import com.kobe.koreahistory.domain.entity.Topic;
 import com.kobe.koreahistory.dto.request.subsection.CreateSubsectionRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.PatchSubsectionNumberRequestDto;
 import com.kobe.koreahistory.dto.request.subsection.PatchSubsectionTitleRequestDto;
+import com.kobe.koreahistory.dto.response.hierarchy.HierarchyResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionNumberResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionTitleResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.ReadSubsectionResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.SubsectionKeywordResponseDto;
 import com.kobe.koreahistory.repository.SectionRepository;
 import com.kobe.koreahistory.repository.SubsectionRepository;
 import lombok.RequiredArgsConstructor;
@@ -102,5 +109,59 @@ public class SubsectionService {
 			.orElseThrow(() -> new IllegalArgumentException("subsection not found"));
 
 		subsectionRepository.delete(subsection);
+	}
+
+	@Transactional(readOnly = true)
+	public List<SubsectionKeywordResponseDto> findSubsectionKeywordRelations() {
+		List<Object[]> results = subsectionRepository.findSubsectionKeywordRelations();
+		return results.stream()
+			.map(row -> {
+				String subsectionTitle = (String) row[0];
+				Long keywordId = ((Number) row[1]).longValue();
+				Integer keywordNumber = ((Number) row[2]).intValue();
+				String keywordTitle = (String) row[3];
+				String keywordsValue = (String) row[4];
+				return new SubsectionKeywordResponseDto(subsectionTitle, keywordId, keywordNumber, keywordTitle, keywordsValue);
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public HierarchyResponseDto findSubsectionHierarchyByTitle(String title) {
+		Subsection subsection = subsectionRepository.findFirstBySubsectionTitleIgnoreCase(title)
+			.orElseThrow(() -> new IllegalArgumentException("subsection not found"));
+		initializeSubsectionHierarchy(subsection);
+		return HierarchyResponseDto.fromSubsection(subsection);
+	}
+
+	private void initializeSubsectionHierarchy(Subsection subsection) {
+		if (subsection == null) {
+			return;
+		}
+
+		Section section = subsection.getSection();
+		if (section != null) {
+			section.getSectionTitle();
+			Lesson lesson = section.getLesson();
+			if (lesson != null) {
+				lesson.getLessonTitle();
+				Chapter chapter = lesson.getChapter();
+				if (chapter != null) {
+					chapter.getChapterTitle();
+				}
+			}
+		}
+
+		if (subsection.getTopics() != null) {
+			subsection.getTopics().forEach(topic -> {
+				if (topic.getKeywords() != null) {
+					topic.getKeywords().forEach(keyword -> {
+						if (keyword.getContents() != null) {
+							keyword.getContents().forEach(content -> content.getContentTitle());
+						}
+					});
+				}
+			});
+		}
 	}
 }

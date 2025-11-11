@@ -1,14 +1,20 @@
 package com.kobe.koreahistory.service;
 
+import com.kobe.koreahistory.domain.entity.Chapter;
 import com.kobe.koreahistory.domain.entity.Content;
 import com.kobe.koreahistory.domain.entity.Keyword;
+import com.kobe.koreahistory.domain.entity.Lesson;
+import com.kobe.koreahistory.domain.entity.Section;
+import com.kobe.koreahistory.domain.entity.Subsection;
+import com.kobe.koreahistory.domain.entity.Topic;
 import com.kobe.koreahistory.dto.request.content.CreateContentRequestDto;
 import com.kobe.koreahistory.dto.request.content.UpdateContentRequestDto;
+import com.kobe.koreahistory.dto.response.content.ContentBlock;
 import com.kobe.koreahistory.dto.response.content.CreateContentResponseDto;
 import com.kobe.koreahistory.dto.response.content.LearningPageResponseDto;
 import com.kobe.koreahistory.dto.response.content.ReadContentResponseDto;
 import com.kobe.koreahistory.dto.response.content.UpdateContentResponseDto;
-import com.kobe.koreahistory.dto.response.content.ContentBlock;
+import com.kobe.koreahistory.dto.response.hierarchy.HierarchyResponseDto;
 import com.kobe.koreahistory.repository.ContentRepository;
 import com.kobe.koreahistory.repository.KeywordRepository;
 import com.kobe.koreahistory.repository.SubsectionRepository;
@@ -192,5 +198,49 @@ public class ContentService {
 			}
 		}
 		return blocks;
+	}
+
+	@Transactional(readOnly = true)
+	public HierarchyResponseDto findContentHierarchyByTitle(String title) {
+		Content content = contentRepository.findFirstByContentTitleIgnoreCase(title)
+			.orElseThrow(() -> new IllegalArgumentException("content not found"));
+		initializeContentHierarchy(content);
+		return HierarchyResponseDto.fromContent(content);
+	}
+
+	private void initializeContentHierarchy(Content content) {
+		if (content == null) {
+			return;
+		}
+
+		Keyword keyword = content.getKeyword();
+		if (keyword != null) {
+			keyword.getKeywordTitle();
+
+			Topic topic = keyword.getTopic();
+			if (topic != null) {
+				topic.getTopicTitle();
+
+				Subsection subsection = topic.getSubsection();
+				if (subsection != null) {
+					subsection.getSubsectionTitle();
+
+					Section section = subsection.getSection();
+					if (section != null) {
+						section.getSectionTitle();
+
+						Lesson lesson = section.getLesson();
+						if (lesson != null) {
+							lesson.getLessonTitle();
+
+							Chapter chapter = lesson.getChapter();
+							if (chapter != null) {
+								chapter.getChapterTitle();
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

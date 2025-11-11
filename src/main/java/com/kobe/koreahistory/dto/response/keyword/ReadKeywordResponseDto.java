@@ -21,12 +21,14 @@ import java.util.List;
 public class ReadKeywordResponseDto {
 	private Long id;
 	private Integer keywordNumber;
+	private String keywordTitle;
 	private List<String> keywords;
 	private TopicInfoResponseDto topic;
 
 	public ReadKeywordResponseDto(Keyword entity) {
 		this.id = entity.getId();
 		this.keywordNumber = entity.getKeywordNumber();
+		this.keywordTitle = entity.getKeywordTitle();
 		this.keywords = entity.getKeywords();
 		this.topic = entity.getTopic() != null ? new TopicInfoResponseDto(entity.getTopic()) : null;
 	}

@@ -1,11 +1,316 @@
-// ===== Detail Page JavaScript =====
-
 (function () {
   "use strict";
 
   const API_BASE_URL = "/api/v1";
   let currentItem = null;
   let isBookmarked = false;
+  let currentHierarchyData = null;
+
+  const hierarchyEndpoints = {
+    chapter: "/chapters/hierarchy",
+    lesson: "/lessons/hierarchy",
+    section: "/sections/hierarchy",
+    subsection: "/subsections/hierarchy",
+    topic: "/topics/hierarchy",
+    keyword: "/keywords/hierarchy",
+    content: "/contents/hierarchy",
+  };
+
+  const hierarchyMeta = {
+    chapter: { badge: "시대", icon: "📚", accentColor: "#6366f1", numberSuffix: "장" },
+    lesson: { badge: "강의", icon: "📖", accentColor: "#3b82f6", numberSuffix: "강" },
+    section: { badge: "소분류", icon: "📑", accentColor: "#f59e0b", numberSuffix: "절" },
+    subsection: { badge: "상세분류", icon: "📋", accentColor: "#10b981", numberSuffix: "항" },
+    topic: { badge: "주제", icon: "🎯", accentColor: "#ef4444", numberSuffix: "편" },
+    keyword: { badge: "키워드", icon: "🏷️", accentColor: "#8b5cf6", numberSuffix: "번" },
+    content: { badge: "내용", icon: "📄", accentColor: "#0ea5e9", numberSuffix: "번" },
+  };
+
+  async function renderHierarchyByType(container) {
+    if (!currentItem || !currentItem.type) return false;
+
+    currentHierarchyData = null;
+    let hierarchyData = null;
+    switch (currentItem.type) {
+      case "chapter":
+      case "lesson":
+      case "section":
+      case "subsection":
+      case "topic":
+      case "keyword":
+      case "content":
+        hierarchyData = await fetchHierarchyData(
+          currentItem.type,
+          currentItem.title,
+          currentItem.id
+        );
+        break;
+      default:
+        return false;
+    }
+
+    if (!hierarchyData) {
+      return false;
+    }
+
+    currentHierarchyData = hierarchyData;
+    renderHierarchyCards(container, hierarchyData);
+    updateDataAttributes(currentItem);
+    return true;
+  }
+
+  async function preloadHierarchyData(type, title, id) {
+    if (!type || (!title && !id)) return;
+    if (!hierarchyEndpoints[type]) return;
+
+    try {
+      currentHierarchyData = await fetchHierarchyData(type, title, id);
+      return currentHierarchyData;
+    } catch (error) {
+      console.warn("Hierarchy preload failed:", error);
+      currentHierarchyData = null;
+      return null;
+    }
+  }
+
+  async function ensureHierarchyData(type, title, id) {
+    if (currentHierarchyData) {
+      return currentHierarchyData;
+    }
+
+    if (!type || (!title && !id)) {
+      return null;
+    }
+
+    try {
+      currentHierarchyData = await fetchHierarchyData(type, title, id);
+      return currentHierarchyData;
+    } catch (error) {
+      console.warn("Failed to ensure hierarchy data:", error);
+      currentHierarchyData = null;
+      return null;
+    }
+  }
+
+  async function fetchHierarchyData(type, title, id) {
+    try {
+      const endpoint = hierarchyEndpoints[type];
+      if (!endpoint) return null;
+
+      const params = new URLSearchParams();
+      if (id !== undefined && id !== null && id !== "") {
+        params.set("id", id);
+      }
+      if (title) {
+        params.set("title", title);
+      }
+      const queryString = params.toString();
+      const response = await fetch(
+        `${API_BASE_URL}${endpoint}${queryString ? `?${queryString}` : ""}`
+      );
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to fetch hierarchy data:", error);
+      return null;
+    }
+  }
+
+  function renderHierarchyCards(container, hierarchyData) {
+    const cardsData = buildHierarchyCardData(hierarchyData);
+
+    if (!cardsData.length) {
+      container.innerHTML =
+        '<div class="lesson-empty"><p>관련 학습 카드가 없습니다.</p></div>';
+      return;
+    }
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "chapter-cards-container";
+    wrapper.style.cssText = `
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: 0.5rem;
+    `;
+
+    container.innerHTML = "";
+    cardsData.forEach((cardData, index) => {
+      const cardElement = createHierarchyCard(cardData, index);
+      wrapper.appendChild(cardElement);
+    });
+    container.appendChild(wrapper);
+  }
+
+  function buildHierarchyCardData(hierarchyData) {
+    const cards = [];
+    const chainOrder = ["chapter", "lesson", "section", "subsection", "topic", "keyword", "content"];
+
+    chainOrder.forEach((type) => {
+      const info = hierarchyData[type];
+      if (info) {
+        const card = createCardDefinition(type, info, {
+          isCurrent: hierarchyData.type === type,
+          isPrimary: true,
+        });
+        if (card) {
+          cards.push(card);
+        }
+      }
+    });
+
+    if (hierarchyData.chapter?.lessons?.length) {
+      uniqueById(hierarchyData.chapter.lessons).forEach((lesson) => {
+        if (hierarchyData.lesson && hierarchyData.lesson.id === lesson.id) return;
+        const card = createCardDefinition("lesson", lesson, { isPrimary: false });
+        if (card) cards.push(card);
+      });
+    }
+
+    if (hierarchyData.lesson?.sections?.length) {
+      uniqueById(hierarchyData.lesson.sections).forEach((section) => {
+        if (hierarchyData.section && hierarchyData.section.id === section.id) return;
+        const card = createCardDefinition("section", section, { isPrimary: false });
+        if (card) cards.push(card);
+      });
+    }
+
+    if (hierarchyData.section?.subsections?.length) {
+      uniqueById(hierarchyData.section.subsections).forEach((subsection) => {
+        if (hierarchyData.subsection && hierarchyData.subsection.id === subsection.id) return;
+        const card = createCardDefinition("subsection", subsection, { isPrimary: false });
+        if (card) cards.push(card);
+      });
+    }
+
+    if (hierarchyData.subsection?.topics?.length) {
+      uniqueById(hierarchyData.subsection.topics).forEach((topic) => {
+        if (hierarchyData.topic && hierarchyData.topic.id === topic.id) return;
+        const card = createCardDefinition("topic", topic, { isPrimary: false });
+        if (card) cards.push(card);
+      });
+    }
+
+    if (hierarchyData.topic?.keywords?.length) {
+      uniqueById(hierarchyData.topic.keywords).forEach((keyword) => {
+        if (hierarchyData.keyword && hierarchyData.keyword.id === keyword.id) return;
+        const card = createCardDefinition("keyword", keyword, { isPrimary: false });
+        if (card) cards.push(card);
+      });
+    }
+
+    if (hierarchyData.keyword?.contents?.length) {
+      uniqueById(hierarchyData.keyword.contents).forEach((content) => {
+        if (hierarchyData.content && hierarchyData.content.id === content.id) return;
+        const card = createCardDefinition("content", content, { isPrimary: false });
+        if (card) cards.push(card);
+      });
+    }
+
+    return cards;
+  }
+
+  function createCardDefinition(type, info, { isCurrent = false, isPrimary = false } = {}) {
+    if (!info) return null;
+    const meta = hierarchyMeta[type] || hierarchyMeta.content;
+
+    const title = extractTitle(info, type);
+    if (!title) return null;
+
+    const numberValue = extractNumber(info, type);
+    const numberLabel = formatNumberLabel(type, numberValue);
+    const description = formatDescription(type, info, title, numberValue);
+
+    return {
+      badge: meta.badge,
+      icon: meta.icon,
+      accentColor: meta.accentColor,
+      title,
+      description,
+      numberLabel,
+      navigateType: type,
+      navigateTitle: title,
+      isCurrent,
+      isPrimary,
+    };
+  }
+
+  function extractTitle(info, type) {
+    const titleFieldMap = {
+      chapter: "chapterTitle",
+      lesson: "lessonTitle",
+      section: "sectionTitle",
+      subsection: "subsectionTitle",
+      topic: "topicTitle",
+      keyword: "keywordTitle",
+      content: "contentTitle",
+    };
+
+    const field = titleFieldMap[type];
+    if (field && info[field]) {
+      return info[field];
+    }
+
+    if (info.title) {
+      return info.title;
+    }
+
+    return null;
+  }
+
+  function extractNumber(info, type) {
+    const numberFieldMap = {
+      chapter: "chapterNumber",
+      lesson: "lessonNumber",
+      section: "sectionNumber",
+      subsection: "subsectionNumber",
+      topic: "topicNumber",
+      keyword: "keywordNumber",
+      content: "contentNumber",
+    };
+
+    const field = numberFieldMap[type];
+    return field && info[field] !== undefined ? info[field] : null;
+  }
+
+  function formatNumberLabel(type, numberValue) {
+    if (numberValue === null || numberValue === undefined) {
+      return "";
+    }
+    const suffix = hierarchyMeta[type]?.numberSuffix || "";
+    return `${numberValue}${suffix}`;
+  }
+
+  function formatDescription(type, info, title, numberValue) {
+    const label = hierarchyMeta[type]?.badge || "학습";
+    let description = numberValue
+      ? `${label} ${numberValue}: ${title}`
+      : title;
+
+    if (type === "keyword" && Array.isArray(info.keywords) && info.keywords.length > 0) {
+      description += ` • ${info.keywords.join(", ")}`;
+    }
+
+    if (type === "content" && info.contentType) {
+      description += ` (${info.contentType})`;
+    }
+
+    return description;
+  }
+
+  function uniqueById(items) {
+    const map = new Map();
+    items.forEach((item) => {
+      if (item && item.id !== undefined && !map.has(item.id)) {
+        map.set(item.id, item);
+      }
+    });
+    return Array.from(map.values());
+  }
 
   // ===== DOM Elements =====
   const elements = {
@@ -21,12 +326,14 @@
     detailTitle: document.getElementById("detailTitle"),
     detailSubtitle: document.getElementById("detailSubtitle"),
     detailDescription: document.getElementById("detailDescription"),
+    detailInfo: document.querySelector(".detail-info"),
 
     // Actions
     bookmarkBtn: document.getElementById("bookmarkBtn"),
     shareBtn: document.getElementById("shareBtn"),
     startLearningBtn: document.getElementById("startLearningBtn"),
     addToListBtn: document.getElementById("addToListBtn"),
+    detailCta: document.querySelector(".detail-cta"),
 
     // Modal
     shareModal: document.getElementById("shareModal"),
@@ -60,11 +367,12 @@
       const urlParams = new URLSearchParams(window.location.search);
       const title = urlParams.get("title");
       const type = urlParams.get("type");
+      const id = urlParams.get("id");
 
       console.log("Detail Page - Title:", title, "Type:", type);
 
       if (title && type) {
-        loadDetailData(title, type);
+        loadDetailData(title, type, id);
       } else {
         // 기본 데이터 표시
         showDefaultData();
@@ -76,7 +384,7 @@
   }
 
   // ===== Load Detail Data =====
-  function loadDetailData(title, type) {
+  function loadDetailData(title, type, id) {
     // 실제 API 호출 대신 더미 데이터 사용
     currentItem = {
       type: type,
@@ -85,9 +393,11 @@
       description: getDescriptionByType(type),
       icon: getIconByType(type),
       category: getCategoryLabel(type),
+      id: id ? decodeURIComponent(id) : null,
     };
 
     updatePageContent(currentItem);
+    preloadHierarchyData(type, currentItem.title, currentItem.id);
     loadRelatedItems(type);
   }
 
@@ -127,6 +437,33 @@
     }
     if (elements.detailDescription) {
       elements.detailDescription.innerHTML = `<p>${item.description}</p>`;
+    }
+
+    updateCtaVisibility(item.type);
+    updateDataAttributes(item);
+  }
+
+  function updateCtaVisibility(type) {
+    if (!elements.detailCta) return;
+
+    if (type === "chapter") {
+      elements.detailCta.style.display = "none";
+    } else {
+      elements.detailCta.style.display = "";
+    }
+  }
+
+  function updateDataAttributes(item) {
+    if (!elements.detailInfo) return;
+
+    elements.detailInfo.removeAttribute("data-topic-id");
+
+    if (item.type === "topic") {
+      if (currentHierarchyData?.topic?.id) {
+        elements.detailInfo.dataset.topicId = currentHierarchyData.topic.id;
+      } else if (item.id) {
+        elements.detailInfo.dataset.topicId = item.id;
+      }
     }
   }
 
@@ -361,16 +698,120 @@
   }
 
   // ===== CTA Handlers =====
-  function handleStartLearning() {
-    console.log("Start Learning:", currentItem);
-    showToast("학습 페이지로 이동합니다", "📖");
+  async function handleStartLearning() {
+    if (!currentItem) return;
 
-    // study.html로 이동
-    setTimeout(() => {
-      const title = currentItem ? encodeURIComponent(currentItem.title) : "";
-      const type = currentItem ? currentItem.type : "chapter";
-      window.location.href = `study.html?title=${title}&type=${type}`;
-    }, 800);
+    const { type, title } = currentItem;
+    await ensureHierarchyData(type, title, currentItem.id);
+
+    if (type === "section") {
+      const lessonTitle =
+        currentHierarchyData?.lesson?.lessonTitle ||
+        currentHierarchyData?.lesson?.title ||
+        "";
+      const sectionTitle =
+        currentHierarchyData?.section?.sectionTitle ||
+        currentHierarchyData?.section?.title ||
+        title ||
+        "";
+
+      if (!lessonTitle) {
+        showToast("연결된 강의를 찾을 수 없습니다", "❌");
+        return;
+      }
+
+      showToast("학습 페이지로 이동합니다", "📖");
+
+      setTimeout(() => {
+        const encodedLesson = encodeURIComponent(lessonTitle);
+        const encodedSection = encodeURIComponent(sectionTitle);
+        window.location.href = `study.html?title=${encodedLesson}&type=lesson&sectionTitle=${encodedSection}`;
+      }, 800);
+          return;
+        }
+        
+    if (type === "subsection") {
+      const lessonTitle =
+        currentHierarchyData?.lesson?.lessonTitle ||
+        currentHierarchyData?.lesson?.title ||
+        "";
+      const sectionTitle =
+        currentHierarchyData?.section?.sectionTitle ||
+        currentHierarchyData?.section?.title ||
+        "";
+      const subsectionTitle =
+        currentHierarchyData?.subsection?.subsectionTitle ||
+        currentHierarchyData?.subsection?.title ||
+        title ||
+        "";
+
+      if (!lessonTitle) {
+        showToast("연결된 강의를 찾을 수 없습니다", "❌");
+          return;
+        }
+        
+      showToast("학습 페이지로 이동합니다", "📖");
+
+      setTimeout(() => {
+        const encodedLesson = encodeURIComponent(lessonTitle);
+        const sectionParam = sectionTitle
+          ? `&sectionTitle=${encodeURIComponent(sectionTitle)}`
+          : "";
+        const subsectionParam = `&subsectionTitle=${encodeURIComponent(subsectionTitle)}`;
+        window.location.href = `study.html?title=${encodedLesson}&type=lesson${sectionParam}${subsectionParam}`;
+      }, 800);
+      return;
+    }
+
+    if (type === "topic") {
+      const lessonTitle =
+        currentHierarchyData?.lesson?.lessonTitle ||
+        currentHierarchyData?.lesson?.title ||
+        "";
+      const sectionTitle =
+        currentHierarchyData?.section?.sectionTitle ||
+        currentHierarchyData?.section?.title ||
+        "";
+      const subsectionTitle =
+        currentHierarchyData?.subsection?.subsectionTitle ||
+        currentHierarchyData?.subsection?.title ||
+        "";
+      const topicTitle =
+        currentHierarchyData?.topic?.topicTitle ||
+        currentHierarchyData?.topic?.title ||
+        title ||
+        "";
+      const topicId = currentHierarchyData?.topic?.id;
+
+      if (!lessonTitle) {
+        showToast("연결된 강의를 찾을 수 없습니다", "❌");
+        return;
+      }
+        
+        showToast("학습 페이지로 이동합니다", "📖");
+        
+        setTimeout(() => {
+        const encodedLesson = encodeURIComponent(lessonTitle);
+        const sectionParam = sectionTitle
+          ? `&sectionTitle=${encodeURIComponent(sectionTitle)}`
+          : "";
+        const subsectionParam = subsectionTitle
+          ? `&subsectionTitle=${encodeURIComponent(subsectionTitle)}`
+          : "";
+        const topicTitleParam = `&topicTitle=${encodeURIComponent(topicTitle)}`;
+        const topicIdParam = topicId ? `&topicId=${encodeURIComponent(topicId)}` : "";
+        window.location.href = `study.html?title=${encodedLesson}&type=lesson${sectionParam}${subsectionParam}${topicTitleParam}${topicIdParam}`;
+        }, 800);
+      return;
+      }
+
+      showToast("학습 페이지로 이동합니다", "📖");
+
+      setTimeout(() => {
+      const encodedTitle = encodeURIComponent(title || "");
+      const encodedType = type || "chapter";
+      window.location.href = `study.html?title=${encodedTitle}&type=${encodedType}`;
+      }, 800);
   }
 
   function handleAddToList() {
@@ -434,47 +875,52 @@
       // 로딩 상태 표시
       targetAccordionContent.innerHTML = '<div class="lesson-loading"><div class="spinner"></div><p>관련 강의를 불러오는 중...</p></div>';
       
+      const hierarchyRendered = await renderHierarchyByType(targetAccordionContent);
+      if (hierarchyRendered) {
+        return;
+      }
+
+      // 계층 데이터를 가져오지 못한 경우 기존 Lesson 카드 로직으로 폴백
       let lessons = [];
       
-      // Chapter 타입인 경우 해당 Chapter의 Lesson들을 가져오기
       if (currentItem.type === "chapter") {
         const response = await fetch(`${API_BASE_URL}/chapters/search/all`);
         if (response.ok) {
           const chapters = await response.json();
-          const chapter = chapters.find(c => c.chapterTitle === currentItem.title);
+          const chapter = chapters.find((c) => c.chapterTitle === currentItem.title);
           if (chapter && chapter.lessons) {
-            lessons = chapter.lessons.map(lesson => ({
+            lessons = chapter.lessons.map((lesson) => ({
               type: "lesson",
               id: lesson.id,
               title: lesson.lessonTitle,
               description: `Lesson ${lesson.lessonNumber}: ${lesson.lessonTitle}`,
               number: lesson.lessonNumber,
-              icon: "📖"
+              icon: "📖",
             }));
           }
         }
       } else {
-        // 다른 타입의 경우 검색으로 Lesson 찾기
-        const searchPromises = [
-          fetch(`${API_BASE_URL}/search/lessons?title=${encodeURIComponent(currentItem.title)}`).then(r => r.ok ? r.json() : []),
-        ];
-        
-        const results = await Promise.all(searchPromises);
-        lessons = results[0].map(lesson => ({
+        const response = await fetch(
+          `${API_BASE_URL}/search/lessons?title=${encodeURIComponent(currentItem.title)}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          lessons = data.map((lesson) => ({
           type: "lesson",
           id: lesson.id,
           title: lesson.lessonTitle,
           description: `Lesson ${lesson.lessonNumber}: ${lesson.lessonTitle}`,
           number: lesson.lessonNumber,
-          icon: "📖"
+            icon: "📖",
         }));
+        }
       }
       
-      // Lesson 카드들 표시
       if (lessons.length > 0) {
         displayLessonCards(lessons, targetAccordionContent);
       } else {
-        targetAccordionContent.innerHTML = '<div class="lesson-empty"><p>관련 강의가 없습니다.</p></div>';
+        targetAccordionContent.innerHTML =
+          '<div class="lesson-empty"><p>관련 학습 카드가 없습니다.</p></div>';
       }
       
     } catch (error) {
@@ -494,6 +940,179 @@
         targetAccordionContent.innerHTML = '<div class="lesson-error"><p>강의를 불러오는 중 오류가 발생했습니다.</p></div>';
       }
     }
+  }
+
+  function createHierarchyCard(cardData, index = 0) {
+    const {
+      title,
+      description,
+      badge,
+      numberLabel,
+      accentColor,
+      icon,
+      navigateType,
+      navigateTitle,
+      isCurrent = false,
+      isPrimary = false,
+    } = cardData;
+
+    const card = document.createElement("div");
+    card.className = "chapter-card";
+    card.style.cssText = `
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+      transition: all 0.25s ease;
+      cursor: ${isCurrent ? "default" : "pointer"};
+      opacity: 0;
+      transform: translateY(20px);
+    `;
+
+    const topLine = document.createElement("div");
+    topLine.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: ${accentColor};
+      border-radius: 10px 10px 0 0;
+      opacity: ${isPrimary ? 1 : 0.7};
+    `;
+    card.appendChild(topLine);
+
+    const header = document.createElement("div");
+    header.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    `;
+
+    const iconEl = document.createElement("span");
+    iconEl.textContent = icon || "📘";
+    iconEl.style.cssText = `
+      font-size: 1.25rem;
+      color: #4b5563;
+    `;
+
+    const badgeEl = document.createElement("span");
+    badgeEl.textContent = badge || "학습";
+    badgeEl.style.cssText = `
+      padding: 0.25rem 0.75rem;
+      background: rgba(99, 102, 241, 0.1);
+      color: ${accentColor};
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    `;
+
+    header.appendChild(iconEl);
+    header.appendChild(badgeEl);
+
+    const titleEl = document.createElement("h4");
+    titleEl.textContent = title || "제목 없음";
+    titleEl.style.cssText = `
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.35;
+      margin: 0;
+    `;
+
+    const descEl = document.createElement("p");
+    descEl.textContent = description || "";
+    descEl.style.cssText = `
+      font-size: 0.875rem;
+      color: #6b7280;
+      line-height: 1.45;
+      margin: 0;
+    `;
+
+    const footer = document.createElement("div");
+    footer.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+    `;
+
+    const numberEl = document.createElement("span");
+    numberEl.textContent = numberLabel || "";
+    numberEl.style.cssText = `
+      font-size: 0.85rem;
+      color: #6b7280;
+      font-weight: 500;
+    `;
+    if (!numberLabel) {
+      numberEl.style.visibility = "hidden";
+    }
+
+    const actionEl = document.createElement("span");
+    actionEl.textContent = isCurrent ? "현재 위치" : "자세히 보기 →";
+    actionEl.style.cssText = `
+      font-size: 0.85rem;
+      color: ${accentColor};
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      opacity: ${isCurrent ? 0.6 : 1};
+    `;
+
+    footer.appendChild(numberEl);
+    footer.appendChild(actionEl);
+
+    card.appendChild(header);
+    card.appendChild(titleEl);
+    card.appendChild(descEl);
+    card.appendChild(footer);
+
+    if (!isCurrent && navigateType && navigateTitle) {
+      card.addEventListener("click", () => {
+        const encodedTitle = encodeURIComponent(navigateTitle);
+        if (
+          navigateType === "lesson" &&
+          currentItem &&
+          currentItem.type === "lesson" &&
+          currentItem.title === navigateTitle
+        ) {
+          window.location.href = `study.html?title=${encodedTitle}&type=lesson`;
+        } else {
+          window.location.href = `detail.html?title=${encodedTitle}&type=${navigateType}`;
+        }
+      });
+
+      card.addEventListener("mouseenter", () => {
+        card.style.transform = "translateY(-2px)";
+        card.style.boxShadow = "0 10px 20px rgba(15, 23, 42, 0.12)";
+        card.style.borderColor = accentColor;
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "translateY(0)";
+        card.style.boxShadow = "0 2px 6px rgba(15, 23, 42, 0.08)";
+        card.style.borderColor = "#e5e7eb";
+      });
+    }
+
+    if (isCurrent) {
+      card.style.borderColor = accentColor;
+      card.style.boxShadow = "0 2px 10px rgba(245, 158, 11, 0.2)";
+    }
+
+    setTimeout(() => {
+      card.style.opacity = "1";
+      card.style.transform = "translateY(0)";
+    }, index * 80);
+
+    return card;
   }
 
   // ===== Display Lesson Cards =====
@@ -654,8 +1273,8 @@
     
     // 클릭 이벤트
     card.addEventListener("click", () => {
-      const title = encodeURIComponent(lesson.title);
-      window.location.href = `detail.html?title=${title}&type=lesson`;
+        const title = encodeURIComponent(lesson.title);
+        window.location.href = `detail.html?title=${title}&type=lesson`;
     });
     
     // 호버 효과

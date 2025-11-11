@@ -1,11 +1,17 @@
 package com.kobe.koreahistory.service;
 
+import com.kobe.koreahistory.domain.entity.Chapter;
+import com.kobe.koreahistory.domain.entity.Content;
 import com.kobe.koreahistory.domain.entity.Keyword;
+import com.kobe.koreahistory.domain.entity.Lesson;
+import com.kobe.koreahistory.domain.entity.Section;
+import com.kobe.koreahistory.domain.entity.Subsection;
 import com.kobe.koreahistory.domain.entity.Topic;
 import com.kobe.koreahistory.dto.request.keyword.CreateKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.DeleteKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.PatchKeywordNumberRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.PatchKeywordRequestDto;
+import com.kobe.koreahistory.dto.response.hierarchy.HierarchyResponseDto;
 import com.kobe.koreahistory.dto.response.keyword.*;
 import com.kobe.koreahistory.repository.KeywordRepository;
 import com.kobe.koreahistory.repository.TopicRepository;
@@ -44,6 +50,24 @@ public class KeywordService {
 
 		Keyword newKeyword = Keyword.builder()
 			.keywordNumber(requestDto.getKeywordNumber())
+			.keywordTitle(requestDto.getKeywordTitle())
+			.keywords(requestDto.getKeywords())
+			.topic(parentTopic)
+			.build();
+
+		Keyword result = keywordRepository.save(newKeyword);
+
+		return new CreateKeywordResponseDto(result);
+	}
+
+	@Transactional
+	public CreateKeywordResponseDto createKeywordById(Long topicId, CreateKeywordRequestDto requestDto) {
+		Topic parentTopic = topicRepository.findById(topicId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 Topic을 찾을 수 없습니다"));
+
+		Keyword newKeyword = Keyword.builder()
+			.keywordNumber(requestDto.getKeywordNumber())
+			.keywordTitle(requestDto.getKeywordTitle())
 			.keywords(requestDto.getKeywords())
 			.topic(parentTopic)
 			.build();
@@ -112,6 +136,9 @@ public class KeywordService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 Keyword를 찾을 수 없습니다."));
 
 		// Entity의 비즈니스 메서드를 호출하여 상태 변경
+		if (requestDto.getKeywordTitle() != null) {
+			keyword.updateKeywordTitle(requestDto.getKeywordTitle());
+		}
 		keyword.updateKeywords(requestDto.getKeywords());
 
 		// 변경된 Keyword 엔티티를 DTO로 변환하여 반환
@@ -149,5 +176,48 @@ public class KeywordService {
 		return keywords.stream()
 			.map(ReadKeywordResponseDto::new)
 			.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public HierarchyResponseDto findKeywordHierarchyByTitle(String title) {
+		Keyword keyword = keywordRepository.findFirstByKeywordTitleIgnoreCase(title)
+			.orElseThrow(() -> new IllegalArgumentException("keyword not found"));
+		initializeKeywordHierarchy(keyword);
+		return HierarchyResponseDto.fromKeyword(keyword);
+	}
+
+	private void initializeKeywordHierarchy(Keyword keyword) {
+		if (keyword == null) {
+			return;
+		}
+
+		Topic topic = keyword.getTopic();
+		if (topic != null) {
+			topic.getTopicTitle();
+			Subsection subsection = topic.getSubsection();
+			if (subsection != null) {
+				subsection.getSubsectionTitle();
+				Section section = subsection.getSection();
+				if (section != null) {
+					section.getSectionTitle();
+					Lesson lesson = section.getLesson();
+					if (lesson != null) {
+						lesson.getLessonTitle();
+						Chapter chapter = lesson.getChapter();
+						if (chapter != null) {
+							chapter.getChapterTitle();
+						}
+					}
+				}
+			}
+		}
+
+		if (keyword.getContents() != null) {
+			keyword.getContents().forEach(content -> content.getContentTitle());
+		}
+
+		if (keyword.getKeywords() != null) {
+			keyword.getKeywords().size();
+		}
 	}
 }

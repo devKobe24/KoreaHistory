@@ -23,12 +23,14 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateKeywordRequestDto {
 	private Integer keywordNumber;
+	private String keywordTitle;
 	private List<String> keywords = new ArrayList<>();
 	private List<CreateContentRequestDto> contents = new ArrayList<>();
 
 	@Builder
-	public CreateKeywordRequestDto(Integer keywordNumber, List<String> keywords, List<CreateContentRequestDto> contents) {
+	public CreateKeywordRequestDto(Integer keywordNumber, String keywordTitle, List<String> keywords, List<CreateContentRequestDto> contents) {
 		this.keywordNumber = keywordNumber;
+		this.keywordTitle = keywordTitle;
 		this.keywords = keywords;
 		this.contents = contents;
 	}

@@ -24,6 +24,7 @@ import com.kobe.koreahistory.dto.response.chapter.ChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.CreateChapterResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterNumberResponseDto;
 import com.kobe.koreahistory.dto.response.chapter.PatchChapterTitleResponseDto;
+import com.kobe.koreahistory.dto.response.hierarchy.HierarchyResponseDto;
 import com.kobe.koreahistory.dto.response.keyword.*;
 import com.kobe.koreahistory.dto.response.lesson.*;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
@@ -34,6 +35,7 @@ import com.kobe.koreahistory.dto.response.subsection.ReadSubsectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.CreateSubsectionResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionNumberResponseDto;
 import com.kobe.koreahistory.dto.response.subsection.PatchSubsectionTitleResponseDto;
+import com.kobe.koreahistory.dto.response.subsection.SubsectionKeywordResponseDto;
 import com.kobe.koreahistory.dto.response.topic.ReadTopicResponseDto;
 import com.kobe.koreahistory.dto.response.topic.CreateTopicResponseDto;
 import com.kobe.koreahistory.dto.response.topic.PatchTopicTitleResponseDto;
@@ -120,6 +122,12 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(responseDto);
 	}
 
+	@GetMapping("/subsections/keywords/relations")
+	public ResponseEntity<List<SubsectionKeywordResponseDto>> getSubsectionKeywordRelations() {
+		List<SubsectionKeywordResponseDto> response = subsectionService.findSubsectionKeywordRelations();
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/topics/search/all")
 	public ResponseEntity<List<ReadTopicResponseDto>> searchAllTopics() {
 		List<ReadTopicResponseDto> response = topicService.findAllTopics();
@@ -150,6 +158,14 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/chapters/hierarchy")
+	public ResponseEntity<HierarchyResponseDto> getChapterHierarchy(
+		@RequestParam String title
+	) {
+		HierarchyResponseDto response = chapterService.findChapterHierarchyByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/search/contents")
 	public ResponseEntity<List<ReadContentResponseDto>> searchContentsByDetail(
 		@RequestParam String detail
@@ -166,11 +182,27 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/lessons/hierarchy")
+	public ResponseEntity<HierarchyResponseDto> getLessonHierarchy(
+		@RequestParam String title
+	) {
+		HierarchyResponseDto response = lessonService.findLessonHierarchyByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/search/sections")
 	public ResponseEntity<List<ReadSectionResponseDto>> searchSectionsByTitle(
 		@RequestParam String title
 	) {
 		List<ReadSectionResponseDto> response = sectionService.searchSectionsByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/sections/hierarchy")
+	public ResponseEntity<HierarchyResponseDto> getSectionHierarchy(
+		@RequestParam String title
+	) {
+		HierarchyResponseDto response = sectionService.findSectionHierarchyByTitle(title);
 		return ResponseEntity.ok(response);
 	}
 
@@ -182,6 +214,14 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/subsections/hierarchy")
+	public ResponseEntity<HierarchyResponseDto> getSubsectionHierarchy(
+		@RequestParam String title
+	) {
+		HierarchyResponseDto response = subsectionService.findSubsectionHierarchyByTitle(title);
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/search/topics")
 	public ResponseEntity<List<ReadTopicResponseDto>> searchTopicsByTitle(
 		@RequestParam String title
@@ -190,11 +230,33 @@ public class KoreaHistoryController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/topics/hierarchy")
+	public ResponseEntity<HierarchyResponseDto> getTopicHierarchy(
+		@RequestParam(required = false) String title,
+		@RequestParam(required = false) Long id
+	) {
+		if (id != null) {
+			return ResponseEntity.ok(topicService.findTopicHierarchyById(id));
+		}
+		if (title != null && !title.isBlank()) {
+			return ResponseEntity.ok(topicService.findTopicHierarchyByTitle(title));
+		}
+		throw new IllegalArgumentException("Either id or title must be provided");
+	}
+
 	@GetMapping("/search/keywords/combination")
 	public ResponseEntity<List<ReadKeywordResponseDto>> searchKeywordCombination(
 		@RequestParam List<String> keywords
 	) {
 		List<ReadKeywordResponseDto> response = keywordService.searchKeywordsByCombination(keywords);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/keywords/hierarchy")
+	public ResponseEntity<HierarchyResponseDto> getKeywordHierarchy(
+		@RequestParam String title
+	) {
+		HierarchyResponseDto response = keywordService.findKeywordHierarchyByTitle(title);
 		return ResponseEntity.ok(response);
 	}
 
@@ -218,6 +280,17 @@ public class KoreaHistoryController {
 	) {
 
 		CreateKeywordResponseDto response = keywordService.createKeyword(topicTitle, requestDto);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/create/keyword/{topicId}")
+	public ResponseEntity<CreateKeywordResponseDto> createKeywordById(
+		@PathVariable Long topicId,
+		@RequestBody CreateKeywordRequestDto requestDto
+	) {
+
+		CreateKeywordResponseDto response = keywordService.createKeywordById(topicId, requestDto);
 
 		return ResponseEntity.ok(response);
 	}
@@ -490,6 +563,14 @@ public class KoreaHistoryController {
 		@PathVariable Long subsectionId
 	) {
 		LearningPageResponseDto response = contentService.getLearningPageBySubsectionId(subsectionId);
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/contents/hierarchy")
+	public ResponseEntity<HierarchyResponseDto> getContentHierarchy(
+		@RequestParam String title
+	) {
+		HierarchyResponseDto response = contentService.findContentHierarchyByTitle(title);
 		return ResponseEntity.ok(response);
 	}
 }

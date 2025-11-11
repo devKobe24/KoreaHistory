@@ -398,6 +398,11 @@ const ApiEndpoints = {
         `${API_BASE_URL}/create/keyword?topicTitle=${encodeURIComponent(topicTitle)}`,
         data
       ),
+    createById: (topicId, data) =>
+      ApiClient.post(
+        `${API_BASE_URL}/create/keyword/${topicId}`,
+        data
+      ),
     update: (id, data) =>
       ApiClient.patch(`${API_BASE_URL}/keywords/${id}/update`, data),
     updateNumber: (id, data) =>

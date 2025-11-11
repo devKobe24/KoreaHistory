@@ -25,4 +25,6 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 	List<Topic> findAllWithSubsectionAndSection();
 	
 	List<Topic> findByTopicTitleContainingIgnoreCase(String title);
+
+	Optional<Topic> findFirstByTopicTitleIgnoreCase(String title);
 }

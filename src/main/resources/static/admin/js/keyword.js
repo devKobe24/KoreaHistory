@@ -47,8 +47,13 @@ function populateTopicSelect() {
 
   topics.forEach((topic) => {
     const option = document.createElement("option");
-    option.value = topic.topicTitle;
-    option.textContent = `${topic.topicNumber}. ${topic.topicTitle}`;
+    // value에 topicId를 저장 (topicTitle 대신)
+    option.value = topic.id;
+    
+    // 형식: "topic_number. topic_title (ID: topic_id, Subsection Title: subsection_title)"
+    const subsectionTitle = topic.subsection?.subsectionTitle || "N/A";
+    option.textContent = `${topic.topicNumber}. ${topic.topicTitle} (ID: ${topic.id}, Subsection Title: ${subsectionTitle})`;
+    option.dataset.topicTitle = topic.topicTitle; // topicTitle도 data 속성으로 저장
     select.appendChild(option);
   });
 }
@@ -140,6 +145,7 @@ async function handleCreateKeyword(event) {
     !validateForm("createKeywordForm", [
       "topicTitle",
       "keywordNumber",
+      "keywordTitle",
       "keywords",
     ])
   ) {
@@ -150,6 +156,13 @@ async function handleCreateKeyword(event) {
   try {
     const formData = getFormData("createKeywordForm");
 
+    // topicSelect의 value는 topicId입니다
+    const topicId = parseInt(formData.topicTitle);
+    if (!topicId || isNaN(topicId)) {
+      showAlert("부모 Topic을 선택해주세요.", "error");
+      return;
+    }
+
     // 키워드 문자열을 배열로 변환
     const keywordsArray = formData.keywords
       .split(",")
@@ -158,10 +171,11 @@ async function handleCreateKeyword(event) {
 
     const keywordData = {
       keywordNumber: parseInt(formData.keywordNumber),
+      keywordTitle: formData.keywordTitle.trim(),
       keywords: keywordsArray,
     };
 
-    await ApiEndpoints.keywords.create(formData.topicTitle, keywordData);
+    await ApiEndpoints.keywords.createById(topicId, keywordData);
 
     showAlert("Keyword가 성공적으로 생성되었습니다.", "success");
 
@@ -201,6 +215,11 @@ function displayKeywords(keywordsData) {
     { key: "id", label: "ID" },
     { key: "keywordNumber", label: "번호" },
     {
+      key: "keywordTitle",
+      label: "제목",
+      accessor: (keyword) => keyword.keywordTitle || "-",
+    },
+    {
       key: "keywords",
       label: "키워드들",
       accessor: (keyword) =>
@@ -231,6 +250,7 @@ function editKeyword(keywordId) {
   // 모달 폼에 데이터 설정
   document.getElementById("editKeywordId").value = keyword.id;
   document.getElementById("editKeywordNumber").value = keyword.keywordNumber;
+  document.getElementById("editKeywordTitle").value = keyword.keywordTitle || "";
   document.getElementById("editKeywords").value = keyword.keywords
     ? keyword.keywords.join(", ")
     : "";
@@ -245,7 +265,7 @@ function editKeyword(keywordId) {
 async function handleEditKeyword(event) {
   event.preventDefault();
 
-  if (!validateForm("editKeywordForm", ["keywordNumber", "keywords"])) {
+  if (!validateForm("editKeywordForm", ["keywordNumber", "keywordTitle", "keywords"])) {
     showAlert("모든 필드를 올바르게 입력해주세요.", "error");
     return;
   }
@@ -274,10 +294,14 @@ async function handleEditKeyword(event) {
       });
     }
 
-    // 키워드 내용 수정
+    // 키워드 제목 및 내용 수정
+    const currentKeywordTitle = keyword.keywordTitle || "";
     const currentKeywords = keyword.keywords || [];
-    if (JSON.stringify(keywordsArray) !== JSON.stringify(currentKeywords)) {
+    
+    if (formData.keywordTitle.trim() !== currentKeywordTitle || 
+        JSON.stringify(keywordsArray) !== JSON.stringify(currentKeywords)) {
       await ApiEndpoints.keywords.update(keywordId, {
+        keywordTitle: formData.keywordTitle.trim(),
         keywords: keywordsArray,
       });
     }
@@ -378,14 +402,18 @@ function displayKeywordCards(keywordsData) {
         keyword.topic && keyword.topic.topicTitle
           ? keyword.topic.topicTitle
           : "Topic 정보 없음";
+      const keywordTitle = keyword.keywordTitle || "제목 없음";
 
       return `
       <div class="keyword-card" data-keyword-id="${keyword.id}">
         <div class="keyword-card-header">
           <h3 class="keyword-card-title">
             <span class="keyword-number">#${keyword.keywordNumber}</span>
-            ${topicTitle}
+            ${keywordTitle}
           </h3>
+          <div class="keyword-card-subtitle">
+            <small class="text-muted">부모 Topic: ${topicTitle}</small>
+          </div>
           <div class="keyword-card-actions">
             <button class="btn btn-sm btn-warning" onclick="editKeyword(${keyword.id})">
               ✏️ 수정

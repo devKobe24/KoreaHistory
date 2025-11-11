@@ -243,14 +243,16 @@
             const card = document.createElement("div");
             card.className = "result-card";
             card.dataset.type = type;
+            if (type === "topic" && result.id) {
+              card.dataset.topicId = result.id;
+            }
             card.style.opacity = "0";
             card.style.transform = "translateY(20px)";
 
             const icon = getTypeIcon(type);
             const typeLabel = getTypeLabel(type);
             const title = result.title || result.name || "제목 없음";
-            const description =
-              result.description || result.content || "설명이 없습니다.";
+            const description = formatDescription(result);
 
             card.innerHTML = `
               <div class="result-card-header">
@@ -279,6 +281,78 @@
             }, index * 50);
 
             return card;
+          }
+
+          function formatDescription(result) {
+            if (result.type === "topic") {
+              const number =
+                result.topicNumber ??
+                result.topic_number ??
+                result.number ??
+                result.topic?.topicNumber ??
+                result.topic?.topic_number ??
+                "";
+              const title = result.title || result.name || result.topicTitle || "제목 없음";
+              const subsectionData =
+                result.subsection ??
+                result.subsectionDto ??
+                result.parentSubsection ??
+                null;
+              const subsectionNumber =
+                result.subsectionNumber ??
+                result.subsection_number ??
+                subsectionData?.subsectionNumber ??
+                subsectionData?.subsection_number ??
+                "";
+              const subsectionTitle =
+                result.subsectionTitle ??
+                result.subsection_title ??
+                subsectionData?.subsectionTitle ??
+                subsectionData?.subsection_title ??
+                "";
+
+              const topicLabel = number
+                ? `Topic: ${number}. ${title}`
+                : `Topic: ${title}`;
+
+              const hasSubsectionInfo =
+                (subsectionNumber !== undefined &&
+                  subsectionNumber !== null &&
+                  String(subsectionNumber).trim() !== "") ||
+                (subsectionTitle !== undefined &&
+                  subsectionTitle !== null &&
+                  String(subsectionTitle).trim() !== "");
+
+              if (hasSubsectionInfo) {
+                const numberPart =
+                  subsectionNumber !== undefined &&
+                  subsectionNumber !== null &&
+                  String(subsectionNumber).trim() !== ""
+                    ? String(subsectionNumber).trim()
+                    : "";
+                const titlePart =
+                  subsectionTitle !== undefined &&
+                  subsectionTitle !== null &&
+                  String(subsectionTitle).trim() !== ""
+                    ? String(subsectionTitle).trim()
+                    : "";
+
+                let subsectionLabel = "";
+                if (numberPart && titlePart) {
+                  subsectionLabel = `${numberPart}. ${titlePart}`;
+                } else if (numberPart) {
+                  subsectionLabel = `${numberPart}.`;
+                } else {
+                  subsectionLabel = titlePart;
+                }
+
+                return `${topicLabel} - ${subsectionLabel}`;
+              }
+
+              return topicLabel;
+            }
+
+            return result.description || result.content || "설명이 없습니다.";
           }
 
           // 테이블 행 생성
@@ -319,12 +393,16 @@
 
           // 상세 페이지 열기
           function openDetailPage(result) {
-            const title = encodeURIComponent(
-              result.title || result.name || "제목 없음"
-            );
+            const titleValue = result.title || result.name || "제목 없음";
             const type = result.type || "default";
-            // detail.html 페이지로 이동
-            window.location.href = `detail.html?title=${title}&type=${type}`;
+            const params = new URLSearchParams();
+            params.set("title", titleValue);
+            params.set("type", type);
+            if (result.id !== undefined && result.id !== null) {
+              params.set("id", result.id);
+            }
+
+            window.location.href = `detail.html?${params.toString()}`;
           }
 
           // 필터 적용
@@ -681,7 +759,16 @@
                                         id: topic.id,
                                         title: topic.topicTitle,
                                         description: `Topic ${topic.topicNumber}: ${topic.topicTitle}`,
-                                        number: topic.topicNumber
+                            number: topic.topicNumber,
+                            subsectionNumber:
+                              topic.subsectionNumber ??
+                              topic.subsection?.subsectionNumber ??
+                              subsection.subsectionNumber,
+                            subsectionTitle:
+                              topic.subsectionTitle ??
+                              topic.subsection?.subsectionTitle ??
+                              subsection.subsectionTitle,
+                            subsection: topic.subsection
                                       });
                                     }
                                   }
@@ -718,8 +805,10 @@
                             collectedData.push({
                               type: "content",
                               id: content.id,
-                              title: content.details ? content.details.join(", ") : "내용",
-                              description: "상세 내용"
+                              title: content.contentTitle || "제목 없음",
+                              description: content.contentNumber !== null && content.contentNumber !== undefined
+                                ? `Content ${content.contentNumber}: ${content.contentTitle || "제목 없음"}`
+                                : content.contentTitle || "상세 내용"
                             });
                           });
                         }
@@ -761,14 +850,27 @@
                     }
                   }
                   
-                  if (lesson && lesson.sections && lesson.sections.length > 0) {
-                    data = lesson.sections.map(section => ({
-                      type: "section",
-                      id: section.id,
-                      title: section.sectionTitle,
-                      description: `Section ${section.sectionNumber}: ${section.sectionTitle}`,
-                      number: section.sectionNumber
-                    }));
+                  if (lesson) {
+                    // Lesson 자체를 먼저 추가
+                    data = [{
+                      type: "lesson",
+                      id: lesson.id,
+                      title: lesson.lessonTitle,
+                      description: `Lesson ${lesson.lessonNumber}: ${lesson.lessonTitle}`,
+                      number: lesson.lessonNumber
+                    }];
+                    
+                    // Lesson의 하위 Section들도 추가
+                    if (lesson.sections && lesson.sections.length > 0) {
+                      const sections = lesson.sections.map(section => ({
+                        type: "section",
+                        id: section.id,
+                        title: section.sectionTitle,
+                        description: `Section ${section.sectionNumber}: ${section.sectionTitle}`,
+                        number: section.sectionNumber
+                      }));
+                      data = data.concat(sections);
+                    }
                   }
                   break;
 
@@ -796,14 +898,27 @@
                     }
                   }
                   
-                  if (section && section.subsections && section.subsections.length > 0) {
-                    data = section.subsections.map(subsection => ({
-                      type: "subsection",
-                      id: subsection.id,
-                      title: subsection.subsectionTitle,
-                      description: `Subsection ${subsection.subsectionNumber}: ${subsection.subsectionTitle}`,
-                      number: subsection.subsectionNumber
-                    }));
+                  if (section) {
+                    // Section 자체를 먼저 추가
+                    data = [{
+                      type: "section",
+                      id: section.id,
+                      title: section.sectionTitle,
+                  description: `Section ${section.sectionNumber}: ${section.sectionTitle}`,
+                      number: section.sectionNumber
+                    }];
+                    
+                    // Section의 하위 Subsection들도 추가
+                    if (section.subsections && section.subsections.length > 0) {
+                      const subsections = section.subsections.map(subsection => ({
+                        type: "subsection",
+                        id: subsection.id,
+                        title: subsection.subsectionTitle,
+                        description: `Subsection ${subsection.subsectionNumber}: ${subsection.subsectionTitle}`,
+                        number: subsection.subsectionNumber
+                      }));
+                      data = data.concat(subsections);
+                    }
                   }
                   break;
 
@@ -836,14 +951,120 @@
                     }
                   }
                   
-                  if (subsection && subsection.topics && subsection.topics.length > 0) {
-                    data = subsection.topics.map(topic => ({
-                      type: "topic",
-                      id: topic.id,
-                      title: topic.topicTitle,
-                      description: `Topic ${topic.topicNumber}: ${topic.topicTitle}`,
-                      number: topic.topicNumber
-                    }));
+                  if (subsection) {
+                    // Subsection 자체를 먼저 추가
+                    data = [{
+                      type: "subsection",
+                      id: subsection.id,
+                      title: subsection.subsectionTitle,
+                      description: `Subsection ${subsection.subsectionNumber}: ${subsection.subsectionTitle}`,
+                      number: subsection.subsectionNumber
+                    }];
+                    
+                    // Subsection의 하위 Topic들도 추가
+                    if (subsection.topics && subsection.topics.length > 0) {
+                      const topics = subsection.topics.map(topic => ({
+                        type: "topic",
+                        id: topic.id,
+                        title: topic.topicTitle,
+                        description: `Topic ${topic.topicNumber}: ${topic.topicTitle}`,
+                        number: topic.topicNumber,
+                        subsectionNumber:
+                          topic.subsectionNumber ??
+                          topic.subsection?.subsectionNumber ??
+                          subsection.subsectionNumber,
+                        subsectionTitle:
+                          topic.subsectionTitle ??
+                          topic.subsection?.subsectionTitle ??
+                          subsection.subsectionTitle,
+                        subsection: topic.subsection
+                      }));
+                      data = data.concat(topics);
+                    }
+                  }
+                  break;
+
+                case "keyword":
+                  // Keyword를 찾아서 표시
+                  try {
+                    // 모든 keywords를 가져와서 title과 매칭되는 keyword 찾기
+                    const keywordsResponse = await fetch(`${API_BASE_URL}/keywords/search/all`);
+                    if (keywordsResponse.ok) {
+                      const allKeywords = await keywordsResponse.json();
+                      
+                      // title을 정규화 (공백 제거 후 정렬)
+                      const normalizeTitle = (str) => {
+                        if (!str) return "";
+                        return str.split(",")
+                          .map(k => k.trim())
+                          .filter(k => k.length > 0)
+                          .sort()
+                          .join(", ");
+                      };
+                      
+                      const normalizedTitle = normalizeTitle(title);
+                      
+                      // keyword의 keywords 배열을 join한 값과 비교
+                      const foundKeyword = allKeywords.find(k => {
+                        if (!k.keywords || k.keywords.length === 0) {
+                          return k.keywordTitle === title;
+                        }
+                        
+                        // keyword의 keywords 배열을 정렬하고 join
+                        const keywordString = k.keywords
+                          .map(kw => kw.trim())
+                          .filter(kw => kw.length > 0)
+                          .sort()
+                          .join(", ");
+                        
+                        // 정규화된 title과 비교
+                        const keywordsMatch = keywordString === normalizedTitle;
+                        const titleMatch = k.keywordTitle === title;
+                        
+                        return keywordsMatch || titleMatch;
+                      });
+                      
+                      if (foundKeyword) {
+                        // Keyword 자체를 추가
+                        data = [{
+                          type: "keyword",
+                          id: foundKeyword.id,
+                          title: foundKeyword.keywords ? foundKeyword.keywords.join(", ") : (foundKeyword.keywordTitle || "키워드"),
+                          description: foundKeyword.keywordTitle || "키워드 그룹",
+                          number: foundKeyword.keywordNumber
+                        }];
+                      }
+                    }
+                  } catch (error) {
+                    console.error("Error loading keyword:", error);
+                  }
+                  break;
+
+                case "content":
+                  // Content를 찾아서 표시
+                  try {
+                    // content_title로 검색
+                    const contentResponse = await fetch(`${API_BASE_URL}/search/contents?detail=${encodeURIComponent(title)}`);
+                    if (contentResponse.ok) {
+                      const contents = await contentResponse.json();
+                      // title이 content_title과 일치하는 content 찾기
+                      const foundContent = contents.find(c => c.contentTitle === title);
+                      
+                      if (foundContent) {
+                        // Content 자체를 추가
+                        data = [{
+                          type: "content",
+                          id: foundContent.id,
+                          title: foundContent.contentTitle || "제목 없음",
+                          description: foundContent.contentNumber !== null && foundContent.contentNumber !== undefined
+                            ? `Content ${foundContent.contentNumber}: ${foundContent.contentTitle || "제목 없음"}`
+                            : foundContent.contentTitle || "상세 내용",
+                          number: foundContent.contentNumber
+                        }];
+                      }
+                    }
+                  } catch (error) {
+                    console.error("Error loading content:", error);
                   }
                   break;
 
@@ -865,9 +1086,35 @@
                     ...results[1].map(le => ({ type: "lesson", id: le.id, title: le.lessonTitle, description: `Lesson ${le.lessonNumber}: ${le.lessonTitle}` })),
                     ...results[2].map(se => ({ type: "section", id: se.id, title: se.sectionTitle, description: `Section ${se.sectionNumber}: ${se.sectionTitle}` })),
                     ...results[3].map(su => ({ type: "subsection", id: su.id, title: su.subsectionTitle, description: `Subsection ${su.subsectionNumber}: ${su.subsectionTitle}` })),
-                    ...results[4].map(to => ({ type: "topic", id: to.id, title: to.topicTitle, description: `Topic ${to.topicNumber}: ${to.topicTitle}` })),
+                    ...results[4].map(to => ({
+                      type: "topic",
+                      id: to.id,
+                      title: to.topicTitle,
+                      description: `Topic ${to.topicNumber}: ${to.topicTitle}`,
+                      number: to.topicNumber,
+                      topicNumber: to.topicNumber,
+                      topicTitle: to.topicTitle,
+                      subsectionNumber:
+                        to.subsection?.subsectionNumber ??
+                        to.subsectionNumber ??
+                        to.parentSubsection?.subsectionNumber ??
+                        "",
+                      subsectionTitle:
+                        to.subsection?.subsectionTitle ??
+                        to.subsectionTitle ??
+                        to.parentSubsection?.subsectionTitle ??
+                        "",
+                      subsection: to.subsection ?? to.parentSubsection ?? null
+                    })),
                     ...results[5].map(ke => ({ type: "keyword", id: ke.id, title: ke.keywords ? ke.keywords.join(", ") : "키워드", description: "키워드 그룹" })),
-                    ...results[6].map(co => ({ type: "content", id: co.id, title: co.details ? co.details.join(", ") : "내용", description: "상세 내용" }))
+                    ...results[6].map(co => ({ 
+                      type: "content", 
+                      id: co.id, 
+                      title: co.contentTitle || "제목 없음", 
+                      description: co.contentNumber !== null && co.contentNumber !== undefined
+                        ? `Content ${co.contentNumber}: ${co.contentTitle || "제목 없음"}`
+                        : co.contentTitle || "상세 내용"
+                    }))
                   ];
                   break;
               }

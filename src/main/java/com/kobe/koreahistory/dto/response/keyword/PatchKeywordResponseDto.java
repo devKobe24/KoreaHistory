@@ -20,11 +20,13 @@ import java.util.List;
 public class PatchKeywordResponseDto {
 	private final Long id;
 	private final Integer keywordNumber;
+	private final String keywordTitle;
 	private final List<String> updatedKeywords;
 
 	public PatchKeywordResponseDto(Keyword entity) {
 		this.id = entity.getId();
 		this.keywordNumber = entity.getKeywordNumber();
+		this.keywordTitle = entity.getKeywordTitle();
 		this.updatedKeywords = entity.getKeywords();
 	}
 }

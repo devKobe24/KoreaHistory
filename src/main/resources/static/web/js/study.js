@@ -8,8 +8,14 @@
   // ===== State =====
   let currentSection = "1";
   let currentSubsection = "1-1";
+  let currentSubsectionId = null;
   let completedSubsections = new Set();
   let totalSubsections = 0;
+  let targetSectionTitle = null;
+  let targetSubsectionTitle = null;
+  let targetTopicTitle = null;
+  let targetTopicId = null;
+  let suppressToast = false;
   // Section 배지 표기를 위한 최소 상태
   let loadedLesson = null; // lesson 로드시 섹션/서브섹션 구조 보관
   let loadedChapter = null; // chapter 로드시 lessons 구조 보관
@@ -26,7 +32,6 @@
     currentTopic: document.getElementById("currentTopic"),
     topicBadge: document.getElementById("topicBadge"),
     topicTitle: document.getElementById("topicTitle"),
-    topicSubtitle: document.getElementById("topicSubtitle"),
     keywordGrid: document.getElementById("keywordGrid"),
     detailSection: document.getElementById("detailSection"),
 
@@ -54,6 +59,68 @@
     if (itemCount === 3) return 3;
     if (itemCount >= 4) return 4;
     return itemCount;
+  }
+
+  function focusTopicBadge(topicId, topicTitle) {
+    if (!topicId && !topicTitle) return;
+
+    const detailSectionEl = document.getElementById("detailSection");
+    if (!detailSectionEl) return;
+
+    const badges = detailSectionEl.querySelectorAll(".topic-section .subsection-badge");
+    let targetBadge = null;
+
+    badges.forEach((badge) => {
+      if (targetBadge) return;
+      const section = badge.closest(".topic-section");
+      const badgeTopicId = section?.dataset?.topicId;
+
+      if (topicId && badgeTopicId && String(badgeTopicId) === String(topicId)) {
+        targetBadge = badge;
+        return;
+      }
+
+      if (topicTitle) {
+        const normalized = topicTitle.trim().toLowerCase();
+        if (!normalized) return;
+        const text = (badge.textContent || "").toLowerCase();
+        if (text.includes(normalized)) {
+          targetBadge = badge;
+        }
+      }
+    });
+
+    if (!targetBadge) {
+      return;
+    }
+
+    const previousTabIndex = targetBadge.getAttribute("tabindex");
+    targetBadge.setAttribute("tabindex", "-1");
+
+    try {
+      targetBadge.focus({ preventScroll: true });
+    } catch (e) {
+      // focus may fail silently
+    }
+
+    targetBadge.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    const originalTransition = targetBadge.style.transition;
+    const originalBoxShadow = targetBadge.style.boxShadow;
+    targetBadge.style.transition = originalTransition || "box-shadow 0.3s ease";
+    targetBadge.style.boxShadow = "0 0 0 4px rgba(102, 126, 234, 0.4)";
+
+    setTimeout(() => {
+      targetBadge.style.boxShadow = originalBoxShadow || "";
+      if (previousTabIndex !== null) {
+        targetBadge.setAttribute("tabindex", previousTabIndex);
+      } else {
+        targetBadge.removeAttribute("tabindex");
+      }
+    }, 2000);
   }
 
   /**
@@ -127,20 +194,24 @@
 
   // ===== Event Handlers =====
   function handleSectionClick() {
-    const section = this.dataset.section;
-    toggleSection(section, this);
+    const sectionId = this.dataset.sectionId || this.dataset.section;
+    if (!sectionId) {
+      console.warn("section-header에 data-section-id가 없습니다.");
+      return;
+    }
+    toggleSection(sectionId, this);
     
     // Chapter 구조인 경우
     if (loadedChapter) {
-      const parts = section.split("-");
+      const parts = sectionId.split("-");
       if (parts.length === 1) {
-        // Lesson이 클릭된 경우 (dataset.section이 "1" 형식)
+        // Lesson이 클릭된 경우 (data-section-id가 "1" 형식)
         const lessonIdx = Math.max(1, parseInt(parts[0] || "1", 10)) - 1;
         if (loadedChapter.lessons && loadedChapter.lessons[lessonIdx]) {
           loadedLesson = loadedChapter.lessons[lessonIdx];
         }
       } else if (parts.length === 2) {
-        // Section이 클릭된 경우 (dataset.section이 "1-1" 형식)
+        // Section이 클릭된 경우 (data-section-id가 "1-1" 형식)
         const [lessonIdx, sectionIdx] = parts;
         const lessonIndex = Math.max(1, parseInt(lessonIdx || "1", 10)) - 1;
         const sectionIndex = Math.max(1, parseInt(sectionIdx || "1", 10)) - 1;
@@ -156,15 +227,19 @@
     }
     
     // Lesson 구조인 경우
-    const index = Math.max(1, parseInt(section || "1", 10)) - 1;
+    const index = Math.max(1, parseInt(sectionId || "1", 10)) - 1;
     updateSectionBadgeByIndex(index);
     // Topic 제목을 해당 Section 제목으로 반영
     updateTopicTitleFromApi(index);
   }
 
   function handleSubsectionClick() {
-    const subsection = this.dataset.subsection;
-    navigateToSubsection(subsection);
+    const subsectionKey = this.dataset.subsection || this.dataset.subsectionId;
+    if (!subsectionKey) {
+      console.warn("subsection-item에 data-subsection-id를 찾을 수 없습니다.");
+      return;
+    }
+    navigateToSubsection(subsectionKey);
   }
 
   // ===== Section Toggle =====
@@ -235,15 +310,78 @@
   }
 
   // ===== Navigation =====
-  function navigateToSubsection(subsectionId) {
-    currentSubsection = subsectionId;
+  function navigateToSubsection(subsectionKey) {
+    currentSubsection = subsectionKey;
 
     // Update active state (동적으로 생성된 요소들 포함)
     const subsectionItems = document.querySelectorAll(".subsection-item");
+    let matchedSubsectionData = null;
     subsectionItems.forEach((item) => {
       item.classList.remove("active");
-      if (item.dataset.subsection === subsectionId) {
+      const itemSubsectionKey = item.dataset.subsection || item.dataset.subsectionId;
+      if (itemSubsectionKey === subsectionKey) {
         item.classList.add("active");
+        matchedSubsectionData = item.dataset;
+      }
+    });
+
+    currentSubsectionId = matchedSubsectionData
+      ? matchedSubsectionData.subsectionId || currentSubsectionId
+      : currentSubsectionId;
+
+    // 현재 subsection이 속한 section 찾기
+    const subsectionKeyForSection =
+      matchedSubsectionData?.subsection || subsectionKey;
+    const [secStr] = (subsectionKeyForSection || "1-1").split("-");
+    const sectionNumber = secStr;
+
+    // 모든 section-header와 subsection-list의 active 상태 업데이트
+    const sectionHeaders = document.querySelectorAll(".section-header");
+    sectionHeaders.forEach((header) => {
+      const headerSection = header.dataset.sectionId || header.dataset.section;
+      
+      // 현재 subsection이 속한 section인지 확인
+      if (headerSection === sectionNumber) {
+        // 해당 section-header를 active로 설정
+        header.classList.add("active");
+        
+        // 해당 section-header의 subsection-list 찾기
+        let subsectionList = header.nextElementSibling;
+        if (!subsectionList || !subsectionList.classList.contains("subsection-list")) {
+          const parentNavSection = header.closest(".nav-section");
+          if (parentNavSection) {
+            subsectionList = Array.from(parentNavSection.children).find(
+              child => child.classList.contains("subsection-list") && child.previousElementSibling === header
+            );
+          }
+        }
+        
+        if (subsectionList) {
+          subsectionList.classList.add("active");
+        }
+      } else {
+        // 다른 section-header는 deactive
+        header.classList.remove("active");
+        
+        // 해당 section-header의 subsection-list도 deactive
+        let subsectionList = header.nextElementSibling;
+        if (!subsectionList || !subsectionList.classList.contains("subsection-list")) {
+          const parentNavSection = header.closest(".nav-section");
+          if (parentNavSection) {
+            subsectionList = Array.from(parentNavSection.children).find(
+              child => child.classList.contains("subsection-list") && child.previousElementSibling === header
+            );
+          }
+        }
+        
+        if (subsectionList) {
+          subsectionList.classList.remove("active");
+          // 해당 subsection-list 내부의 모든 subsection-item도 deactive
+          const subsectionItems = subsectionList.querySelectorAll(".subsection-item");
+          subsectionItems.forEach(item => {
+            item.classList.remove("active");
+          });
+        }
       }
     });
 
@@ -251,7 +389,7 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     // Load content
-    loadSubsectionContent(subsectionId);
+    loadSubsectionContent(subsectionKey);
 
     // Update navigation buttons
     updateNavigationButtons();
@@ -260,7 +398,6 @@
     showToast("학습 내용이 변경되었습니다", "📖");
 
     // 현재 subsection이 속한 Section 기준으로 제목 갱신
-    const [secStr] = (subsectionId || "1-1").split("-");
     const sIdx = Math.max(1, parseInt(secStr || "1", 10)) - 1;
     updateTopicTitleFromApi(sIdx);
 
@@ -269,6 +406,15 @@
     
     // Subsection 제목 갱신
     updateSubsectionTitleFromApi();
+    
+    // type이 lesson일 때 subsection-keyword 관계를 로드하여 업데이트
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get("type");
+    if (type === "lesson") {
+      setTimeout(() => {
+        loadSubsectionKeywordRelations();
+      }, 300);
+    }
   }
 
   function navigateToPrevious() {
@@ -279,7 +425,8 @@
 
     if (currentIndex > 0) {
       const prevSubsection =
-        allSubsections[currentIndex - 1].dataset.subsection;
+        allSubsections[currentIndex - 1].dataset.subsection ||
+        allSubsections[currentIndex - 1].dataset.subsectionId;
       navigateToSubsection(prevSubsection);
     }
   }
@@ -292,7 +439,8 @@
 
     if (currentIndex < allSubsections.length - 1) {
       const nextSubsection =
-        allSubsections[currentIndex + 1].dataset.subsection;
+        allSubsections[currentIndex + 1].dataset.subsection ||
+        allSubsections[currentIndex + 1].dataset.subsectionId;
       navigateToSubsection(nextSubsection);
     }
   }
@@ -314,6 +462,37 @@
     }
   }
 
+  // ===== Move Keyword Section Above Detail =====
+  function moveKeywordSectionAboveDetail() {
+    // keyword-section과 detail-section 요소 찾기
+    const keywordSection = document.querySelector(".keyword-section");
+    const detailSection = document.getElementById("detailSection");
+    
+    if (!keywordSection || !detailSection) {
+      console.warn("keyword-section 또는 detail-section을 찾을 수 없습니다.");
+      return;
+    }
+    
+    // keyword-section이 이미 detail-section 위에 있는지 확인
+    if (keywordSection.parentElement === detailSection.parentElement) {
+      // 같은 부모 요소 안에 있는 경우, 순서 확인
+      const parent = keywordSection.parentElement;
+      const keywordIndex = Array.from(parent.children).indexOf(keywordSection);
+      const detailIndex = Array.from(parent.children).indexOf(detailSection);
+      
+      // 이미 keyword-section이 detail-section 위에 있으면 종료
+      if (keywordIndex < detailIndex) {
+        return;
+      }
+    }
+    
+    // keyword-section을 detail-section 바로 위로 이동
+    const parent = detailSection.parentElement;
+    if (parent) {
+      parent.insertBefore(keywordSection, detailSection);
+    }
+  }
+
   // ===== Load Study Data =====
   function loadStudyData() {
     // URL 파라미터에서 데이터 로드
@@ -321,9 +500,26 @@
     const title = urlParams.get("title");
     const type = urlParams.get("type");
     const section = urlParams.get("section");
+    const sectionTitleParam = urlParams.get("sectionTitle");
+    const subsectionTitleParam = urlParams.get("subsectionTitle");
+    const topicTitleParam = urlParams.get("topicTitle");
+    const topicIdParam = urlParams.get("topicId");
 
     if (title) {
       updatePageTitle(decodeURIComponent(title));
+    }
+
+    if (sectionTitleParam) {
+      targetSectionTitle = decodeURIComponent(sectionTitleParam);
+    }
+    if (subsectionTitleParam) {
+      targetSubsectionTitle = decodeURIComponent(subsectionTitleParam);
+    }
+    if (topicTitleParam) {
+      targetTopicTitle = decodeURIComponent(topicTitleParam);
+    }
+    if (topicIdParam) {
+      targetTopicId = decodeURIComponent(topicIdParam);
     }
 
     if (section) {
@@ -337,6 +533,9 @@
     } else if (type === "lesson" && title) {
       // Lesson 타입인 경우 실제 API에서 Section 데이터 로드
       loadLessonSections(decodeURIComponent(title));
+      // moveKeywordSectionAboveDetail은 loadLessonSections 내부에서 호출됨
+      // type이 lesson일 때 subsection-keyword 관계를 로드하여 업데이트
+      loadSubsectionKeywordRelations();
     } else if (type === "section" && title) {
       // Section 타입인 경우 해당 Section의 Subsection들을 로드
       loadSectionSubsections(decodeURIComponent(title));
@@ -475,7 +674,17 @@
           currentSubsection = "1-1";
           loadSubsectionContent(currentSubsection);
         }
-
+        
+        // type이 lesson일 때 keyword-section을 detail-section 위로 이동 (DOM 렌더링 완료 후)
+        setTimeout(() => {
+          moveKeywordSectionAboveDetail();
+        }, 100);
+        
+        // type이 lesson일 때 subsection-keyword 관계를 로드하여 업데이트 (DOM 렌더링 완료 후)
+        setTimeout(() => {
+          loadSubsectionKeywordRelations();
+        }, 300);
+        
         // 배지 초기값: 첫 번째 섹션 기준
         updateSectionBadgeByIndex(0);
         // Subsection 배지 초기값 설정
@@ -690,7 +899,7 @@
       const lessonHeader = document.createElement("div");
       lessonHeader.className = "section-header";
       // 기본적으로 모든 header는 inactive 상태
-      lessonHeader.dataset.section = lessonIndex + 1; // Section처럼 처리
+      lessonHeader.dataset.sectionId = lessonIndex + 1; // Section처럼 처리
       
       lessonHeader.innerHTML = `
         <span class="section-number">${lessonNumber}</span>
@@ -714,7 +923,7 @@
           const sectionHeader = document.createElement("div");
           sectionHeader.className = "section-header";
           // 기본적으로 모든 header는 inactive 상태
-          sectionHeader.dataset.section = `${lessonIndex + 1}-${sectionIndex + 1}`;
+          sectionHeader.dataset.sectionId = `${lessonIndex + 1}-${sectionIndex + 1}`;
           
           sectionHeader.innerHTML = `
             <span class="section-number">${sectionNumber}</span>
@@ -739,6 +948,11 @@
                 hasActiveSubsectionItem = true;
               }
               
+              const subsectionIdValue =
+                subsection.id ??
+                subsection.subsectionId ??
+                `${lessonIndex + 1}-${sectionIndex + 1}-${subsectionIndex + 1}`;
+              subsectionItem.dataset.subsectionId = String(subsectionIdValue);
               subsectionItem.dataset.subsection = `${lessonIndex + 1}-${sectionIndex + 1}-${subsectionIndex + 1}`;
               
               subsectionItem.innerHTML = `
@@ -774,6 +988,37 @@
     // 총 subsection 수 재계산
     calculateTotalSubsections();
     updateProgress();
+    // 네비게이션 버튼 상태 업데이트
+    updateNavigationButtons();
+
+    if (targetSubsectionTitle) {
+      const subsectionItems = subsectionList.querySelectorAll(".subsection-item");
+      const targetItem = Array.from(subsectionItems).find((item) => {
+        const titleEl = item.querySelector(".subsection-title");
+        return titleEl && titleEl.textContent === targetSubsectionTitle;
+      });
+
+      const datasetSource = targetItem
+        ? targetItem.dataset
+        : subsectionItems.length > 0
+        ? subsectionItems[0].dataset
+        : null;
+      const navigateKey =
+        datasetSource?.subsection || datasetSource?.subsectionId || null;
+
+      if (navigateKey) {
+        if (targetItem) {
+          subsectionItems.forEach((item) => item.classList.remove("active"));
+          targetItem.classList.add("active");
+        }
+
+        suppressToast = true;
+        navigateToSubsection(navigateKey);
+        suppressToast = false;
+      }
+
+      targetSubsectionTitle = null;
+    }
   }
 
   // ===== Generate Study Navigation =====
@@ -797,7 +1042,7 @@
       const sectionHeader = document.createElement("div");
       sectionHeader.className = "section-header";
       if (sectionIndex === 0) sectionHeader.classList.add("active");
-      sectionHeader.dataset.section = sectionIndex + 1;
+      sectionHeader.dataset.sectionId = sectionIndex + 1;
       
       sectionHeader.innerHTML = `
         <span class="section-number">${sectionNumber}</span>
@@ -815,6 +1060,11 @@
           const subsectionItem = document.createElement("div");
           subsectionItem.className = "subsection-item";
           if (sectionIndex === 0 && subsectionIndex === 0) subsectionItem.classList.add("active");
+          const subsectionIdValue =
+            subsection.id ??
+            subsection.subsectionId ??
+            `${sectionIndex + 1}-${subsectionIndex + 1}`;
+          subsectionItem.dataset.subsectionId = String(subsectionIdValue);
           subsectionItem.dataset.subsection = `${sectionIndex + 1}-${subsectionIndex + 1}`;
           
           subsectionItem.innerHTML = `
@@ -841,6 +1091,14 @@
     updateSectionBadgeByIndex(0);
     // 생성 직후 제목(섹션 0번) 갱신 시도
     updateTopicTitleFromApi(0);
+    // 네비게이션 버튼 상태 업데이트
+    updateNavigationButtons();
+
+    if (targetSectionTitle || targetSubsectionTitle) {
+      activateSectionByTitle(targetSectionTitle, targetSubsectionTitle);
+      targetSectionTitle = null;
+      targetSubsectionTitle = null;
+    }
   }
 
   // ===== Generate Single Section Navigation =====
@@ -862,7 +1120,7 @@
     
     const sectionHeader = document.createElement("div");
     sectionHeader.className = "section-header active";
-    sectionHeader.dataset.section = "1";
+    sectionHeader.dataset.sectionId = "1";
     
     sectionHeader.innerHTML = `
       <span class="section-number">${sectionNumber}</span>
@@ -879,6 +1137,11 @@
         const subsectionItem = document.createElement("div");
         subsectionItem.className = "subsection-item";
         if (subsectionIndex === 0) subsectionItem.classList.add("active");
+        const subsectionIdValue =
+          subsection.id ??
+          subsection.subsectionId ??
+          `1-${subsectionIndex + 1}`;
+        subsectionItem.dataset.subsectionId = String(subsectionIdValue);
         subsectionItem.dataset.subsection = `1-${subsectionIndex + 1}`;
         
         subsectionItem.innerHTML = `
@@ -900,6 +1163,107 @@
     // 총 subsection 수 재계산
     calculateTotalSubsections();
     updateProgress();
+    // 네비게이션 버튼 상태 업데이트
+    updateNavigationButtons();
+
+    if (targetSectionTitle || targetSubsectionTitle) {
+      activateSectionByTitle(targetSectionTitle, targetSubsectionTitle);
+      targetSectionTitle = null;
+      targetSubsectionTitle = null;
+    }
+  }
+
+  function activateSectionByTitle(sectionTitle, subsectionTitle) {
+    if (!loadedLesson || !loadedLesson.sections) {
+      return;
+    }
+
+    let targetSectionIndex = -1;
+    let targetSubsectionIndex = -1;
+
+    loadedLesson.sections.forEach((section, index) => {
+      if (targetSectionIndex === -1 && sectionTitle && section.sectionTitle === sectionTitle) {
+        targetSectionIndex = index;
+      }
+
+      if (
+        subsectionTitle &&
+        section.subsections &&
+        targetSubsectionIndex === -1
+      ) {
+        const foundIndex = section.subsections.findIndex(
+          (subsection) => subsection.subsectionTitle === subsectionTitle
+        );
+        if (foundIndex !== -1) {
+          targetSubsectionIndex = foundIndex;
+          if (targetSectionIndex === -1) {
+            targetSectionIndex = index;
+          }
+        }
+      }
+    });
+
+    if (targetSectionIndex === -1) {
+      return;
+    }
+
+    const sectionHeaders = document.querySelectorAll(".section-header");
+    const subsectionLists = document.querySelectorAll(".subsection-list");
+
+    sectionHeaders.forEach((header, index) => {
+      header.classList.toggle("active", index === targetSectionIndex);
+    });
+
+    subsectionLists.forEach((list, index) => {
+      list.classList.toggle("active", index === targetSectionIndex);
+    });
+
+    currentSection = String(targetSectionIndex + 1);
+    updateSectionBadgeByIndex(targetSectionIndex);
+    updateTopicTitleFromApi(targetSectionIndex);
+
+    const targetList = subsectionLists[targetSectionIndex];
+    if (!targetList) {
+      return;
+    }
+
+    const subsectionItems = targetList.querySelectorAll(".subsection-item");
+    subsectionItems.forEach((item) => item.classList.remove("active"));
+
+    let targetDataset = null;
+
+    if (
+      subsectionTitle &&
+      targetSubsectionIndex !== -1 &&
+      subsectionItems[targetSubsectionIndex]
+    ) {
+      targetDataset = subsectionItems[targetSubsectionIndex].dataset;
+    }
+
+    if (!targetDataset && subsectionItems.length > 0) {
+      targetDataset = subsectionItems[0].dataset;
+    }
+
+    if (targetDataset) {
+      const navigateKey =
+        targetDataset.subsection || targetDataset.subsectionId || null;
+      const targetItem = navigateKey
+        ? Array.from(subsectionItems).find((item) => {
+            const itemKey = item.dataset.subsection || item.dataset.subsectionId;
+            return itemKey === navigateKey;
+          })
+        : null;
+
+      if (targetItem) {
+        targetItem.classList.add("active");
+      }
+
+      if (navigateKey) {
+        suppressToast = true;
+        navigateToSubsection(navigateKey);
+        suppressToast = false;
+      }
+    }
   }
 
   // ===== Generate Single Subsection Navigation =====
@@ -921,7 +1285,7 @@
     
     const sectionHeader = document.createElement("div");
     sectionHeader.className = "section-header active";
-    sectionHeader.dataset.section = "1";
+    sectionHeader.dataset.sectionId = "1";
     
     sectionHeader.innerHTML = `
       <span class="section-number">${sectionNumber}</span>
@@ -959,6 +1323,8 @@
     // 총 subsection 수 재계산
     calculateTotalSubsections();
     updateProgress();
+    // 네비게이션 버튼 상태 업데이트
+    updateNavigationButtons();
   }
 
   function loadSubsectionContent(subsectionId) {
@@ -968,81 +1334,38 @@
     const contentData = getSubsectionData(subsectionId);
 
     // 더미 데이터는 API 데이터가 없는 경우에만 반영하도록 가드 처리
-    if (!loadedLesson && elements.topicBadge) {
-      elements.topicBadge.textContent = contentData.badge;
-    }
-    if (!loadedLesson && elements.topicTitle) {
-      elements.topicTitle.textContent = contentData.title;
-    }
-    if (elements.topicSubtitle) {
-      elements.topicSubtitle.textContent = contentData.subtitle;
-    }
-    if (elements.currentTopic) {
-      elements.currentTopic.textContent = contentData.title;
+    if (!loadedLesson) {
+      if (elements.topicBadge) {
+        elements.topicBadge.textContent = contentData.badge;
+      }
+      if (elements.topicTitle) {
+        elements.topicTitle.textContent = contentData.title;
+      }
+      if (elements.currentTopic) {
+        elements.currentTopic.textContent = contentData.title;
+      }
     }
 
     console.log("Loaded content for:", subsectionId);
-    // 키워드를 API로부터 받아 렌더링
-    renderKeywordsFromApi();
-    // LearningPage API로 ContentBlock 렌더링 (기존 방식으로 폴백)
-    renderLearningPageFromApi();
+    // Topics, Keywords, Contents를 topic-section 구조로 렌더링
+    renderTopicsFromApi()
+      .then(() => {
+        // 토픽 데이터가 최신 cache에 반영된 뒤 키워드 렌더링
+        return renderKeywordsFromApi();
+      })
+      .catch((error) => {
+        console.warn('Failed to render topics before keywords:', error);
+        // 토픽 렌더링 실패 시에도 키워드 렌더링은 시도
+        renderKeywordsFromApi();
+      });
   }
 
   // ===== LearningPage API로 렌더링 (ContentBlock 다형성 지원) =====
+  // NOTE: 현재는 renderTopicsFromApi()를 사용하므로 이 함수는 사용하지 않음
+  // 만약 ContentBlock 타입을 사용하려면 topic-section 구조 안에서 사용해야 함
   async function renderLearningPageFromApi() {
-    try {
-      if (!loadedLesson || !Array.isArray(loadedLesson.sections)) return;
-      
-      // 현재 subsection 정보 가져오기
-      const [secStr, subStr] = (currentSubsection || "1-1").split("-");
-      const sIdx = Math.max(1, parseInt(secStr || "1", 10)) - 1;
-      const subIdx = Math.max(1, parseInt(subStr || "1", 10)) - 1;
-      const section = loadedLesson.sections[sIdx];
-      if (!section || !Array.isArray(section.subsections)) return;
-      const subsection = section.subsections[subIdx];
-      if (!subsection) return;
-      
-      const subsectionId = subsection.id;
-      if (!subsectionId) return;
-      
-      // LearningPage API 호출
-      const response = await fetch(`${API_BASE_URL}/learning/subsection/${subsectionId}`);
-      if (!response.ok) {
-        console.warn('Failed to fetch learning page:', response.status);
-        // 기존 방식으로 폴백
-    renderTopicsFromApi();
-        return;
-      }
-      
-      const learningPage = await response.json();
-      if (!learningPage.blocks || learningPage.blocks.length === 0) {
-        console.warn('No blocks found in learning page');
-        // 기존 방식으로 폴백
-        renderTopicsFromApi();
-        return;
-      }
-      
-      // detail-subsection 요소 찾기
-      const detailSubsection = document.querySelector('.detail-subsection');
-      if (!detailSubsection) return;
-      
-      // 기존 detail-content-box 제거
-      const existingBoxes = detailSubsection.querySelectorAll('.detail-content-box');
-      existingBoxes.forEach(box => box.remove());
-      
-      // ContentBlock 타입별로 렌더링
-      learningPage.blocks.forEach((block) => {
-        const box = renderContentBlock(block);
-        if (box) {
-          detailSubsection.appendChild(box);
-        }
-      });
-      
-    } catch (e) {
-      console.warn('Failed to render learning page from API:', e);
-      // 기존 방식으로 폴백
-      renderTopicsFromApi();
-    }
+    // 이 함수는 현재 사용하지 않음 - renderTopicsFromApi()가 대신 사용됨
+    return;
   }
 
   // ===== ContentBlock 타입별 렌더링 =====
@@ -1392,89 +1715,576 @@
       const subsection = section.subsections[subIdx];
       if (!subsection) return;
       
-      // Subsection에 속한 topics 가져오기
-      const topics = subsection.topics || [];
-      if (topics.length === 0) return;
+      const subsectionId = subsection.id;
+      if (!subsectionId) return;
       
-      // Contents API에서 현재 topic에 속한 detail_value 가져오기
-      let topicDetailMap = new Map(); // topic.id -> detail_values 배열
+      // detail-section에 로딩 스피너 표시
+      const detailSectionEl = document.getElementById('detailSection');
+      let detailLoadingOverlay = null;
+      if (detailSectionEl) {
+        // 기존 스피너가 있으면 제거
+        const existingOverlay = detailSectionEl.querySelector('.detail-loading-overlay');
+        if (existingOverlay) existingOverlay.remove();
+        
+        detailLoadingOverlay = document.createElement('div');
+        detailLoadingOverlay.className = 'detail-loading-overlay';
+        detailLoadingOverlay.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          border-radius: 8px;
+        `;
+        
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner';
+        spinner.style.cssText = `
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #667eea;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        `;
+        
+        detailLoadingOverlay.appendChild(spinner);
+        detailSectionEl.style.position = 'relative';
+        detailSectionEl.appendChild(detailLoadingOverlay);
+      }
       
+      // Subsection에 속한 topics 가져오기 - API에서 모든 topics 가져와서 필터링
+      let allTopics = [];
+      try {
+        const topicsRes = await fetch(`${API_BASE_URL}/topics/search/all`);
+      if (topicsRes.ok) {
+        const topicsArr = await topicsRes.json();
+        if (Array.isArray(topicsArr)) {
+      const normalizedSubsectionId = String(subsectionId);
+      const normalizedCurrentSubsectionId = currentSubsectionId ? String(currentSubsectionId) : null;
+      const subsectionIdToMatch = normalizedCurrentSubsectionId || normalizedSubsectionId;
+
+          const extractSubsectionId = (topic) => {
+            if (typeof topic.subsectionId !== 'undefined' && topic.subsectionId !== null) {
+              return String(topic.subsectionId);
+            }
+            if (!topic) return null;
+            if (topic.subsection && (topic.subsection.id || topic.subsection.subsectionId)) {
+              return String(topic.subsection.id ?? topic.subsection.subsectionId);
+            }
+            if (topic.parentSubsection && (topic.parentSubsection.id || topic.parentSubsection.subsectionId)) {
+              return String(topic.parentSubsection.id ?? topic.parentSubsection.subsectionId);
+            }
+            if (typeof topic.subsection_id !== 'undefined' && topic.subsection_id !== null) {
+              return String(topic.subsection_id);
+            }
+            if (topic.subsectionDto && (topic.subsectionDto.id || topic.subsectionDto.subsectionId)) {
+              return String(topic.subsectionDto.id ?? topic.subsectionDto.subsectionId);
+            }
+            return null;
+          };
+
+          const extractTopicId = (topic) => {
+            if (!topic) return null;
+            if (typeof topic.id !== 'undefined' && topic.id !== null) {
+              return String(topic.id);
+            }
+            if (typeof topic.topicId !== 'undefined' && topic.topicId !== null) {
+              return String(topic.topicId);
+            }
+            if (typeof topic.topic_id !== 'undefined' && topic.topic_id !== null) {
+              return String(topic.topic_id);
+            }
+            return null;
+          };
+
+          // 현재 subsection에 속한 topics만 필터링 (id 매칭 실패 시 제목으로 폴백)
+          allTopics = topicsArr.filter((topic) => {
+            const topicSubsectionId = extractSubsectionId(topic);
+
+            if (subsectionIdToMatch && topicSubsectionId) {
+              return topicSubsectionId === subsectionIdToMatch;
+            }
+
+            if (!subsectionIdToMatch) {
+              const topicSubsectionTitle =
+                topic.subsection?.subsectionTitle ??
+                topic.parentSubsection?.subsectionTitle ??
+                topic.subsectionTitle ??
+                topic.subsection_title ??
+                null;
+
+              const targetSubsectionTitle =
+                subsection.subsectionTitle ??
+                subsection.subsection_title ??
+                null;
+
+              if (
+                topicSubsectionTitle &&
+                targetSubsectionTitle &&
+                topicSubsectionTitle.trim() === targetSubsectionTitle.trim()
+              ) {
+                return true;
+              }
+            }
+
+            if (targetTopicId) {
+              const topicIdVal = extractTopicId(topic);
+              if (topicIdVal && topicIdVal === String(targetTopicId)) {
+                return true;
+              }
+            }
+
+            return false;
+          });
+
+          if (targetTopicId) {
+            const targetIdStr = String(targetTopicId);
+            const hasTargetTopic = allTopics.some((topic) => extractTopicId(topic) === targetIdStr);
+            if (!hasTargetTopic) {
+              const topicFromAll = topicsArr.find((topic) => extractTopicId(topic) === targetIdStr);
+              if (topicFromAll) {
+                if (!topicFromAll.subsection) {
+                  topicFromAll.subsection = subsection;
+                }
+                allTopics.unshift(topicFromAll);
+              }
+            }
+          }
+
+          // topicNumber 순서로 정렬
+          allTopics.sort((a, b) => (a.topicNumber || 0) - (b.topicNumber || 0));
+
+          if (subsection) {
+            subsection.topics = Array.isArray(allTopics) ? [...allTopics] : [];
+          }
+        }
+      }
+      } catch (e) {
+        console.warn('Failed to fetch topics:', e);
+        return;
+      }
+      
+      if (allTopics.length === 0) {
+        console.warn('No topics found for subsection:', subsectionId);
+        return;
+      }
+      
+      if (targetTopicId) {
+        const targetIndex = allTopics.findIndex(
+          (topic) =>
+            topic.id !== undefined &&
+            topic.id !== null &&
+            String(topic.id) === String(targetTopicId)
+        );
+        if (targetIndex > -1) {
+          const [targetTopic] = allTopics.splice(targetIndex, 1);
+          allTopics.unshift(targetTopic);
+        }
+      }
+
+      // Keywords API에서 모든 keywords 가져오기
+      let allKeywords = [];
+      try {
+        const keywordsRes = await fetch(`${API_BASE_URL}/keywords/search/all`);
+        if (keywordsRes.ok) {
+          const keywordsArr = await keywordsRes.json();
+          if (Array.isArray(keywordsArr)) {
+            allKeywords = keywordsArr;
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to fetch keywords:', e);
+      }
+      
+      // Contents API에서 모든 contents 가져오기
+      let allContents = [];
       try {
         const contentsRes = await fetch(`${API_BASE_URL}/contents/search/all`);
         if (contentsRes.ok) {
           const contentsArr = await contentsRes.json();
           if (Array.isArray(contentsArr)) {
-            // 각 Content를 처리하여 topic별로 detail_value 그룹화
-            contentsArr.forEach((content) => {
-              // content.keyword.topic.id를 통해 어떤 topic에 속하는지 확인
-              if (content.keyword && content.keyword.topic && content.keyword.topic.id) {
-                const topicId = content.keyword.topic.id;
-                
-                if (!topicDetailMap.has(topicId)) {
-                  topicDetailMap.set(topicId, []);
-                }
-                
-                // 각 Content의 details 리스트를 해당 topic에 추가
-                if (Array.isArray(content.details)) {
-                  content.details.forEach((detailValue) => {
-                    if (detailValue) {
-                      topicDetailMap.get(topicId).push(detailValue);
-                    }
-                  });
-                }
-              }
-            });
+            allContents = contentsArr;
           }
         }
       } catch (e) {
         console.warn('Failed to fetch contents:', e);
       }
       
-      // detail-subsection 요소 찾기
-      const detailSubsection = document.querySelector('.detail-subsection');
-      if (!detailSubsection) return;
+      // detail-section 요소 찾기 (이미 detailSectionEl로 선언했으므로 재사용)
+      if (!detailSectionEl) return;
+      
+      // 현재 subsection 인덱스를 기반으로 정확한 detail-subsection 찾기
+      // 모든 detail-subsection 중에서 현재 선택된 subsection에 해당하는 것을 찾음
+      const allDetailSubsections = detailSectionEl.querySelectorAll('.detail-subsection');
+      let detailSubsection = null;
+      
+      // subsection 인덱스를 기반으로 해당하는 detail-subsection 찾기
+      if (allDetailSubsections.length > 0) {
+        // subIdx는 0-based이므로 그대로 사용 가능
+        if (subIdx >= 0 && subIdx < allDetailSubsections.length) {
+          detailSubsection = allDetailSubsections[subIdx];
+        } else {
+          // 인덱스가 범위를 벗어나면 첫 번째 것 사용
+          detailSubsection = allDetailSubsections[0];
+        }
+      }
+      
+      // detail-subsection이 없으면 새로 생성
+      if (!detailSubsection) {
+        detailSubsection = document.createElement('div');
+        detailSubsection.className = 'detail-subsection';
+        detailSectionEl.appendChild(detailSubsection);
+      }
+      
+      // 기존 topic-section 제거
+      const existingTopicSections = detailSubsection.querySelectorAll('.topic-section');
+      existingTopicSections.forEach(section => section.remove());
       
       // 기존 detail-content-box 제거 (하드코딩된 것들 제거)
       const existingBoxes = detailSubsection.querySelectorAll('.detail-content-box');
       existingBoxes.forEach(box => box.remove());
       
-      // Topics 개수만큼 detail-content-box 생성 (각 topic의 모든 detail_value를 하나의 box에 묶음)
-      topics.forEach((topic) => {
-        const topicId = topic.id || topic.topicId;
-        const detailValues = topicDetailMap.get(topicId) || [];
+      // 기존 subsection-badge와 subsection-title도 제거 (Topic-section 구조로 대체)
+      const existingBadge = detailSubsection.querySelector('.subsection-badge');
+      if (existingBadge) existingBadge.remove();
+      const existingTitle = detailSubsection.querySelector('.subsection-title');
+      if (existingTitle) existingTitle.remove();
+      
+      // 첫 번째 topic의 subsection 정보 저장 (같은 subsection_id를 가진 topic들 중 첫 번째 것)
+      let firstSubsectionTitle = null;
+      let firstSubsectionId = null;
+      
+      // 각 Topic에 대해 topic-section 생성
+      allTopics.forEach((topic, index) => {
+        const topicId = topic.id;
         
-        // 하나의 detail-content-box 생성
-        const box = document.createElement('div');
-        box.className = 'detail-content-box';
-        
-        // content-subtitle에 topic title 표시
-        const subtitle = document.createElement('h5');
-        subtitle.className = 'content-subtitle';
-        subtitle.textContent = topic.topicTitle || topic.topic_title || '주제';
-        box.appendChild(subtitle);
-        
-        // 해당 topic에 속한 모든 detail_value를 content-text로 추가
-        if (detailValues.length === 0) {
-          // detail_value가 없으면 topic의 기본 내용 표시
-          const text = document.createElement('p');
-          text.className = 'content-text';
-          text.textContent = topic.topicContent || topic.topic_content || topic.description || '';
-          box.appendChild(text);
-        } else {
-          // 각 detail_value를 별도의 content-text로 추가
-          detailValues.forEach((detailValue) => {
-            const text = document.createElement('p');
-            text.className = 'content-text';
-            text.textContent = detailValue;
-            box.appendChild(text);
-          });
+        // 첫 번째 topic의 subsection 정보 저장
+        if (index === 0 && topic.subsection) {
+          firstSubsectionId = topic.subsection.id;
+          firstSubsectionTitle = topic.subsection.subsectionTitle;
         }
         
-        detailSubsection.appendChild(box);
+        // 현재 topic에 속한 keywords 필터링
+        const topicKeywords = allKeywords.filter(keyword => 
+          keyword.topic && keyword.topic.id === topicId
+        );
+        // keywordNumber 순서로 정렬
+        topicKeywords.sort((a, b) => (a.keywordNumber || 0) - (b.keywordNumber || 0));
+        
+        // topic-section 생성
+        const topicSection = document.createElement('div');
+        topicSection.className = 'topic-section';
+        if (topicId) {
+          topicSection.dataset.topicId = topicId;
+        }
+        const subsectionIdForDataset =
+          topic.subsection?.id ??
+          topic.subsection?.subsectionId ??
+          topic.parentSubsection?.id ??
+          topic.parentSubsection?.subsectionId ??
+          topic.subsectionId ??
+          topic.subsection_id ??
+          null;
+        if (subsectionIdForDataset) {
+          topicSection.dataset.subsectionId = subsectionIdForDataset;
+        }
+        
+        // 첫 번째 topic-section이고 같은 subsection_id를 가진 경우에만 subsection-title 추가 (subsection-badge 위에)
+        if (index === 0 && firstSubsectionTitle && topic.subsection && topic.subsection.id === firstSubsectionId) {
+          const subsectionTitle = document.createElement('h4');
+          subsectionTitle.className = 'subsection-title';
+          subsectionTitle.textContent = firstSubsectionTitle;
+          topicSection.appendChild(subsectionTitle);
+        }
+        
+        // Topic 제목 (subsection-badge 스타일로) - "Topic: (topic_number) topic_title"
+        const topicBadge = document.createElement('div');
+        topicBadge.className = 'subsection-badge';
+        topicBadge.textContent = `Topic: (${topic.topicNumber || ''}) ${topic.topicTitle || '주제'}`;
+        topicSection.appendChild(topicBadge);
+        
+        // 각 Keyword에 대해 keyword-section 생성
+        topicKeywords.forEach((keyword) => {
+          const keywordId = keyword.id;
+          
+          // 현재 keyword에 속한 contents 필터링
+          const keywordContents = allContents.filter(content => 
+            content.keyword && content.keyword.id === keywordId
+          );
+          // contentNumber 순서로 정렬
+          keywordContents.sort((a, b) => (a.contentNumber || 0) - (b.contentNumber || 0));
+          
+          // 각 Content에 대해 detail-content-box 생성 (ContentBlock 타입에 따라 다르게 렌더링)
+          keywordContents.forEach((content) => {
+            const contentBox = document.createElement('div');
+            contentBox.className = 'detail-content-box';
+            
+            // ContentType에 따라 다르게 렌더링
+            const contentType = content.contentType;
+            
+            if (contentType === 'TEXT' && content.blockData) {
+              // TEXT 타입: blockData JSON 파싱
+              try {
+                const blockData = JSON.parse(content.blockData);
+                
+                // h6.content-subtitle: blockData JSON의 "title" 값 (또는 keyword_title)
+                // keyword 정보가 있으면 keyword_title 사용, 없으면 blockData.title 사용
+                const subtitleText = keyword.keywordTitle || blockData.title;
+                if (subtitleText) {
+                  const h6Subtitle = document.createElement('h6');
+                  h6Subtitle.className = 'content-subtitle';
+                  h6Subtitle.textContent = subtitleText;
+                  contentBox.appendChild(h6Subtitle);
+                }
+                
+                // p.content-text: blockData JSON의 "text" 값
+                if (blockData.text) {
+                  const textParagraph = document.createElement('p');
+                  textParagraph.className = 'content-text';
+                  textParagraph.textContent = blockData.text;
+                  contentBox.appendChild(textParagraph);
+                }
+              } catch (e) {
+                console.warn('Failed to parse blockData JSON:', e);
+                // JSON 파싱 실패 시 기존 방식으로 폴백
+                const fallbackText = document.createElement('p');
+                fallbackText.className = 'content-text';
+                fallbackText.textContent = content.blockData;
+                contentBox.appendChild(fallbackText);
+              }
+            } else if (contentType === 'HERITAGE' && content.blockData) {
+              // HERITAGE 타입: blockData JSON 파싱
+              try {
+                const blockData = JSON.parse(content.blockData);
+                
+                // HERITAGE 타입은 h5.content-subtitle 제거 (subsection-badge에 이미 topic 정보가 있음)
+                
+                // heritage 배열 렌더링 - 테이블 형태로
+                if (blockData.heritage && Array.isArray(blockData.heritage) && blockData.heritage.length > 0) {
+                  // site별로 그룹화 (같은 site를 가진 문화재들을 함께 표시)
+                  const siteGroups = {};
+                  blockData.heritage.forEach((heritageItem) => {
+                    const siteKey = heritageItem.site || '기타';
+                    if (!siteGroups[siteKey]) {
+                      siteGroups[siteKey] = [];
+                    }
+                    siteGroups[siteKey].push(heritageItem);
+                  });
+                  
+                  // 각 site 그룹별로 테이블 생성
+                  Object.keys(siteGroups).forEach((siteKey) => {
+                    const heritageItems = siteGroups[siteKey];
+                    
+                    // 테이블 컨테이너 생성
+                    const heritageTable = document.createElement('div');
+                    heritageTable.className = 'heritage-table';
+                    heritageTable.style.display = 'grid';
+                    heritageTable.style.gridTemplateColumns = `repeat(${heritageItems.length}, 1fr)`;
+                    heritageTable.style.gap = '0';
+                    heritageTable.style.marginTop = '1rem';
+                    heritageTable.style.border = '1px solid #e0e0e0';
+                    heritageTable.style.borderRadius = '4px';
+                    heritageTable.style.overflow = 'hidden';
+                    heritageTable.style.backgroundColor = '#ffffff';
+                    
+                    // 메인 헤더 행: site 정보 (같은 site를 가진 경우 하나의 헤더로 span)
+                    const mainHeaderRow = document.createElement('div');
+                    mainHeaderRow.style.display = 'contents';
+                    
+                    // site가 있는 경우 메인 헤더 추가
+                    if (siteKey !== '기타') {
+                      const mainHeaderCell = document.createElement('div');
+                      mainHeaderCell.style.gridColumn = `1 / ${heritageItems.length + 1}`;
+                      mainHeaderCell.style.padding = '0.75rem';
+                      mainHeaderCell.style.backgroundColor = '#f5f5f5';
+                      mainHeaderCell.style.borderBottom = '1px solid #e0e0e0';
+                      mainHeaderCell.style.textAlign = 'center';
+                      mainHeaderCell.style.fontWeight = 'bold';
+                      mainHeaderCell.style.fontSize = '1rem';
+                      mainHeaderCell.style.color = '#333';
+                      mainHeaderCell.textContent = siteKey;
+                      mainHeaderRow.appendChild(mainHeaderCell);
+                    }
+                    heritageTable.appendChild(mainHeaderRow);
+                    
+                    // 서브 헤더 행: item 이름들
+                    const subHeaderRow = document.createElement('div');
+                    subHeaderRow.style.display = 'contents';
+                    
+                    heritageItems.forEach((heritageItem, index) => {
+                      // 서브 헤더 셀 (item 이름)
+                      const subHeaderCell = document.createElement('div');
+                      subHeaderCell.style.padding = '0.75rem';
+                      subHeaderCell.style.backgroundColor = '#f5f5f5';
+                      subHeaderCell.style.borderRight = index < heritageItems.length - 1 ? '1px solid #e0e0e0' : 'none';
+                      subHeaderCell.style.borderBottom = '1px solid #e0e0e0';
+                      subHeaderCell.style.textAlign = 'center';
+                      subHeaderCell.style.fontWeight = 'bold';
+                      subHeaderCell.style.fontSize = '0.95rem';
+                      subHeaderCell.style.color = '#333';
+                      
+                      let headerText = heritageItem.item || '문화재';
+                      if (heritageItem.period) {
+                        headerText += ` (${heritageItem.period})`;
+                      }
+                      subHeaderCell.textContent = headerText;
+                      subHeaderRow.appendChild(subHeaderCell);
+                    });
+                    
+                    heritageTable.appendChild(subHeaderRow);
+                    
+                    // 이미지 행
+                    const imageRow = document.createElement('div');
+                    imageRow.style.display = 'contents';
+                    
+                    heritageItems.forEach((heritageItem, index) => {
+                      // 이미지 셀
+                      const imageCell = document.createElement('div');
+                      imageCell.style.padding = '1rem';
+                      imageCell.style.borderRight = index < heritageItems.length - 1 ? '1px solid #e0e0e0' : 'none';
+                      imageCell.style.borderTop = '1px solid #e0e0e0';
+                      imageCell.style.textAlign = 'center';
+                      imageCell.style.display = 'flex';
+                      imageCell.style.alignItems = 'center';
+                      imageCell.style.justifyContent = 'center';
+                      imageCell.style.minHeight = '250px';
+                      imageCell.style.backgroundColor = '#ffffff';
+                      
+                      if (heritageItem.imageUrl) {
+                        const img = document.createElement('img');
+                        img.src = heritageItem.imageUrl;
+                        img.alt = heritageItem.item || '문화재 이미지';
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '200px';
+                        img.style.height = 'auto';
+                        img.style.objectFit = 'contain';
+                        img.onerror = function() {
+                          this.style.display = 'none';
+                          const errorText = document.createElement('p');
+                          errorText.style.color = '#999';
+                          errorText.style.fontSize = '0.875rem';
+                          errorText.textContent = '이미지를 불러올 수 없습니다.';
+                          imageCell.appendChild(errorText);
+                        };
+                        imageCell.appendChild(img);
+                      } else {
+                        const noImageText = document.createElement('p');
+                        noImageText.style.color = '#999';
+                        noImageText.style.fontSize = '0.875rem';
+                        noImageText.textContent = '이미지 없음';
+                        imageCell.appendChild(noImageText);
+                      }
+                      
+                      imageRow.appendChild(imageCell);
+                    });
+                    
+                    heritageTable.appendChild(imageRow);
+                    contentBox.appendChild(heritageTable);
+                  });
+                }
+              } catch (e) {
+                console.warn('Failed to parse HERITAGE blockData JSON:', e);
+                // JSON 파싱 실패 시 에러 메시지
+                const errorText = document.createElement('p');
+                errorText.className = 'content-text';
+                errorText.style.color = 'var(--text-muted, #666)';
+                errorText.textContent = '문화재 정보를 불러올 수 없습니다.';
+                contentBox.appendChild(errorText);
+              }
+            } else if (contentType && contentType !== '') {
+              // 다른 ContentBlock 타입들 (TABLE, TIMELINE, COMPARISON_TABLE, HERITAGE, IMAGE_GALLERY)
+              // 추후 구현 가능
+              console.warn('ContentBlock type not yet implemented:', contentType);
+              const placeholderText = document.createElement('p');
+              placeholderText.className = 'content-text';
+              placeholderText.style.color = 'var(--text-muted, #666)';
+              placeholderText.textContent = `ContentBlock 타입 "${contentType}"은 아직 구현되지 않았습니다.`;
+              contentBox.appendChild(placeholderText);
+            } else {
+              // 기존 방식: contentType이 없거나 빈 문자열인 경우
+              // h6.content-subtitle: keyword_title 표시
+              if (keyword.keywordTitle) {
+                const keywordSubtitle = document.createElement('h6');
+                keywordSubtitle.className = 'content-subtitle';
+                keywordSubtitle.textContent = keyword.keywordTitle;
+                contentBox.appendChild(keywordSubtitle);
+              }
+              
+              // Content details 표시
+              if (content.details && Array.isArray(content.details)) {
+                content.details.forEach((detail) => {
+                  if (detail) {
+                    const detailText = document.createElement('p');
+                    detailText.className = 'content-text';
+                    detailText.textContent = detail;
+                    contentBox.appendChild(detailText);
+                  }
+                });
+              }
+            }
+            
+            topicSection.appendChild(contentBox);
+          });
+          
+          // keyword에 contents가 없는 경우
+          if (keywordContents.length === 0) {
+            const emptyBox = document.createElement('div');
+            emptyBox.className = 'detail-content-box';
+            const emptyText = document.createElement('p');
+            emptyText.className = 'content-text';
+            emptyText.style.color = 'var(--text-muted, #666)';
+            emptyText.textContent = '내용이 없습니다.';
+            emptyBox.appendChild(emptyText);
+            topicSection.appendChild(emptyBox);
+          }
+        });
+        
+        // topic에 keywords가 없는 경우
+        if (topicKeywords.length === 0) {
+          const emptyBox = document.createElement('div');
+          emptyBox.className = 'detail-content-box';
+          const emptyText = document.createElement('p');
+          emptyText.className = 'content-text';
+          emptyText.style.color = 'var(--text-muted, #666)';
+          emptyText.textContent = '등록된 키워드가 없습니다.';
+          emptyBox.appendChild(emptyText);
+          topicSection.appendChild(emptyBox);
+        }
+        
+        detailSubsection.appendChild(topicSection);
       });
+      
+      // 로딩 오버레이 제거 (페이드 아웃 효과)
+      if (detailLoadingOverlay) {
+        detailLoadingOverlay.style.opacity = '0';
+        detailLoadingOverlay.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => {
+          detailLoadingOverlay.remove();
+        }, 300);
+      }
+
+      if (targetTopicTitle || targetTopicId) {
+        requestAnimationFrame(() => {
+          focusTopicBadge(targetTopicId, targetTopicTitle);
+          targetTopicId = null;
+          targetTopicTitle = null;
+        });
+      }
       
     } catch (e) {
       console.warn('Failed to render topic content boxes:', e);
+      // 에러 발생 시에도 로딩 오버레이 제거
+      const detailSectionEl = document.getElementById('detailSection');
+      if (detailSectionEl) {
+        const existingOverlay = detailSectionEl.querySelector('.detail-loading-overlay');
+        if (existingOverlay) existingOverlay.remove();
+      }
     }
   }
 
@@ -1503,10 +2313,138 @@
       const grid = elements.keywordGrid;
       if (!grid) return;
 
+      const subsectionInfo = getCurrentSubsectionInfo();
+      if (!subsectionInfo) return;
+      const { subsectionId, subsectionTitle, topicIdSet } = subsectionInfo;
+
+      // 로딩 스피너 표시 (기존 내용을 유지하면서 오버레이로 표시)
+      const keywordSection = grid.closest('.keyword-section');
+      let loadingOverlay = null;
+      if (keywordSection) {
+        // 기존 스피너가 있으면 제거
+        const existingOverlay = keywordSection.querySelector('.keyword-loading-overlay');
+        if (existingOverlay) existingOverlay.remove();
+        
+        loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'keyword-loading-overlay';
+        loadingOverlay.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          border-radius: 8px;
+        `;
+        
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner';
+        spinner.style.cssText = `
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #667eea;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        `;
+        
+        loadingOverlay.appendChild(spinner);
+        keywordSection.style.position = 'relative';
+        keywordSection.appendChild(loadingOverlay);
+      }
+
       const res = await fetch(`${API_BASE_URL}/keywords/search/all`);
-      if (!res.ok) return;
+      if (!res.ok) {
+        if (loadingOverlay) loadingOverlay.remove();
+        return;
+      }
       const data = await res.json();
-      if (!Array.isArray(data)) return;
+      if (!Array.isArray(data)) {
+        if (loadingOverlay) loadingOverlay.remove();
+        return;
+      }
+
+      const normalizedSubsectionId = subsectionId ? String(subsectionId) : null;
+      const normalizedTargetTopicId = targetTopicId ? String(targetTopicId) : null;
+
+      const extractTopicId = (keyword) => {
+        if (!keyword) return null;
+        if (keyword.topic && (keyword.topic.id || keyword.topic.topicId)) {
+          return String(keyword.topic.id ?? keyword.topic.topicId);
+        }
+        if (typeof keyword.topicId !== 'undefined' && keyword.topicId !== null) {
+          return String(keyword.topicId);
+        }
+        if (typeof keyword.topic_id !== 'undefined' && keyword.topic_id !== null) {
+          return String(keyword.topic_id);
+        }
+        if (keyword.topicDto && (keyword.topicDto.id || keyword.topicDto.topicId)) {
+          return String(keyword.topicDto.id ?? keyword.topicDto.topicId);
+        }
+        return null;
+      };
+
+      const extractSubsectionIdFromKeyword = (keyword) => {
+        if (!keyword) return null;
+        if (keyword.subsection && (keyword.subsection.id || keyword.subsection.subsectionId)) {
+          return String(keyword.subsection.id ?? keyword.subsection.subsectionId);
+        }
+        if (keyword.topic && keyword.topic.subsection && (keyword.topic.subsection.id || keyword.topic.subsection.subsectionId)) {
+          return String(keyword.topic.subsection.id ?? keyword.topic.subsection.subsectionId);
+        }
+        if (keyword.topicDto && keyword.topicDto.subsection && (keyword.topicDto.subsection.id || keyword.topicDto.subsection.subsectionId)) {
+          return String(keyword.topicDto.subsection.id ?? keyword.topicDto.subsection.subsectionId);
+        }
+        if (typeof keyword.subsectionId !== 'undefined' && keyword.subsectionId !== null) {
+          return String(keyword.subsectionId);
+        }
+        if (typeof keyword.subsection_id !== 'undefined' && keyword.subsection_id !== null) {
+          return String(keyword.subsection_id);
+        }
+        return null;
+      };
+
+      const filteredKeywords = data.filter((keyword) => {
+        const keywordTopicId = extractTopicId(keyword);
+        const keywordSubsectionId = extractSubsectionIdFromKeyword(keyword);
+
+        if (normalizedTargetTopicId && keywordTopicId === normalizedTargetTopicId) {
+          return true;
+        }
+
+        if (topicIdSet.size > 0 && keywordTopicId && topicIdSet.has(keywordTopicId)) {
+          return true;
+        }
+
+        if (normalizedSubsectionId && keywordSubsectionId && keywordSubsectionId === normalizedSubsectionId) {
+          return true;
+        }
+
+        const keywordSubsectionTitle =
+          keyword.subsection?.subsectionTitle ??
+          keyword.subsection?.subsection_title ??
+          keyword.topic?.subsection?.subsectionTitle ??
+          keyword.topic?.subsection?.subsection_title ??
+          keyword.topicDto?.subsection?.subsectionTitle ??
+          keyword.topicDto?.subsection?.subsection_title ??
+          null;
+
+        if (
+          keywordSubsectionTitle &&
+          subsectionTitle &&
+          keywordSubsectionTitle.trim() === subsectionTitle.trim()
+        ) {
+          return true;
+        }
+
+        return false;
+      });
+
+      const keywordsToRender = filteredKeywords.length > 0 ? filteredKeywords : data;
 
       // 보조 데이터: detail_value 채우기 위해 contents에서 details 필드 추출
       let detailValues = [];
@@ -1528,10 +2466,17 @@
         console.warn('Failed to fetch contents for keywords:', e);
       }
 
+      // 페이드 아웃 효과 후 내용 교체
+      if (grid.children.length > 0) {
+        grid.style.opacity = '0.5';
+        grid.style.transition = 'opacity 0.2s ease-out';
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+
       // 비우고 재생성
       grid.innerHTML = "";
 
-      data.forEach((item, idx) => {
+      keywordsToRender.forEach((item, idx) => {
         const n = item.keywordNumber ?? item.keyword_number ?? item.number ?? (idx + 1);
         const title = item.keywordTitle ?? item.keyword_title ?? item.title ?? (item.keywords ? item.keywords[0] : "키워드");
         // 우선순위: detail.detail_value -> keywordDesc -> description -> keywords join
@@ -1564,8 +2509,32 @@
 
         grid.appendChild(card);
       });
+
+      setGridColumns(grid, keywordsToRender.length);
+      
+      // 페이드 인 효과
+      grid.style.opacity = '0';
+      grid.style.transition = 'opacity 0.3s ease-in';
+      requestAnimationFrame(() => {
+        grid.style.opacity = '1';
+      });
+      
+      // 로딩 오버레이 제거
+      if (loadingOverlay) {
+        loadingOverlay.style.opacity = '0';
+        loadingOverlay.style.transition = 'opacity 0.2s ease-out';
+        setTimeout(() => {
+          loadingOverlay.remove();
+        }, 200);
+      }
     } catch (e) {
       console.warn('Failed to render keyword cards:', e);
+      // 에러 발생 시에도 로딩 오버레이 제거
+      const keywordSection = elements.keywordGrid?.closest('.keyword-section');
+      if (keywordSection) {
+        const existingOverlay = keywordSection.querySelector('.keyword-loading-overlay');
+        if (existingOverlay) existingOverlay.remove();
+      }
     }
   }
 
@@ -1624,6 +2593,296 @@
     document.querySelectorAll('.subsection-badge').forEach((el) => {
       el.textContent = text;
     });
+  }
+
+  // ===== Load Subsection-Keyword Relations =====
+  async function loadSubsectionKeywordRelations() {
+    try {
+      // API에서 subsection-keyword 관계 데이터 가져오기
+      const response = await fetch(`${API_BASE_URL}/subsections/keywords/relations`);
+      if (!response.ok) {
+        console.warn('Failed to fetch subsection-keyword relations');
+        return;
+      }
+      
+      const relations = await response.json();
+      if (!Array.isArray(relations) || relations.length === 0) {
+        console.warn('No subsection-keyword relations found');
+        return;
+      }
+      
+      // 현재 subsection의 title 찾기
+      const currentSubsectionTitle = getCurrentSubsectionTitle();
+      if (!currentSubsectionTitle) {
+        console.warn('Current subsection title not found');
+        return;
+      }
+      
+      // 현재 subsection과 매칭되는 relations 찾기
+      // SQL 쿼리 결과: subsection_title과 keywords_value 쌍
+      const matchingRelations = relations.filter(rel => 
+        rel.subsectionTitle === currentSubsectionTitle
+      );
+      
+      if (matchingRelations.length === 0) {
+        console.warn('No matching keywords found for current subsection');
+        return;
+      }
+      
+      // subsection-title 업데이트 (관계 데이터의 subsection_title 사용)
+      // 첫 번째 매칭되는 relation의 subsectionTitle 사용 (모두 같을 것이므로)
+      if (matchingRelations[0].subsectionTitle) {
+        updateSubsectionTitleFromRelations(matchingRelations[0].subsectionTitle);
+      }
+      
+      // keyword-title 업데이트 (현재 subsection과 매칭되는 keywords_value만 전달)
+      updateKeywordTitlesFromRelations(matchingRelations);
+      
+    } catch (error) {
+      console.error('Error loading subsection-keyword relations:', error);
+    }
+  }
+  
+  // 현재 subsection의 title 가져오기
+  function getCurrentSubsectionTitle() {
+    const parts = (currentSubsection || "1-1").split("-");
+    
+    // Chapter 구조인 경우 (1-1-1 형식)
+    if (loadedChapter && parts.length === 3) {
+      const [lesStr, secStr, subStr] = parts;
+      const lIdx = Math.max(1, parseInt(lesStr || "1", 10)) - 1;
+      const sIdx = Math.max(1, parseInt(secStr || "1", 10)) - 1;
+      const subIdx = Math.max(1, parseInt(subStr || "1", 10)) - 1;
+      
+      if (loadedChapter.lessons && loadedChapter.lessons[lIdx]) {
+        const lesson = loadedChapter.lessons[lIdx];
+        if (lesson.sections && lesson.sections[sIdx]) {
+          const section = lesson.sections[sIdx];
+          if (section.subsections && section.subsections[subIdx]) {
+            const subsection = section.subsections[subIdx];
+            return subsection.subsectionTitle || subsection.subsection_title;
+          }
+        }
+      }
+      return null;
+    }
+  }
+
+  function findSubsectionById(targetIdStr) {
+    if (!targetIdStr) return null;
+
+    const matchInLesson = () => {
+      if (!loadedLesson || !Array.isArray(loadedLesson.sections)) return null;
+      for (const section of loadedLesson.sections) {
+        if (!Array.isArray(section.subsections)) continue;
+        for (const subsection of section.subsections) {
+          const subsectionIdValue =
+            subsection.id ?? subsection.subsectionId ?? subsection.subsection_id;
+          if (
+            subsectionIdValue !== null &&
+            subsectionIdValue !== undefined &&
+            String(subsectionIdValue) === targetIdStr
+          ) {
+            return subsection;
+          }
+        }
+      }
+      return null;
+    };
+
+    const matchInChapter = () => {
+      if (!loadedChapter || !Array.isArray(loadedChapter.lessons)) return null;
+      for (const lesson of loadedChapter.lessons) {
+        if (!Array.isArray(lesson.sections)) continue;
+        for (const section of lesson.sections) {
+          if (!Array.isArray(section.subsections)) continue;
+          for (const subsection of section.subsections) {
+            const subsectionIdValue =
+              subsection.id ?? subsection.subsectionId ?? subsection.subsection_id;
+            if (
+              subsectionIdValue !== null &&
+              subsectionIdValue !== undefined &&
+              String(subsectionIdValue) === targetIdStr
+            ) {
+              return subsection;
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    return matchInLesson() || matchInChapter();
+  }
+
+  function getCurrentSubsectionInfo() {
+    const parts = (currentSubsection || "1-1").split("-");
+    const targetIdStr = currentSubsectionId ? String(currentSubsectionId) : null;
+
+    if (targetIdStr) {
+      const subsectionById = findSubsectionById(targetIdStr);
+      if (subsectionById) {
+        return {
+          subsection: subsectionById,
+          subsectionId: targetIdStr,
+          subsectionTitle:
+            subsectionById.subsectionTitle ?? subsectionById.subsection_title ?? null,
+          topicIdSet: new Set(
+            Array.isArray(subsectionById.topics)
+              ? subsectionById.topics
+                  .map((topic) => topic?.id ?? topic?.topicId ?? topic?.topic_id)
+                  .filter((id) => id !== null && id !== undefined)
+                  .map((id) => String(id))
+              : []
+          ),
+        };
+      }
+    }
+
+    const buildResult = (subsection) => {
+      if (!subsection) return null;
+      const subsectionId =
+        subsection.id ??
+        subsection.subsectionId ??
+        subsection.subsection_id ??
+        null;
+      const subsectionTitle =
+        subsection.subsectionTitle ??
+        subsection.subsection_title ??
+        null;
+
+      const topicIdSet = new Set();
+      if (Array.isArray(subsection.topics)) {
+        subsection.topics.forEach((topic) => {
+          const topicId =
+            topic?.id ??
+            topic?.topicId ??
+            topic?.topic_id ??
+            null;
+          if (topicId !== null && topicId !== undefined) {
+            topicIdSet.add(String(topicId));
+          }
+        });
+      }
+
+      return {
+        subsection,
+        subsectionId,
+        subsectionTitle,
+        topicIdSet,
+      };
+    };
+
+    if (loadedChapter && parts.length === 3) {
+      const [lesStr, secStr, subStr] = parts;
+      const lIdx = Math.max(1, parseInt(lesStr || "1", 10)) - 1;
+      const sIdx = Math.max(1, parseInt(secStr || "1", 10)) - 1;
+      const subIdx = Math.max(1, parseInt(subStr || "1", 10)) - 1;
+
+      const lesson = loadedChapter.lessons?.[lIdx];
+      const section = lesson?.sections?.[sIdx];
+      const subsection = section?.subsections?.[subIdx];
+      return buildResult(subsection);
+    }
+
+    if (!loadedLesson || !Array.isArray(loadedLesson.sections)) return null;
+    const [secStr, subStr] = parts;
+    const sIdx = Math.max(1, parseInt(secStr || "1", 10)) - 1;
+    const subIdx = Math.max(1, parseInt(subStr || "1", 10)) - 1;
+    const section = loadedLesson.sections[sIdx];
+    if (!section || !Array.isArray(section.subsections)) return null;
+    const subsection = section.subsections[subIdx];
+    return buildResult(subsection);
+  }
+  // 관계 데이터의 subsection_title로 subsection-title 업데이트
+  function updateSubsectionTitleFromRelations(subsectionTitle) {
+    document.querySelectorAll('.subsection-title').forEach((el) => {
+      // 네비게이션의 subsection-title은 제외하고 detail-section 내부의 것만 업데이트
+      if (el.closest('.detail-subsection')) {
+        el.textContent = subsectionTitle;
+      }
+    });
+  }
+  
+  // 관계 데이터의 keyword_title과 keywords_value로 keyword-title과 keyword-desc 업데이트
+  function updateKeywordTitlesFromRelations(relations) {
+    const keywordGrid = elements.keywordGrid;
+    if (!keywordGrid) return;
+    
+    if (relations.length === 0) {
+      // relations가 없으면 모든 기존 카드 숨김
+      const keywordCards = keywordGrid.querySelectorAll('.keyword-card');
+      keywordCards.forEach(card => {
+        card.style.display = 'none';
+      });
+      return;
+    }
+    
+    // keywordId별로 그룹화
+    const keywordMap = new Map();
+    
+    relations.forEach(rel => {
+      const keywordId = rel.keywordId || rel.keyword_id;
+      const keywordNumber = rel.keywordNumber || rel.keyword_number || 1;
+      const keywordTitle = rel.keywordTitle || rel.keyword_title || '';
+      const keywordsValue = rel.keywordsValue || rel.keywords_value || '';
+      
+      if (!keywordMap.has(keywordId)) {
+        keywordMap.set(keywordId, {
+          keywordId: keywordId,
+          keywordNumber: keywordNumber,
+          keywordTitle: keywordTitle,
+          keywordsValues: []
+        });
+      }
+      
+      // keywordsValue를 배열에 추가
+      if (keywordsValue) {
+        keywordMap.get(keywordId).keywordsValues.push(keywordsValue);
+      }
+    });
+    
+    // keywordNumber 순서로 정렬
+    const sortedKeywords = Array.from(keywordMap.values()).sort((a, b) => {
+      return (a.keywordNumber || 0) - (b.keywordNumber || 0);
+    });
+    
+    // 기존 keyword-card 모두 제거하고 새로 생성
+    keywordGrid.innerHTML = '';
+    
+    // 각 keyword마다 keyword-card 생성
+    sortedKeywords.forEach((keyword, index) => {
+      const card = document.createElement('div');
+      card.className = 'keyword-card';
+      
+      const numEl = document.createElement('div');
+      numEl.className = 'keyword-number';
+      numEl.textContent = pad2(keyword.keywordNumber || (index + 1));
+      
+      const contentEl = document.createElement('div');
+      contentEl.className = 'keyword-content';
+      
+      const titleEl = document.createElement('h4');
+      titleEl.className = 'keyword-title';
+      titleEl.textContent = keyword.keywordTitle || '제목 없음';
+      
+      const descEl = document.createElement('p');
+      descEl.className = 'keyword-desc';
+      descEl.textContent = keyword.keywordsValues.join(', ') || '설명 없음';
+      
+      contentEl.appendChild(titleEl);
+      contentEl.appendChild(descEl);
+      
+      card.appendChild(numEl);
+      card.appendChild(contentEl);
+      
+      keywordGrid.appendChild(card);
+    });
+    
+    // grid-column 수 조정 (표시되는 카드 개수에 따라)
+    if (sortedKeywords.length > 0) {
+      setGridColumns(keywordGrid, sortedKeywords.length);
+    }
   }
 
   // Subsection 제목을 API의 subsection_title로 갱신
@@ -1816,6 +3075,10 @@
 
   // ===== Toast Notification =====
   function showToast(message, icon = "ℹ") {
+    if (suppressToast) {
+      return;
+    }
+
     if (!elements.toast) return;
 
     if (elements.toastIcon) {

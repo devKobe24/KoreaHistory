@@ -21,10 +21,12 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class PatchKeywordRequestDto {
+	private String keywordTitle;
 	private List<String> keywords = new ArrayList<>();
 
 	@Builder
-	public PatchKeywordRequestDto(List<String> keywords) {
+	public PatchKeywordRequestDto(String keywordTitle, List<String> keywords) {
+		this.keywordTitle = keywordTitle;
 		this.keywords = keywords;
 	}
 }

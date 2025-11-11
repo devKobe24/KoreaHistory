@@ -1,14 +1,20 @@
 package com.kobe.koreahistory.service;
 
+import com.kobe.koreahistory.domain.entity.Chapter;
+import com.kobe.koreahistory.domain.entity.Content;
+import com.kobe.koreahistory.domain.entity.Keyword;
+import com.kobe.koreahistory.domain.entity.Lesson;
+import com.kobe.koreahistory.domain.entity.Section;
 import com.kobe.koreahistory.domain.entity.Subsection;
 import com.kobe.koreahistory.domain.entity.Topic;
 import com.kobe.koreahistory.dto.request.topic.CreateTopicRequestDto;
-import com.kobe.koreahistory.dto.request.topic.PatchTopicTitleRequestDto;
 import com.kobe.koreahistory.dto.request.topic.PatchTopicNumberRequestDto;
+import com.kobe.koreahistory.dto.request.topic.PatchTopicTitleRequestDto;
+import com.kobe.koreahistory.dto.response.hierarchy.HierarchyResponseDto;
 import com.kobe.koreahistory.dto.response.topic.CreateTopicResponseDto;
-import com.kobe.koreahistory.dto.response.topic.ReadTopicResponseDto;
-import com.kobe.koreahistory.dto.response.topic.PatchTopicTitleResponseDto;
 import com.kobe.koreahistory.dto.response.topic.PatchTopicNumberResponseDto;
+import com.kobe.koreahistory.dto.response.topic.PatchTopicTitleResponseDto;
+import com.kobe.koreahistory.dto.response.topic.ReadTopicResponseDto;
 import com.kobe.koreahistory.repository.SubsectionRepository;
 import com.kobe.koreahistory.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
@@ -104,5 +110,52 @@ public class TopicService {
 		Topic savedTopic = topicRepository.save(topic);
 
 		return new PatchTopicNumberResponseDto(savedTopic);
+	}
+
+	@Transactional(readOnly = true)
+	public HierarchyResponseDto findTopicHierarchyByTitle(String title) {
+		Topic topic = topicRepository.findFirstByTopicTitleIgnoreCase(title)
+			.orElseThrow(() -> new IllegalArgumentException("topic not found"));
+		initializeTopicHierarchy(topic);
+		return HierarchyResponseDto.fromTopic(topic);
+	}
+
+	@Transactional(readOnly = true)
+	public HierarchyResponseDto findTopicHierarchyById(Long id) {
+		Topic topic = topicRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("topic not found"));
+		initializeTopicHierarchy(topic);
+		return HierarchyResponseDto.fromTopic(topic);
+	}
+
+	private void initializeTopicHierarchy(Topic topic) {
+		if (topic == null) {
+			return;
+		}
+
+		Subsection subsection = topic.getSubsection();
+		if (subsection != null) {
+			subsection.getSubsectionTitle();
+			Section section = subsection.getSection();
+			if (section != null) {
+				section.getSectionTitle();
+				Lesson lesson = section.getLesson();
+				if (lesson != null) {
+					lesson.getLessonTitle();
+					Chapter chapter = lesson.getChapter();
+					if (chapter != null) {
+						chapter.getChapterTitle();
+					}
+				}
+			}
+		}
+
+		if (topic.getKeywords() != null) {
+			topic.getKeywords().forEach(keyword -> {
+				if (keyword.getContents() != null) {
+					keyword.getContents().forEach(content -> content.getContentTitle());
+				}
+			});
+		}
 	}
 }

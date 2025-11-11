@@ -19,6 +19,9 @@ public class ReadTopicResponseDto {
 	private final Long id;
 	private final Integer topicNumber;
 	private final String topicTitle;
+	private final Long subsectionId;
+	private final Integer subsectionNumber;
+	private final String subsectionTitle;
 	private final SubsectionInfo subsection;
 
 	// Entity를 인자로 받은 단일 생성자로 변환 로직을 캡슐화
@@ -26,7 +29,17 @@ public class ReadTopicResponseDto {
 		this.id = entity.getId();
 		this.topicNumber = entity.getTopicNumber();
 		this.topicTitle = entity.getTopicTitle();
-		this.subsection = entity.getSubsection() != null ? new SubsectionInfo(entity.getSubsection()) : null;
+		if (entity.getSubsection() != null) {
+			this.subsectionId = entity.getSubsection().getId();
+			this.subsectionNumber = entity.getSubsection().getSubsectionNumber();
+			this.subsectionTitle = entity.getSubsection().getSubsectionTitle();
+			this.subsection = new SubsectionInfo(entity.getSubsection());
+		} else {
+			this.subsectionId = null;
+			this.subsectionNumber = null;
+			this.subsectionTitle = null;
+			this.subsection = null;
+		}
 	}
 
 	@Getter

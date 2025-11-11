@@ -393,8 +393,11 @@ async function performSearch() {
       })),
       ...contentsResults.map((content) => ({
         id: content.id,
-        title: content.details ? content.details.join(", ") : "내용",
-        description: `상세 내용`,
+        title: content.contentTitle || (content.details ? content.details.join(", ") : "내용"),
+        description:
+          content.contentNumber !== null && content.contentNumber !== undefined
+            ? `${content.contentNumber}: ${content.contentTitle || "내용"}`
+            : content.contentTitle || (content.details ? content.details.join(", ") : "상세 내용"),
         type: "content",
         data: content,
       })),

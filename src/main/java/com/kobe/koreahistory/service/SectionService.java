@@ -1,10 +1,16 @@
 package com.kobe.koreahistory.service;
 
+import com.kobe.koreahistory.domain.entity.Chapter;
+import com.kobe.koreahistory.domain.entity.Content;
+import com.kobe.koreahistory.domain.entity.Keyword;
 import com.kobe.koreahistory.domain.entity.Lesson;
 import com.kobe.koreahistory.domain.entity.Section;
+import com.kobe.koreahistory.domain.entity.Subsection;
+import com.kobe.koreahistory.domain.entity.Topic;
 import com.kobe.koreahistory.dto.request.section.CreateSectionRequestDto;
 import com.kobe.koreahistory.dto.request.section.PatchSectionNumberRequestDto;
 import com.kobe.koreahistory.dto.request.section.PatchSectionTitleRequestDto;
+import com.kobe.koreahistory.dto.response.hierarchy.HierarchyResponseDto;
 import com.kobe.koreahistory.dto.response.section.CreateSectionResponseDto;
 import com.kobe.koreahistory.dto.response.section.PatchSectionNumberResponseDto;
 import com.kobe.koreahistory.dto.response.section.PatchSectionTitleResponseDto;
@@ -102,5 +108,44 @@ public class SectionService {
 		return sections.stream()
 			.map(ReadSectionResponseDto::new)
 			.collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public HierarchyResponseDto findSectionHierarchyByTitle(String title) {
+		Section section = sectionRepository.findFirstBySectionTitleIgnoreCase(title)
+			.orElseThrow(() -> new IllegalArgumentException("section not found"));
+		initializeSectionHierarchy(section);
+		return HierarchyResponseDto.fromSection(section);
+	}
+
+	private void initializeSectionHierarchy(Section section) {
+		if (section == null) {
+			return;
+		}
+
+		Lesson lesson = section.getLesson();
+		if (lesson != null) {
+			lesson.getLessonTitle();
+			Chapter chapter = lesson.getChapter();
+			if (chapter != null) {
+				chapter.getChapterTitle();
+			}
+		}
+
+		if (section.getSubsections() != null) {
+			section.getSubsections().forEach(subsection -> {
+				if (subsection.getTopics() != null) {
+					subsection.getTopics().forEach(topic -> {
+						if (topic.getKeywords() != null) {
+							topic.getKeywords().forEach(keyword -> {
+								if (keyword.getContents() != null) {
+									keyword.getContents().forEach(content -> content.getContentTitle());
+								}
+							});
+						}
+					});
+				}
+			});
+		}
 	}
 }
