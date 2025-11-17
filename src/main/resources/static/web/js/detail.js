@@ -384,21 +384,46 @@
   }
 
   // ===== Load Detail Data =====
-  function loadDetailData(title, type, id) {
-    // 실제 API 호출 대신 더미 데이터 사용
-    currentItem = {
+  async function loadDetailData(title, type, id) {
+    // id가 있으면 실제 API에서 데이터를 가져오고, 없으면 더미 데이터 사용
+    let itemData = {
       type: type,
       title: decodeURIComponent(title),
       subtitle: getSubtitleByType(type),
       description: getDescriptionByType(type),
       icon: getIconByType(type),
       category: getCategoryLabel(type),
-      id: id ? decodeURIComponent(id) : null,
+      id: id || null,
     };
+    
+    // id가 있고 type이 chapter인 경우 실제 API에서 데이터 가져오기
+    if (id && type === "chapter") {
+      try {
+        const response = await fetch(`${API_BASE_URL}/chapters/search/all`);
+        if (response.ok) {
+          const chapters = await response.json();
+          const chapter = chapters.find(c => c.id === parseInt(id));
+          if (chapter) {
+            itemData.title = chapter.chapterTitle || itemData.title;
+            itemData.description = `Chapter ${chapter.chapterNumber}: ${chapter.chapterTitle}`;
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to load chapter data:", error);
+      }
+    }
+    
+    currentItem = itemData;
 
     updatePageContent(currentItem);
-    preloadHierarchyData(type, currentItem.title, currentItem.id);
-    loadRelatedItems(type);
+    // 계층 데이터 로드 후 data 속성 업데이트
+    await preloadHierarchyData(type, currentItem.title, currentItem.id);
+    // 계층 데이터 로드 완료 후 data 속성 다시 업데이트
+    updateDataAttributes(currentItem);
+    // type이 chapter, lesson, section, subsection, topic, keyword, 또는 content가 아닐 때만 관련 항목 로드
+    if (type !== "chapter" && type !== "lesson" && type !== "section" && type !== "subsection" && type !== "topic" && type !== "keyword" && type !== "content") {
+      loadRelatedItems(type);
+    }
   }
 
   // ===== Update Page Content =====
@@ -440,7 +465,42 @@
     }
 
     updateCtaVisibility(item.type);
+    updateTypeSpecificVisibility(item.type);
     updateDataAttributes(item);
+  }
+
+  function updateTypeSpecificVisibility(type) {
+    // type이 chapter, lesson, section, subsection, topic, keyword, 또는 content일 때 detail-meta, detail-actions, related-section 제거
+    if (type === "chapter" || type === "lesson" || type === "section" || type === "subsection" || type === "topic" || type === "keyword" || type === "content") {
+      const detailMeta = document.querySelector(".detail-meta");
+      if (detailMeta) {
+        detailMeta.remove();
+      }
+      
+      const detailActions = document.querySelector(".detail-actions");
+      if (detailActions) {
+        detailActions.remove();
+      }
+      
+      const relatedSection = document.querySelector(".related-section");
+      if (relatedSection) {
+        relatedSection.remove();
+      }
+    }
+    
+    // type이 chapter, lesson, section, subsection, topic, keyword, 또는 content일 때 특정 accordion 항목 제거
+    if (type === "chapter" || type === "lesson" || type === "section" || type === "subsection" || type === "topic" || type === "keyword" || type === "content") {
+      const accordionItems = document.querySelectorAll(".accordion-item");
+      accordionItems.forEach((item) => {
+        const titleElement = item.querySelector(".accordion-title");
+        if (titleElement) {
+          const titleText = titleElement.textContent.trim();
+          if (titleText === "주요 키워드" || titleText === "학습 목표" || titleText === "참고 자료") {
+            item.remove();
+          }
+        }
+      });
+    }
   }
 
   function updateCtaVisibility(type) {
@@ -456,13 +516,32 @@
   function updateDataAttributes(item) {
     if (!elements.detailInfo) return;
 
+    // 기존 data 속성 제거
     elements.detailInfo.removeAttribute("data-topic-id");
+    elements.detailInfo.removeAttribute("data-keyword-id");
+    elements.detailInfo.removeAttribute("data-content-id");
 
     if (item.type === "topic") {
       if (currentHierarchyData?.topic?.id) {
         elements.detailInfo.dataset.topicId = currentHierarchyData.topic.id;
       } else if (item.id) {
         elements.detailInfo.dataset.topicId = item.id;
+      }
+    }
+
+    if (item.type === "keyword") {
+      if (currentHierarchyData?.keyword?.id) {
+        elements.detailInfo.dataset.keywordId = currentHierarchyData.keyword.id;
+      } else if (item.id) {
+        elements.detailInfo.dataset.keywordId = item.id;
+      }
+    }
+
+    if (item.type === "content") {
+      if (currentHierarchyData?.content?.id) {
+        elements.detailInfo.dataset.contentId = currentHierarchyData.content.id;
+      } else if (item.id) {
+        elements.detailInfo.dataset.contentId = item.id;
       }
     }
   }
@@ -804,6 +883,149 @@
         }, 800);
       return;
       }
+
+    if (type === "keyword") {
+      const keywordInfo = currentHierarchyData?.keyword;
+      const lessonTitle =
+        currentHierarchyData?.lesson?.lessonTitle ||
+        currentHierarchyData?.lesson?.title ||
+        "";
+      const sectionTitle =
+        currentHierarchyData?.section?.sectionTitle ||
+        currentHierarchyData?.section?.title ||
+        "";
+      const subsectionTitle =
+        currentHierarchyData?.subsection?.subsectionTitle ||
+        currentHierarchyData?.subsection?.title ||
+        "";
+      const topicTitle =
+        currentHierarchyData?.topic?.topicTitle ||
+        currentHierarchyData?.topic?.title ||
+        "";
+      const topicId = currentHierarchyData?.topic?.id;
+      const keywordId = keywordInfo?.id;
+      const keywordValues = Array.isArray(keywordInfo?.keywords)
+        ? keywordInfo.keywords
+        : [];
+      const keywordValueJoined = keywordValues.join(", ");
+      const detailTitleText =
+        (elements.detailTitle?.textContent || currentItem.title || "").trim();
+      const keywordIdFromDom =
+        elements.detailInfo?.dataset?.keywordId || currentItem.id || null;
+
+      if (!lessonTitle) {
+        showToast("연결된 강의를 찾을 수 없습니다", "❌");
+        return;
+      }
+
+      if (
+        !keywordId ||
+        !keywordIdFromDom ||
+        String(keywordId) !== String(keywordIdFromDom)
+      ) {
+        showToast("키워드 정보를 확인할 수 없습니다", "❌");
+        return;
+      }
+
+      if (!keywordValueJoined || keywordValueJoined !== detailTitleText) {
+        showToast("연결된 학습 데이터를 찾을 수 없습니다", "ℹ");
+        return;
+      }
+
+      showToast("학습 페이지로 이동합니다", "📖");
+
+      setTimeout(() => {
+        const encodedLesson = encodeURIComponent(lessonTitle);
+        const sectionParam = sectionTitle
+          ? `&sectionTitle=${encodeURIComponent(sectionTitle)}`
+          : "";
+        const subsectionParam = subsectionTitle
+          ? `&subsectionTitle=${encodeURIComponent(subsectionTitle)}`
+          : "";
+        const topicTitleParam = topicTitle
+          ? `&topicTitle=${encodeURIComponent(topicTitle)}`
+          : "";
+        const topicIdParam = topicId ? `&topicId=${encodeURIComponent(topicId)}` : "";
+        const keywordIdParam = `&keywordId=${encodeURIComponent(keywordId)}`;
+        const keywordTitleParam = keywordInfo?.keywordTitle
+          ? `&keywordTitle=${encodeURIComponent(keywordInfo.keywordTitle)}`
+          : "";
+        window.location.href = `study.html?title=${encodedLesson}&type=lesson${sectionParam}${subsectionParam}${topicTitleParam}${topicIdParam}${keywordIdParam}${keywordTitleParam}`;
+      }, 800);
+      return;
+    }
+
+    if (type === "content") {
+      const contentInfo = currentHierarchyData?.content;
+      const lessonTitle =
+        currentHierarchyData?.lesson?.lessonTitle ||
+        currentHierarchyData?.lesson?.title ||
+        "";
+      const sectionTitle =
+        currentHierarchyData?.section?.sectionTitle ||
+        currentHierarchyData?.section?.title ||
+        "";
+      const subsectionTitle =
+        currentHierarchyData?.subsection?.subsectionTitle ||
+        currentHierarchyData?.subsection?.title ||
+        "";
+      const topicTitle =
+        currentHierarchyData?.topic?.topicTitle ||
+        currentHierarchyData?.topic?.title ||
+        "";
+      const topicId = currentHierarchyData?.topic?.id;
+      const keywordId = currentHierarchyData?.keyword?.id;
+      const keywordTitle = currentHierarchyData?.keyword?.keywordTitle || "";
+      const contentId = contentInfo?.id;
+      const contentTitle = contentInfo?.contentTitle || "";
+      const detailTitleText =
+        (elements.detailTitle?.textContent || currentItem.title || "").trim();
+      const contentIdFromDom =
+        elements.detailInfo?.dataset?.contentId || currentItem.id || null;
+
+      if (!lessonTitle) {
+        showToast("연결된 강의를 찾을 수 없습니다", "❌");
+        return;
+      }
+
+      if (
+        !contentId ||
+        !contentIdFromDom ||
+        String(contentId) !== String(contentIdFromDom)
+      ) {
+        showToast("내용 정보를 확인할 수 없습니다", "❌");
+        return;
+      }
+
+      if (!contentTitle || contentTitle !== detailTitleText) {
+        showToast("연결된 학습 데이터를 찾을 수 없습니다", "ℹ");
+        return;
+      }
+
+      showToast("학습 페이지로 이동합니다", "📖");
+
+      setTimeout(() => {
+        const encodedLesson = encodeURIComponent(lessonTitle);
+        const sectionParam = sectionTitle
+          ? `&sectionTitle=${encodeURIComponent(sectionTitle)}`
+          : "";
+        const subsectionParam = subsectionTitle
+          ? `&subsectionTitle=${encodeURIComponent(subsectionTitle)}`
+          : "";
+        const topicTitleParam = topicTitle
+          ? `&topicTitle=${encodeURIComponent(topicTitle)}`
+          : "";
+        const topicIdParam = topicId ? `&topicId=${encodeURIComponent(topicId)}` : "";
+        const keywordIdParam = keywordId ? `&keywordId=${encodeURIComponent(keywordId)}` : "";
+        const keywordTitleParam = keywordTitle
+          ? `&keywordTitle=${encodeURIComponent(keywordTitle)}`
+          : "";
+        const contentIdParam = `&contentId=${encodeURIComponent(contentId)}`;
+        const contentTitleParam = `&contentTitle=${encodeURIComponent(contentTitle)}`;
+        window.location.href = `study.html?title=${encodedLesson}&type=lesson${sectionParam}${subsectionParam}${topicTitleParam}${topicIdParam}${keywordIdParam}${keywordTitleParam}${contentIdParam}${contentTitleParam}`;
+      }, 800);
+      return;
+    }
 
       showToast("학습 페이지로 이동합니다", "📖");
 

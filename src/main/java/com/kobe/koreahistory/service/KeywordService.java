@@ -186,6 +186,14 @@ public class KeywordService {
 		return HierarchyResponseDto.fromKeyword(keyword);
 	}
 
+	@Transactional(readOnly = true)
+	public HierarchyResponseDto findKeywordHierarchyById(Long id) {
+		Keyword keyword = keywordRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("keyword not found"));
+		initializeKeywordHierarchy(keyword);
+		return HierarchyResponseDto.fromKeyword(keyword);
+	}
+
 	private void initializeKeywordHierarchy(Keyword keyword) {
 		if (keyword == null) {
 			return;

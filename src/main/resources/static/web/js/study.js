@@ -135,6 +135,16 @@
 
   // ===== Initialize =====
   function init() {
+    // type=lesson일 때 study-info-card 제거
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get("type");
+    if (type === "lesson") {
+      const studyInfoCard = document.querySelector(".study-info-card");
+      if (studyInfoCard) {
+        studyInfoCard.remove();
+      }
+    }
+    
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", function () {
         setupEventListeners();
@@ -2197,8 +2207,178 @@
                 errorText.textContent = '문화재 정보를 불러올 수 없습니다.';
                 contentBox.appendChild(errorText);
               }
+            } else if (contentType === 'TABLE' && content.blockData) {
+              // TABLE 타입: blockData JSON 파싱
+              try {
+                const blockData = JSON.parse(content.blockData);
+                
+                // renderTableBlock 함수 사용 (contentBox에 직접 렌더링)
+                const tableBox = renderTableBlock(contentBox, {
+                  type: 'TABLE',
+                  title: blockData.title,
+                  rows: blockData.rows
+                });
+                
+                if (!tableBox) {
+                  // 렌더링 실패 시 에러 메시지
+                  const errorText = document.createElement('p');
+                  errorText.className = 'content-text';
+                  errorText.style.color = 'var(--text-muted, #666)';
+                  errorText.textContent = '테이블 정보를 불러올 수 없습니다.';
+                  contentBox.appendChild(errorText);
+                }
+              } catch (e) {
+                console.warn('Failed to parse TABLE blockData JSON:', e);
+                // JSON 파싱 실패 시 에러 메시지
+                const errorText = document.createElement('p');
+                errorText.className = 'content-text';
+                errorText.style.color = 'var(--text-muted, #666)';
+                errorText.textContent = '테이블 정보를 불러올 수 없습니다.';
+                contentBox.appendChild(errorText);
+              }
+            } else if (contentType === 'COMPARISON_TABLE' && content.blockData) {
+              // COMPARISON_TABLE 타입: blockData JSON 파싱
+              try {
+                const blockData = JSON.parse(content.blockData);
+                
+                // renderComparisonTableBlock 함수 사용 (contentBox에 직접 렌더링)
+                const comparisonTableBox = renderComparisonTableBlock(contentBox, {
+                  type: 'COMPARISON_TABLE',
+                  title: blockData.title,
+                  headers: blockData.headers,
+                  rows: blockData.rows
+                });
+                
+                if (!comparisonTableBox) {
+                  // 렌더링 실패 시 에러 메시지
+                  const errorText = document.createElement('p');
+                  errorText.className = 'content-text';
+                  errorText.style.color = 'var(--text-muted, #666)';
+                  errorText.textContent = '비교 테이블 정보를 불러올 수 없습니다.';
+                  contentBox.appendChild(errorText);
+                }
+              } catch (e) {
+                console.warn('Failed to parse COMPARISON_TABLE blockData JSON:', e);
+                // JSON 파싱 실패 시 에러 메시지
+                const errorText = document.createElement('p');
+                errorText.className = 'content-text';
+                errorText.style.color = 'var(--text-muted, #666)';
+                errorText.textContent = '비교 테이블 정보를 불러올 수 없습니다.';
+                contentBox.appendChild(errorText);
+              }
+            } else if (contentType === 'TIMELINE' && content.blockData) {
+              // TIMELINE 타입: blockData JSON 파싱
+              try {
+                const blockData = JSON.parse(content.blockData);
+                
+                // timeline 배열을 rows 형식으로 변환 (renderTimelineBlock이 기대하는 형식)
+                let timelineRows = [];
+                if (blockData.timeline && Array.isArray(blockData.timeline)) {
+                  // timeline 배열을 events 배열로 변환
+                  timelineRows = [{
+                    events: blockData.timeline.map((item, index) => ({
+                      title: item.event || item.title || `이벤트 ${index + 1}`,
+                      subtitle: item.year || '',
+                      details: item.details || []
+                    }))
+                  }];
+                } else if (blockData.rows && Array.isArray(blockData.rows)) {
+                  // 이미 rows 형식인 경우 그대로 사용
+                  timelineRows = blockData.rows;
+                }
+                
+                // renderTimelineBlock 함수 사용 (contentBox에 직접 렌더링)
+                const timelineBox = renderTimelineBlock(contentBox, {
+                  type: 'TIMELINE',
+                  title: blockData.title,
+                  rows: timelineRows
+                });
+                
+                if (!timelineBox) {
+                  // 렌더링 실패 시 에러 메시지
+                  const errorText = document.createElement('p');
+                  errorText.className = 'content-text';
+                  errorText.style.color = 'var(--text-muted, #666)';
+                  errorText.textContent = '타임라인 정보를 불러올 수 없습니다.';
+                  contentBox.appendChild(errorText);
+                }
+              } catch (e) {
+                console.warn('Failed to parse TIMELINE blockData JSON:', e);
+                // JSON 파싱 실패 시 에러 메시지
+                const errorText = document.createElement('p');
+                errorText.className = 'content-text';
+                errorText.style.color = 'var(--text-muted, #666)';
+                errorText.textContent = '타임라인 정보를 불러올 수 없습니다.';
+                contentBox.appendChild(errorText);
+              }
+            } else if (contentType === 'IMAGE_GALLERY' && content.blockData) {
+              // IMAGE_GALLERY 타입: blockData JSON 파싱
+              try {
+                const blockData = JSON.parse(content.blockData);
+                
+                // 스키마 형식을 renderImageGalleryBlock이 기대하는 형식으로 변환
+                let galleryItems = [];
+                if (blockData.items && Array.isArray(blockData.items)) {
+                  galleryItems = blockData.items.map((item) => {
+                    // 스키마 형식인지 확인 (images 배열이 있는 경우)
+                    if (item.images && Array.isArray(item.images)) {
+                      // 스키마 형식: images 배열의 첫 번째 이미지를 imageUrl로 사용
+                      const imageUrl = item.images.length > 0 ? item.images[0] : '';
+                      
+                      // name 또는 id를 name으로 사용
+                      const name = item.name || item.id || '이미지';
+                      
+                      // 추가 정보를 name에 포함 (선택사항)
+                      let displayName = name;
+                      if (item.category) {
+                        displayName += ` (${item.category})`;
+                      }
+                      if (item.location && item.location.region) {
+                        displayName += ` - ${item.location.region}`;
+                      }
+                      
+                      return {
+                        imageUrl: imageUrl,
+                        name: displayName,
+                        style: item.style || 'DEFAULT'
+                      };
+                    } else {
+                      // 이미 올바른 형식인 경우 (imageUrl이 있는 경우) 그대로 사용
+                      return {
+                        imageUrl: item.imageUrl || '',
+                        name: item.name || '이미지',
+                        style: item.style || 'DEFAULT'
+                      };
+                    }
+                  });
+                }
+                
+                // renderImageGalleryBlock 함수 사용 (contentBox에 직접 렌더링)
+                const galleryBox = renderImageGalleryBlock(contentBox, {
+                  type: 'IMAGE_GALLERY',
+                  title: blockData.title,
+                  items: galleryItems
+                });
+                
+                if (!galleryBox) {
+                  // 렌더링 실패 시 에러 메시지
+                  const errorText = document.createElement('p');
+                  errorText.className = 'content-text';
+                  errorText.style.color = 'var(--text-muted, #666)';
+                  errorText.textContent = '이미지 갤러리 정보를 불러올 수 없습니다.';
+                  contentBox.appendChild(errorText);
+                }
+              } catch (e) {
+                console.warn('Failed to parse IMAGE_GALLERY blockData JSON:', e);
+                // JSON 파싱 실패 시 에러 메시지
+                const errorText = document.createElement('p');
+                errorText.className = 'content-text';
+                errorText.style.color = 'var(--text-muted, #666)';
+                errorText.textContent = '이미지 갤러리 정보를 불러올 수 없습니다.';
+                contentBox.appendChild(errorText);
+              }
             } else if (contentType && contentType !== '') {
-              // 다른 ContentBlock 타입들 (TABLE, TIMELINE, COMPARISON_TABLE, HERITAGE, IMAGE_GALLERY)
+              // 다른 ContentBlock 타입들
               // 추후 구현 가능
               console.warn('ContentBlock type not yet implemented:', contentType);
               const placeholderText = document.createElement('p');

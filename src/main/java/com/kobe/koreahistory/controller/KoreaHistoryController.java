@@ -254,10 +254,16 @@ public class KoreaHistoryController {
 
 	@GetMapping("/keywords/hierarchy")
 	public ResponseEntity<HierarchyResponseDto> getKeywordHierarchy(
-		@RequestParam String title
+		@RequestParam(required = false) Long id,
+		@RequestParam(required = false) String title
 	) {
-		HierarchyResponseDto response = keywordService.findKeywordHierarchyByTitle(title);
-		return ResponseEntity.ok(response);
+		if (id != null) {
+			return ResponseEntity.ok(keywordService.findKeywordHierarchyById(id));
+		}
+		if (title != null && !title.isBlank()) {
+			return ResponseEntity.ok(keywordService.findKeywordHierarchyByTitle(title));
+		}
+		throw new IllegalArgumentException("Either id or title must be provided");
 	}
 
 	@GetMapping("/keywords/search/all")

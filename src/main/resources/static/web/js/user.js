@@ -445,6 +445,11 @@ function displaySearchResults(results) {
 function createResultItem(result) {
   const item = document.createElement("div");
   item.className = `result-item result-${result.type || "default"}`;
+  
+  // chapter_id를 구분할 수 있도록 data-id 속성 추가
+  if (result.id !== undefined && result.id !== null) {
+    item.dataset.id = result.id;
+  }
 
   let typeIcon, typeLabel;
   switch (result.type) {
@@ -736,10 +741,23 @@ function openChapterDetail(chapter) {
 }
 
 function openResultDetail(result) {
-  // result.html로 이동하면서 제목을 URL 파라미터로 전달
-  const title = encodeURIComponent(result.title || result.name || "제목 없음");
+  // result.html로 이동하면서 제목과 id를 URL 파라미터로 전달
+  // URLSearchParams는 자동으로 인코딩하므로 원본 값을 넣어야 함
+  const title = result.title || result.name || "제목 없음";
   const type = result.type || "default";
-  window.location.href = `pages/result.html?title=${title}&type=${type}`;
+  const params = new URLSearchParams();
+  params.set("title", title);
+  params.set("type", type);
+  if (result.id !== undefined && result.id !== null) {
+    params.set("id", result.id);
+  }
+  
+  // chapter 필터가 활성화되어 있고 타입이 chapter인 경우 detail.html로 이동
+  if (currentFilter === "chapter" && type === "chapter") {
+    window.location.href = `pages/detail.html?${params.toString()}`;
+  } else {
+    window.location.href = `pages/result.html?${params.toString()}`;
+  }
 }
 
 // ===== 에러 처리 =====

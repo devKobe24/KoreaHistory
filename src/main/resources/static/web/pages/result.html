@@ -487,8 +487,9 @@
             try {
               const title = getUrlParameter("title");
               const type = getUrlParameter("type");
+              const id = getUrlParameter("id");
 
-              console.log("Title:", title, "Type:", type);
+              console.log("Title:", title, "Type:", type, "ID:", id);
 
               if (title) {
                 document.title = title + " - 한국사 아띠";
@@ -504,8 +505,8 @@
                   categoryEl.textContent = getTypeLabel(type);
               }
 
-              // 실제 데이터 로드
-              loadResultData(type, title);
+              // 실제 데이터 로드 (id가 있으면 id로, 없으면 title로 검색)
+              loadResultData(type, title, id);
 
               // 이벤트 리스너
               setupEventListeners();
@@ -679,9 +680,9 @@
           }
 
           // 실제 데이터 로드
-          async function loadResultData(type, title) {
+          async function loadResultData(type, title, id) {
             try {
-              console.log("Loading data for type:", type, "title:", title);
+              console.log("Loading data for type:", type, "title:", title, "id:", id);
               
               // 로딩 상태 표시
               const contentGrid = document.getElementById("resultContentGrid");
@@ -700,7 +701,10 @@
                   if (response.ok) {
                     const chapters = await response.json();
                     console.log("Chapters received:", chapters);
-                    const chapter = chapters.find(c => c.chapterTitle === title);
+                    // id가 있으면 id로 찾고, 없으면 title로 찾기
+                    const chapter = id 
+                      ? chapters.find(c => c.id === parseInt(id))
+                      : chapters.find(c => c.chapterTitle === title);
                     console.log("Found chapter:", chapter);
                     if (chapter) {
                       const collectedData = [];

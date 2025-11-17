@@ -645,48 +645,48 @@ function generateJSONTemplate(mode = 'create') {
     },
     "COMPARISON_TABLE": {
       "title": "비교 테이블 제목",
-      "headers": ["구분", "항목1", "항목2"],
+      "headers": ["항목1", "항목2"],
       "rows": [
         {
           "category": "구분1",
           "items": [
-            {"details": ["내용1-1", "내용1-2"]},
-            {"details": ["내용2-1"]}
+            {
+              "label": "라벨1",
+              "details": ["내용1-1", "내용1-2"]
+            },
+            {
+              "label": "라벨2",
+              "details": ["내용2-1", "내용2-2"]
+            }
           ]
         },
         {
           "category": "구분2",
           "items": [
-            {"details": ["내용1-1"]},
-            {"details": ["내용2-1", "내용2-2"]}
+            {
+              "label": "라벨1",
+              "details": ["내용1-1"]
+            },
+            {
+              "label": "라벨2",
+              "details": ["내용2-1"]
+            }
           ]
         }
       ]
     },
     "TIMELINE": {
       "title": "타임라인 제목",
-      "rows": [
+      "timeline": [
         {
-          "events": [
-            {
-              "title": "이벤트1",
-              "subtitle": "부제목1",
-              "details": ["상세내용1", "상세내용2"],
-              "style": "GRAY"
-            },
-            {
-              "title": "이벤트2",
-              "subtitle": "부제목2",
-              "details": ["상세내용1"],
-              "style": "YELLOW"
-            },
-            {
-              "title": "이벤트3",
-              "subtitle": "부제목3",
-              "details": ["상세내용1", "상세내용2", "상세내용3"],
-              "style": "PURPLE"
-            }
-          ]
+          "year": "연도",
+          "event": "이벤트",
+          "details": ["상세내용1", "상세내용2"]
+        },
+        {
+          "year": "연도",
+          "event": "이벤트",
+          "details": ["상세내용1"]
         }
       ]
     },
@@ -709,10 +709,16 @@ function generateJSONTemplate(mode = 'create') {
     "IMAGE_GALLERY": {
       "title": "이미지 갤러리 제목",
       "items": [
-        {"name": "이미지1", "imageUrl": "https://example.com/image1.png", "style": "DEFAULT"},
-        {"name": "이미지2", "imageUrl": "https://example.com/image2.png", "style": "ORANGE"},
-        {"name": "이미지3", "imageUrl": "https://example.com/image3.png", "style": "GREEN"},
-        {"name": "이미지4", "imageUrl": "https://example.com/image4.png", "style": "YELLOW"}
+        {
+          "id": "item1",
+          "name": "이미지1",
+          "images": ["https://example.com/image1.png", "https://example.com/image1-2.png"]
+        },
+        {
+          "id": "item2",
+          "name": "이미지2",
+          "images": ["https://example.com/image2.png"]
+        }
       ]
     }
   };
