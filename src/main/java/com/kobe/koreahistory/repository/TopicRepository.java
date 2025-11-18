@@ -23,4 +23,8 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 	
 	@Query("SELECT t FROM Topic t LEFT JOIN FETCH t.subsection s LEFT JOIN FETCH s.section sec LEFT JOIN FETCH sec.lesson l LEFT JOIN FETCH l.chapter c")
 	List<Topic> findAllWithSubsectionAndSection();
+	
+	List<Topic> findByTopicTitleContainingIgnoreCase(String title);
+
+	Optional<Topic> findFirstByTopicTitleIgnoreCase(String title);
 }

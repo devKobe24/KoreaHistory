@@ -1,8 +1,8 @@
 package com.kobe.koreahistory.dto.request.content;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,9 +19,18 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class UpdateContentRequestDto {
-	private List<String> details;
+	private Integer contentNumber;
+	private String contentTitle;
+	private List<String> details = new ArrayList<>();
+	private String contentType; // "TEXT", "TABLE", "TIMELINE", "COMPARISON_TABLE", "HERITAGE", "IMAGE_GALLERY"
+	private String blockData; // JSON 형태의 ContentBlock 데이터
 
-	public UpdateContentRequestDto(List<String> details) {
+	@Builder
+	public UpdateContentRequestDto(Integer contentNumber, String contentTitle, List<String> details, String contentType, String blockData) {
+		this.contentNumber = contentNumber;
+		this.contentTitle = contentTitle;
 		this.details = details;
+		this.contentType = contentType;
+		this.blockData = blockData;
 	}
 }

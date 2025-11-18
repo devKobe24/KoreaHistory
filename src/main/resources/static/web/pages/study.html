@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>학습하기 - 한국사 아띠</title>
+    <link rel="stylesheet" href="../css/user.css" />
+    <link rel="stylesheet" href="../css/study.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="page-transition study-page">
+    <!-- 헤더 -->
+    <header class="header">
+      <nav class="navbar">
+        <div class="nav-brand">
+          <h1>🇰🇷 한국사 아띠</h1>
+          <span>한국사 학습 플랫폼</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="../index.html" class="nav-link">홈</a></li>
+          <li><a href="../index.html#search" class="nav-link">검색</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+        </ul>
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="study-main">
+      <div class="study-container">
+        <!-- 왼쪽 사이드바: Section & Subsection 네비게이션 -->
+        <aside class="study-sidebar">
+          <div class="sidebar-header">
+            <h2 class="sidebar-title">학습 목차</h2>
+            <div class="progress-indicator">
+              <div class="progress-bar">
+                <div
+                  class="progress-fill"
+                  id="progressFill"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <span class="progress-text" id="progressText">0% 완료</span>
+            </div>
+          </div>
+
+          <nav class="study-nav" id="studyNav">
+            <!-- 동적으로 생성됩니다 -->
+          </nav>
+
+          <!-- 학습 정보 카드 -->
+          <div class="study-info-card">
+            <div class="info-item">
+              <span class="info-icon">⏱️</span>
+              <div class="info-content">
+                <span class="info-label">학습 시간</span>
+                <span class="info-value">약 45분</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">📊</span>
+              <div class="info-content">
+                <span class="info-label">난이도</span>
+                <span class="info-value">중급</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- 오른쪽: 학습 콘텐츠 -->
+        <article class="study-content">
+          <!-- Breadcrumb -->
+          <nav class="study-breadcrumb">
+            <a href="../index.html">홈</a>
+            <span class="breadcrumb-separator">›</span>
+            <a href="detail.html">고대 한국사</a>
+            <span class="breadcrumb-separator">›</span>
+            <span id="currentTopic">고조선의 건국</span>
+          </nav>
+
+          <!-- Topic (주제) -->
+          <div class="topic-section">
+            <div class="topic-header">
+              <span class="topic-badge" id="topicBadge">Section 01</span>
+              <h1 class="topic-title" id="topicTitle">고조선의 건국</h1>
+            </div>
+
+            <!-- Keyword (키워드) -->
+            <div class="keyword-section">
+              <h3 class="keyword-header">
+                <span class="keyword-icon">🏷️</span>
+                <span>핵심 키워드</span>
+              </h3>
+              <div class="keyword-grid" id="keywordGrid">
+                <div class="keyword-card">
+                  <div class="keyword-number">01</div>
+                  <div class="keyword-content">
+                    <h4 class="keyword-title">단군왕검</h4>
+                    <p class="keyword-desc">고조선을 건국한 시조</p>
+                  </div>
+                </div>
+                <div class="keyword-card">
+                  <div class="keyword-number">02</div>
+                  <div class="keyword-content">
+                    <h4 class="keyword-title">홍익인간</h4>
+                    <p class="keyword-desc">널리 인간을 이롭게 한다</p>
+                  </div>
+                </div>
+                <div class="keyword-card">
+                  <div class="keyword-number">03</div>
+                  <div class="keyword-content">
+                    <h4 class="keyword-title">8조법</h4>
+                    <p class="keyword-desc">고조선의 법률 체계</p>
+                  </div>
+                </div>
+                <div class="keyword-card">
+                  <div class="keyword-number">04</div>
+                  <div class="keyword-content">
+                    <h4 class="keyword-title">청동기 문화</h4>
+                    <p class="keyword-desc">고조선의 문화적 특징</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detail (상세 내용) -->
+            <div class="detail-section" id="detailSection">
+              <h3 class="detail-header">
+                <span class="detail-icon">📖</span>
+                <span>상세 학습 내용</span>
+              </h3>
+
+              <!-- Subsection 1 -->
+              <div class="detail-subsection">
+                <div class="subsection-badge">Subsection 1-1</div>
+                <h4 class="subsection-title">단군신화</h4>
+
+                <div class="detail-content-box">
+                  <h5 class="content-subtitle">📜 신화의 내용</h5>
+                  <p class="content-text">
+                    단군신화는 환웅이 하늘에서 내려와 곰이 변한 웅녀와 결혼하여
+                    단군왕검을 낳았다는 내용입니다. 이는 한국 최초의 국가인
+                    고조선의 건국을 설명하는 신화로, 《삼국유사》에 기록되어
+                    있습니다.
+                  </p>
+
+                  <div class="content-highlight">
+                    <div class="highlight-icon">💡</div>
+                    <div class="highlight-text">
+                      <strong>핵심 포인트:</strong> 단군신화는 하늘(천신),
+                      곰(토템), 인간이 결합된 이야기로, 고조선이 농경 사회를
+                      기반으로 성립되었음을 보여줍니다.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-content-box">
+                  <h5 class="content-subtitle">🎯 역사적 의미</h5>
+                  <ul class="content-list">
+                    <li>한국 민족의 시원을 설명하는 신화</li>
+                    <li>홍익인간 이념의 제시</li>
+                    <li>청동기 문화의 반영</li>
+                    <li>제정일치 사회의 모습</li>
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 네비게이션 버튼 -->
+          <div class="study-navigation">
+            <button class="nav-button prev-button" id="prevButton" disabled>
+              <span class="nav-icon">←</span>
+              <span class="nav-text">이전 학습</span>
+            </button>
+            <button class="nav-button next-button" id="nextButton">
+              <span class="nav-text">다음 학습</span>
+              <span class="nav-icon">→</span>
+            </button>
+          </div>
+
+          <!-- 학습 완료 버튼 -->
+          <div class="study-complete">
+            <button class="complete-button" id="completeButton">
+              <span class="complete-icon">✓</span>
+              <span class="complete-text">이 섹션 완료하기</span>
+            </button>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>🇰🇷 한국사 아띠</h3>
+            <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
+          </div>
+          <div class="footer-section">
+            <h4>학습 자료</h4>
+            <ul>
+              <li><a href="../index.html#search">자료 검색</a></li>
+              <li><a href="about.html">플랫폼 소개</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>기술 정보</h4>
+            <ul>
+              <li>Spring Boot + JPA</li>
+              <li>H2 Database</li>
+              <li>RESTful API</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 한국사 아띠. 한국사 학습을 위한 모든 것.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 스크롤 투 탑 버튼 -->
+    <button class="scroll-to-top" id="scrollToTop">
+      <span>↑</span>
+    </button>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toast">
+      <span class="toast-icon" id="toastIcon">✓</span>
+      <span class="toast-message" id="toastMessage">학습을 완료했습니다!</span>
+    </div>
+
+    <script src="../js/user.js"></script>
+    <script src="../js/study.js"></script>
+  </body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>소개 - 한국사 아띠</title>
+    <link rel="stylesheet" href="../css/user.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="page-transition">
+    <!-- 헤더 -->
+    <header class="header">
+      <nav class="navbar">
+        <div class="nav-brand">
+          <h1>🇰🇷 한국사 아띠</h1>
+          <span>한국사 학습 플랫폼</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="../index.html" class="nav-link">홈</a></li>
+          <li><a href="../index.html#search" class="nav-link">검색</a></li>
+          <li><a href="about.html" class="nav-link active">소개</a></li>
+        </ul>
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 히어로 섹션 -->
+      <section class="about-hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1 class="hero-title">
+                <span class="highlight">한국사 아띠</span>와 함께하는<br />
+                역사 학습의 새로운 경험
+              </h1>
+              <p class="hero-description">
+                체계적이고 효율적인 한국사 학습을 위한 최고의 온라인 플랫폼입니다.<br />
+                시대별, 강의별로 구성된 풍부한 학습 자료를 통해 한국사를 깊이 있게 이해하세요.
+              </p>
+              <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="window.location.href='../index.html#search'">
+                  🔍 학습 시작하기
+                </button>
+                <button class="btn btn-secondary" onclick="scrollToSection('features')">
+                  ✨ 특징 보기
+                </button>
+              </div>
+            </div>
+            <div class="hero-visual">
+              <div class="hero-image">
+                <div class="floating-card card-1">
+                  <div class="card-icon">📚</div>
+                  <span>시대별 학습</span>
+                </div>
+                <div class="floating-card card-2">
+                  <div class="card-icon">🔍</div>
+                  <span>스마트 검색</span>
+                </div>
+                <div class="floating-card card-3">
+                  <div class="card-icon">📱</div>
+                  <span>모바일 지원</span>
+                </div>
+                <div class="floating-card card-4">
+                  <div class="card-icon">🎯</div>
+                  <span>체계적 구조</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 특징 섹션 -->
+      <section id="features" class="features-section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">✨ 주요 특징</h2>
+            <p class="section-description">
+              한국사 아띠만의 특별한 학습 경험을 제공합니다
+            </p>
+          </div>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <div class="icon-bg">🏗️</div>
+              </div>
+              <h3>7단계 계층적 구조</h3>
+              <p>Chapter부터 Content까지 체계적으로 구성된 학습 구조로 단계별 학습이 가능합니다.</p>
+              <div class="feature-tags">
+                <span class="tag">체계적</span>
+                <span class="tag">단계별</span>
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <div class="icon-bg">🔍</div>
+              </div>
+              <h3>강력한 검색 시스템</h3>
+              <p>키워드 기반 부분 검색과 필터링 기능으로 원하는 자료를 빠르게 찾을 수 있습니다.</p>
+              <div class="feature-tags">
+                <span class="tag">빠른 검색</span>
+                <span class="tag">필터링</span>
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <div class="icon-bg">📱</div>
+              </div>
+              <h3>반응형 디자인</h3>
+              <p>모든 기기에서 최적화된 학습 경험을 제공합니다. 언제 어디서나 학습하세요.</p>
+              <div class="feature-tags">
+                <span class="tag">모바일</span>
+                <span class="tag">반응형</span>
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <div class="icon-bg">🎨</div>
+              </div>
+              <h3>직관적 UI/UX</h3>
+              <p>아름답고 직관적인 사용자 인터페이스로 학습에 집중할 수 있습니다.</p>
+              <div class="feature-tags">
+                <span class="tag">직관적</span>
+                <span class="tag">아름다운</span>
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <div class="icon-bg">⚡</div>
+              </div>
+              <h3>빠른 성능</h3>
+              <p>최적화된 로딩 속도와 부드러운 사용자 경험을 제공합니다.</p>
+              <div class="feature-tags">
+                <span class="tag">빠른 속도</span>
+                <span class="tag">최적화</span>
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">
+                <div class="icon-bg">📊</div>
+              </div>
+              <h3>체계적 관리</h3>
+              <p>관리자 페이지를 통한 체계적인 콘텐츠 관리와 업데이트가 가능합니다.</p>
+              <div class="feature-tags">
+                <span class="tag">관리</span>
+                <span class="tag">업데이트</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 학습 구조 섹션 -->
+      <section class="structure-section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">📚 학습 구조</h2>
+            <p class="section-description">
+              7단계 계층적 구조로 체계적인 학습이 가능합니다
+            </p>
+          </div>
+          <div class="structure-container">
+            <div class="structure-flow">
+              <div class="structure-item">
+                <div class="structure-icon">📚</div>
+                <div class="structure-content">
+                  <h4>Chapter</h4>
+                  <p>대분류</p>
+                  <span class="structure-desc">시대별 구분</span>
+                </div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="structure-item">
+                <div class="structure-icon">📖</div>
+                <div class="structure-content">
+                  <h4>Lesson</h4>
+                  <p>중분류</p>
+                  <span class="structure-desc">강의별 구분</span>
+                </div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="structure-item">
+                <div class="structure-icon">📑</div>
+                <div class="structure-content">
+                  <h4>Section</h4>
+                  <p>소분류</p>
+                  <span class="structure-desc">세부 주제</span>
+                </div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="structure-item">
+                <div class="structure-icon">📋</div>
+                <div class="structure-content">
+                  <h4>Subsection</h4>
+                  <p>상세분류</p>
+                  <span class="structure-desc">세부 내용</span>
+                </div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="structure-item">
+                <div class="structure-icon">🎯</div>
+                <div class="structure-content">
+                  <h4>Topic</h4>
+                  <p>강의</p>
+                  <span class="structure-desc">구체적 주제</span>
+                </div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="structure-item">
+                <div class="structure-icon">🏷️</div>
+                <div class="structure-content">
+                  <h4>Keyword</h4>
+                  <p>키워드</p>
+                  <span class="structure-desc">핵심 키워드</span>
+                </div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="structure-item">
+                <div class="structure-icon">📄</div>
+                <div class="structure-content">
+                  <h4>Content</h4>
+                  <p>내용</p>
+                  <span class="structure-desc">상세 내용</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 기술 스택 섹션 -->
+      <section class="tech-section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">🛠️ 기술 스택</h2>
+            <p class="section-description">
+              최신 기술로 구현된 안정적이고 확장 가능한 플랫폼입니다
+            </p>
+          </div>
+          <div class="tech-container">
+            <div class="tech-category">
+              <h3>Backend</h3>
+              <div class="tech-items">
+                <div class="tech-item">
+                  <div class="tech-icon">☕</div>
+                  <h4>Spring Boot</h4>
+                  <p>백엔드 프레임워크</p>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-icon">🗄️</div>
+                  <h4>JPA</h4>
+                  <p>데이터베이스 ORM</p>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-icon">💾</div>
+                  <h4>H2 Database</h4>
+                  <p>인메모리 데이터베이스</p>
+                </div>
+              </div>
+            </div>
+            <div class="tech-category">
+              <h3>Frontend</h3>
+              <div class="tech-items">
+                <div class="tech-item">
+                  <div class="tech-icon">🎨</div>
+                  <h4>HTML/CSS/JS</h4>
+                  <p>프론트엔드 기술</p>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-icon">🌐</div>
+                  <h4>RESTful API</h4>
+                  <p>API 설계</p>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-icon">📱</div>
+                  <h4>반응형 디자인</h4>
+                  <p>모든 기기 지원</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA 섹션 -->
+      <section class="cta-section">
+        <div class="container">
+          <div class="cta-content">
+            <h2>지금 바로 시작하세요!</h2>
+            <p>한국사 아띠와 함께 체계적인 한국사 학습을 시작해보세요.</p>
+            <div class="cta-buttons">
+              <button class="btn btn-primary btn-large" onclick="window.location.href='../index.html#search'">
+                🔍 학습 시작하기
+              </button>
+              <button class="btn btn-secondary btn-large" onclick="window.location.href='../index.html'">
+                🏠 홈으로 가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>🇰🇷 한국사 아띠</h3>
+            <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
+          </div>
+          <div class="footer-section">
+            <h4>학습 자료</h4>
+            <ul>
+              <li><a href="../index.html#search">자료 검색</a></li>
+              <li><a href="about.html">플랫폼 소개</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>기술 정보</h4>
+            <ul>
+              <li>Spring Boot + JPA</li>
+              <li>H2 Database</li>
+              <li>RESTful API</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 한국사 아띠. 한국사 학습을 위한 모든 것.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 스크롤 투 탑 버튼 -->
+    <button class="scroll-to-top" id="scrollToTop">
+      <span>↑</span>
+    </button>
+
+    <script src="../js/user.js"></script>
+  </body>
+</html>

@@ -31,6 +31,9 @@ public class Keyword {
 	@Column(nullable = false)
 	private Integer keywordNumber;
 
+	@Column(nullable = false)
+	private String keywordTitle;
+
 	@ElementCollection(fetch = FetchType.LAZY)
 	@CollectionTable(
 		name = "keywords", // 키워드 문자열을 저장할 테이블 이름
@@ -47,14 +50,24 @@ public class Keyword {
 	private Topic topic;
 
 	@Builder
-	public Keyword(Integer keywordNumber, List<String> keywords, Topic topic) {
+	public Keyword(Integer keywordNumber, String keywordTitle, List<String> keywords, Topic topic) {
 		this.keywordNumber = keywordNumber;
+		this.keywordTitle = keywordTitle;
 		this.keywords = keywords;
 		this.topic = topic;
 	}
 
 	public void updateKeywordNumber(Integer newKeywordNumber) {
 		this.keywordNumber = newKeywordNumber;
+	}
+
+	public void updateKeywordTitle(String newKeywordTitle) {
+		this.keywordTitle = newKeywordTitle;
+	}
+
+	public void updateKeywords(List<String> newKeywords) {
+		this.keywords.clear();
+		this.keywords.addAll(newKeywords);
 	}
 
 	public void updateKeyword(String newKeyword) {

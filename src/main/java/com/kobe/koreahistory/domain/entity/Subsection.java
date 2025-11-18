@@ -47,4 +47,12 @@ public class Subsection {
 		this.subsectionTitle = subsectionTitle;
 		this.section = section;
 	}
+
+	public void updateSubsectionNumber(Integer newSubsectionNumber) {
+		this.subsectionNumber = newSubsectionNumber;
+	}
+
+	public void updateSubsectionTitle(String newSubsectionTitle) {
+		this.subsectionTitle = newSubsectionTitle;
+	}
 }

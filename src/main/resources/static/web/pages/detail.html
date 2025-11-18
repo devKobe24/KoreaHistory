@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상세보기 - 한국사 아띠</title>
+    <link rel="stylesheet" href="../css/user.css" />
+    <link rel="stylesheet" href="../css/detail.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="page-transition detail-page">
+    <!-- 헤더 -->
+    <header class="header">
+      <nav class="navbar">
+        <div class="nav-brand">
+          <h1 id="navTitle">🇰🇷 한국사 아띠</h1>
+          <span>한국사 학습 플랫폼</span>
+        </div>
+        <ul class="nav-menu">
+          <li><a href="../index.html" class="nav-link">홈</a></li>
+          <li><a href="../index.html#search" class="nav-link">검색</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+        </ul>
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="detail-main">
+      <!-- Breadcrumb -->
+      <div class="detail-container">
+        <nav class="breadcrumb">
+          <a href="../index.html">홈</a>
+          <span class="breadcrumb-separator">›</span>
+          <a href="result.html" id="breadcrumbCategory">시대</a>
+          <span class="breadcrumb-separator">›</span>
+          <span id="breadcrumbTitle">고대 한국사</span>
+        </nav>
+
+        <!-- 상세 정보 섹션 -->
+        <div class="detail-content">
+          <!-- 왼쪽: 이미지/아이콘 영역 -->
+          <div class="detail-visual">
+            <div class="detail-image-container">
+              <div class="detail-main-image" id="detailMainImage">
+                <span class="detail-icon">🏛️</span>
+              </div>
+            </div>
+
+            <!-- 부가 정보 -->
+            <div class="detail-meta">
+              <div class="meta-item">
+                <span class="meta-label">분류</span>
+                <span class="meta-value" id="metaType">시대</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">학습 시간</span>
+                <span class="meta-value">약 30분</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">난이도</span>
+                <span class="meta-value">중급</span>
+              </div>
+            </div>
+
+            <!-- 공유 버튼 -->
+            <div class="detail-actions">
+              <button class="action-btn bookmark-btn" id="bookmarkBtn">
+                <span class="action-icon">🔖</span>
+                <span class="action-text">북마크</span>
+              </button>
+              <button class="action-btn share-btn" id="shareBtn">
+                <span class="action-icon">🔗</span>
+                <span class="action-text">공유하기</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 오른쪽: 상세 정보 -->
+          <div class="detail-info">
+            <!-- 타이틀 영역 -->
+            <div class="detail-header">
+              <span class="detail-category" id="detailCategory">시대</span>
+              <h1 class="detail-title" id="detailTitle">고대 한국사</h1>
+              <p class="detail-subtitle" id="detailSubtitle">
+                한국 고대사의 전반적인 흐름과 주요 사건들을 학습합니다
+              </p>
+            </div>
+
+            <!-- 주요 설명 -->
+            <div class="detail-description">
+              <p id="detailDescription">
+                고대 한국사는 선사시대부터 통일신라 시대까지를 포괄합니다.
+                고조선의 건국으로부터 시작하여 삼국시대를 거쳐 통일신라에 이르는
+                한국 고대의 역사적 발전 과정을 이해할 수 있습니다.
+              </p>
+            </div>
+
+            <!-- 아코디언 섹션 -->
+            <div class="accordion-container">
+              <!-- 주요 내용 -->
+              <div class="accordion-item">
+                <button class="accordion-header">
+                  <span class="accordion-title">주요 학습 내용</span>
+                  <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                  <div class="lesson-cards-container">
+                    <!-- 동적으로 Lesson 카드들이 추가됩니다 -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- 주요 키워드 -->
+              <div class="accordion-item">
+                <button class="accordion-header">
+                  <span class="accordion-title">주요 키워드</span>
+                  <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                  <div class="keyword-tags">
+                    <span class="keyword-tag">고조선</span>
+                    <span class="keyword-tag">삼국시대</span>
+                    <span class="keyword-tag">고구려</span>
+                    <span class="keyword-tag">백제</span>
+                    <span class="keyword-tag">신라</span>
+                    <span class="keyword-tag">가야</span>
+                    <span class="keyword-tag">통일신라</span>
+                    <span class="keyword-tag">발해</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 학습 목표 -->
+              <div class="accordion-item">
+                <button class="accordion-header">
+                  <span class="accordion-title">학습 목표</span>
+                  <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                  <ul class="content-list">
+                    <li>고대 한국사의 전반적인 흐름을 이해한다</li>
+                    <li>삼국의 건국과 발전 과정을 설명할 수 있다</li>
+                    <li>통일신라의 성립 배경과 의의를 파악한다</li>
+                    <li>고대 한국의 문화적 특징을 이해한다</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 참고 자료 -->
+              <div class="accordion-item">
+                <button class="accordion-header">
+                  <span class="accordion-title">참고 자료</span>
+                  <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                  <div class="reference-list">
+                    <div class="reference-item">
+                      <span class="reference-icon">📚</span>
+                      <div class="reference-info">
+                        <p class="reference-title">한국사 교과서</p>
+                        <p class="reference-desc">교육부 편찬</p>
+                      </div>
+                    </div>
+                    <div class="reference-item">
+                      <span class="reference-icon">🌐</span>
+                      <div class="reference-info">
+                        <p class="reference-title">국사편찬위원회</p>
+                        <p class="reference-desc">한국사데이터베이스</p>
+                      </div>
+                    </div>
+                    <div class="reference-item">
+                      <span class="reference-icon">🎥</span>
+                      <div class="reference-info">
+                        <p class="reference-title">역사 다큐멘터리</p>
+                        <p class="reference-desc">KBS 역사스페셜</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 학습 시작 버튼 -->
+            <div class="detail-cta">
+              <button class="cta-btn primary-cta" id="startLearningBtn">
+                <span class="cta-icon">📖</span>
+                <span class="cta-text">학습 시작하기</span>
+              </button>
+              <button class="cta-btn secondary-cta" id="addToListBtn">
+                <span class="cta-icon">➕</span>
+                <span class="cta-text">학습 목록에 추가</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 관련 학습 자료 섹션 -->
+        <section class="related-section">
+          <div class="section-header">
+            <h2 class="section-title">이 강의와 관련된 학습 자료</h2>
+            <p class="section-description">함께 학습하면 좋은 자료들입니다</p>
+          </div>
+
+          <div class="related-grid" id="relatedGrid">
+            <!-- 동적으로 생성됩니다 -->
+            <div class="loading-spinner">
+              <div class="spinner"></div>
+              <p>관련 자료를 불러오는 중...</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>🇰🇷 한국사 아띠</h3>
+            <p>한국사 학습을 위한 최고의 온라인 플랫폼</p>
+          </div>
+          <div class="footer-section">
+            <h4>학습 자료</h4>
+            <ul>
+              <li><a href="../index.html#search">자료 검색</a></li>
+              <li><a href="about.html">플랫폼 소개</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>기술 정보</h4>
+            <ul>
+              <li>Spring Boot + JPA</li>
+              <li>H2 Database</li>
+              <li>RESTful API</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 한국사 아띠. 한국사 학습을 위한 모든 것.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 스크롤 투 탑 버튼 -->
+    <button class="scroll-to-top" id="scrollToTop">
+      <span>↑</span>
+    </button>
+
+    <!-- 공유 모달 -->
+    <div class="modal" id="shareModal">
+      <div class="modal-overlay" id="shareModalOverlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">공유하기</h3>
+          <button class="modal-close" id="closeShareModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="share-options">
+            <button class="share-option" data-platform="kakao">
+              <span class="share-icon">💬</span>
+              <span>카카오톡</span>
+            </button>
+            <button class="share-option" data-platform="facebook">
+              <span class="share-icon">👍</span>
+              <span>페이스북</span>
+            </button>
+            <button class="share-option" data-platform="twitter">
+              <span class="share-icon">🐦</span>
+              <span>트위터</span>
+            </button>
+            <button class="share-option" data-platform="copy">
+              <span class="share-icon">🔗</span>
+              <span>링크 복사</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/user.js"></script>
+    <script src="../js/detail.js"></script>
+  </body>
+</html>

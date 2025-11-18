@@ -106,8 +106,15 @@ function displayTopicsList(topics) {
       <div class="hierarchy">
         <div class="hierarchy-item">
           <span class="hierarchy-level">Topic</span>
-          <strong>${topic.topicNumber}. ${topic.topicTitle}</strong>
-          <span style="margin-left: 10px; color: #666; font-size: 0.9em;">(ID: ${topic.id})</span>
+          <strong>${topic.topicNumber ?? ""}. ${topic.topicTitle ?? ""}</strong>
+          <span style="margin-left: 10px; color: #666; font-size: 0.9em;">
+            (ID: ${topic.id ?? "-"})
+            ${
+              topic.subsection && (topic.subsection.subsectionNumber !== undefined || topic.subsection.subsectionTitle)
+                ? ` - ${topic.subsection.subsectionNumber ?? ""}.${topic.subsection.subsectionTitle ?? ""}`
+                : ""
+            }
+          </span>
           <div style="margin-left: 100px;">
             <button class="btn btn-warning btn-small" onclick="editTopic(${topic.id})">수정</button>
             <button class="btn btn-danger btn-small" onclick="deleteTopic(${topic.id})">삭제</button>
@@ -262,27 +269,22 @@ function displayTopicDetail(topicDetail) {
 /**
  * Topic 수정 모달 열기
  */
-function editTopic(topicId) {
-  // 현재 상세 정보에서 Topic 데이터 추출
-  const topicDetail = document.querySelector(".hierarchy-item strong");
-  if (!topicDetail) {
-    showAlert("Topic 정보를 찾을 수 없습니다.", "error");
-    return;
+async function editTopic(topicId) {
+  try {
+    // 서버에서 Topic 데이터 가져오기
+    const topicDetail = await ApiEndpoints.topics.getById(topicId);
+    
+    // 모달 폼에 데이터 설정
+    document.getElementById("editTopicId").value = topicId;
+    document.getElementById("editTopicNumber").value = topicDetail.topicNumber;
+    document.getElementById("editTopicTitle").value = topicDetail.topicTitle;
+
+    // 모달 표시
+    document.getElementById("editModal").style.display = "block";
+  } catch (error) {
+    console.error("Topic 조회 실패:", error);
+    showAlert("Topic 정보를 불러오는데 실패했습니다.", "error");
   }
-
-  // 모달 폼에 데이터 설정 (실제 데이터는 서버에서 가져와야 함)
-  document.getElementById("editTopicId").value = topicId;
-
-  // 상세 정보에서 현재 값 추출 (임시)
-  const titleText = topicDetail.textContent;
-  const parts = titleText.split(". ");
-  if (parts.length >= 2) {
-    document.getElementById("editTopicNumber").value = parts[0];
-    document.getElementById("editTopicTitle").value = parts[1];
-  }
-
-  // 모달 표시
-  document.getElementById("editModal").style.display = "block";
 }
 
 /**

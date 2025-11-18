@@ -31,4 +31,6 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
 	@Query("SELECT k FROM Keyword k LEFT JOIN FETCH k.topic")
 	List<Keyword> findAllWithTopic();
+
+	Optional<Keyword> findFirstByKeywordTitleIgnoreCase(String title);
 }

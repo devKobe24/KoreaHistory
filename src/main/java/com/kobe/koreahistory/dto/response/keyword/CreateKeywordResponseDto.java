@@ -22,12 +22,14 @@ import java.util.stream.Collectors;
 public class CreateKeywordResponseDto {
 	private final Long id;
 	private final Integer keywordNumber;
+	private final String keywordTitle;
 	private final List<String> keywords;
 	private final List<CreateContentResponseDto> contents;
 
 	public CreateKeywordResponseDto(Keyword entity) {
 		this.id = entity.getId();
 		this.keywordNumber = entity.getKeywordNumber();
+		this.keywordTitle = entity.getKeywordTitle();
 		this.keywords = entity.getKeywords();
 
 		// Keyword에 직접 연결된 contents를 DTO로 변환

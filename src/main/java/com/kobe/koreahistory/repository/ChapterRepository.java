@@ -2,9 +2,8 @@ package com.kobe.koreahistory.repository;
 
 import com.kobe.koreahistory.domain.entity.Chapter;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,9 +23,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, Integer> {
 	Optional<Chapter> findById(Long chapterId);
 	Chapter deleteById(Long chapterId);
 
-	@Query("SELECT c FROM Chapter c " +
-		"LEFT JOIN FETCH c.lessons l " +
-		"LEFT JOIN FETCH l.sections " +
-		"WHERE c.chapterTitle = :title")
-	Optional<Chapter> findByChapterTitleWithDetails(@Param("title") String title);
+	Optional<Chapter> findFirstByChapterTitleIgnoreCase(String title);
+
+	List<Chapter> findByChapterTitleContainingIgnoreCase(String title);
 }

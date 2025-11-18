@@ -12,9 +12,9 @@ document.addEventListener("DOMContentLoaded", function () {
 function initializeApp() {
   // 페이지 로드 애니메이션
   setTimeout(() => {
-    document.body.classList.add('loaded');
+    document.body.classList.add("loaded");
   }, 100);
-  
+
   setupEventListeners();
   loadChapters();
   loadStats();
@@ -50,11 +50,17 @@ function setupEventListeners() {
   // 필터 버튼
   const filterBtns = document.querySelectorAll(".filter-btn");
   filterBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
+    btn.addEventListener("click", async function () {
       filterBtns.forEach((b) => b.classList.remove("active"));
       this.classList.add("active");
       currentFilter = this.dataset.filter;
-      filterSearchResults();
+      
+      // "시대" 필터가 활성화된 경우 모든 Chapter를 로드
+      if (currentFilter === "chapter") {
+        await loadAllChapters();
+      } else {
+        filterSearchResults();
+      }
     });
   });
 
@@ -181,13 +187,15 @@ function createChapterCard(chapter, index) {
             <div class="chapter-icon">${eraIcon}</div>
             <div>
                 <h3 class="chapter-title">${chapter.chapterTitle}</h3>
-                <p class="chapter-description">${chapter.description || "한국사의 중요한 시대입니다."}</p>
+                <p class="chapter-description">${
+                  chapter.description || "한국사의 중요한 시대입니다."
+                }</p>
             </div>
         </div>
         <div class="chapter-stats">
             <div class="stat">
                 <div class="stat-number">${chapter.lessons?.length || 0}</div>
-                <div class="stat-label">주제</div>
+                <div class="stat-label">강의</div>
             </div>
             <div class="stat">
                 <div class="stat-number">${getTotalSections(chapter)}</div>
@@ -288,13 +296,114 @@ async function performSearch() {
   try {
     showSearchLoading();
 
-    const response = await fetch(
-      `${API_BASE_URL}/search/keywords?keyword=${encodeURIComponent(query)}`
-    );
-    if (!response.ok) throw new Error("검색에 실패했습니다.");
+    // 여러 검색 API를 병렬로 호출
+    const [
+      keywordsResponse,
+      chaptersResponse,
+      contentsResponse,
+      lessonsResponse,
+      sectionsResponse,
+      subsectionsResponse,
+      topicsResponse,
+    ] = await Promise.all([
+      fetch(
+        `${API_BASE_URL}/search/keywords?keyword=${encodeURIComponent(query)}`
+      ),
+      fetch(
+        `${API_BASE_URL}/search/chapters?title=${encodeURIComponent(query)}`
+      ),
+      fetch(
+        `${API_BASE_URL}/search/contents?detail=${encodeURIComponent(query)}`
+      ),
+      fetch(
+        `${API_BASE_URL}/search/lessons?title=${encodeURIComponent(query)}`
+      ),
+      fetch(
+        `${API_BASE_URL}/search/sections?title=${encodeURIComponent(query)}`
+      ),
+      fetch(
+        `${API_BASE_URL}/search/subsections?title=${encodeURIComponent(query)}`
+      ),
+      fetch(`${API_BASE_URL}/search/topics?title=${encodeURIComponent(query)}`),
+    ]);
 
-    const results = await response.json();
-    displaySearchResults(results);
+    const keywordsResults = keywordsResponse.ok
+      ? await keywordsResponse.json()
+      : [];
+    const chaptersResults = chaptersResponse.ok
+      ? await chaptersResponse.json()
+      : [];
+    const contentsResults = contentsResponse.ok
+      ? await contentsResponse.json()
+      : [];
+    const lessonsResults = lessonsResponse.ok
+      ? await lessonsResponse.json()
+      : [];
+    const sectionsResults = sectionsResponse.ok
+      ? await sectionsResponse.json()
+      : [];
+    const subsectionsResults = subsectionsResponse.ok
+      ? await subsectionsResponse.json()
+      : [];
+    const topicsResults = topicsResponse.ok ? await topicsResponse.json() : [];
+
+    // 결과를 통합하여 표시
+    const allResults = [
+      ...chaptersResults.map((chapter) => ({
+        id: chapter.id,
+        title: chapter.chapterTitle,
+        description: `Chapter ${chapter.chapterNumber}: ${chapter.chapterTitle}`,
+        type: "chapter",
+        data: chapter,
+      })),
+      ...lessonsResults.map((lesson) => ({
+        id: lesson.id,
+        title: lesson.lessonTitle,
+        description: `Lesson ${lesson.lessonNumber}: ${lesson.lessonTitle}`,
+        type: "lesson",
+        data: lesson,
+      })),
+      ...sectionsResults.map((section) => ({
+        id: section.id,
+        title: section.sectionTitle,
+        description: `Section ${section.sectionNumber}: ${section.sectionTitle}`,
+        type: "section",
+        data: section,
+      })),
+      ...subsectionsResults.map((subsection) => ({
+        id: subsection.id,
+        title: subsection.subsectionTitle,
+        description: `Subsection ${subsection.subsectionNumber}: ${subsection.subsectionTitle}`,
+        type: "subsection",
+        data: subsection,
+      })),
+      ...topicsResults.map((topic) => ({
+        id: topic.id,
+        title: topic.topicTitle,
+        description: `Topic ${topic.topicNumber}: ${topic.topicTitle}`,
+        type: "topic",
+        data: topic,
+      })),
+      ...keywordsResults.map((keyword) => ({
+        id: keyword.id,
+        title: keyword.keywords ? keyword.keywords.join(", ") : "키워드",
+        description: `키워드 그룹`,
+        type: "keyword",
+        data: keyword,
+      })),
+      ...contentsResults.map((content) => ({
+        id: content.id,
+        title: content.contentTitle || (content.details ? content.details.join(", ") : "내용"),
+        description:
+          content.contentNumber !== null && content.contentNumber !== undefined
+            ? `${content.contentNumber}: ${content.contentTitle || "내용"}`
+            : content.contentTitle || (content.details ? content.details.join(", ") : "상세 내용"),
+        type: "content",
+        data: content,
+      })),
+    ];
+
+    displaySearchResults(allResults);
   } catch (error) {
     console.error("검색 오류:", error);
     showSearchError();
@@ -335,15 +444,59 @@ function displaySearchResults(results) {
 
 function createResultItem(result) {
   const item = document.createElement("div");
-  item.className = "result-item";
+  item.className = `result-item result-${result.type || "default"}`;
+  
+  // chapter_id를 구분할 수 있도록 data-id 속성 추가
+  if (result.id !== undefined && result.id !== null) {
+    item.dataset.id = result.id;
+  }
+
+  let typeIcon, typeLabel;
+  switch (result.type) {
+    case "chapter":
+      typeIcon = "📚";
+      typeLabel = "시대";
+      break;
+    case "lesson":
+      typeIcon = "📖";
+      typeLabel = "강의";
+      break;
+    case "section":
+      typeIcon = "📑";
+      typeLabel = "소분류";
+      break;
+    case "subsection":
+      typeIcon = "📋";
+      typeLabel = "상세분류";
+      break;
+    case "topic":
+      typeIcon = "🎯";
+      typeLabel = "강의";
+      break;
+    case "keyword":
+      typeIcon = "🏷️";
+      typeLabel = "키워드";
+      break;
+    case "content":
+      typeIcon = "📄";
+      typeLabel = "내용";
+      break;
+    default:
+      typeIcon = "📝";
+      typeLabel = "기타";
+  }
 
   item.innerHTML = `
-        <h4 class="result-title">${result.title || result.name || "제목 없음"}</h4>
-        <p class="result-description">${result.description || result.content || "설명이 없습니다."}</p>
-        <div class="result-meta">
-            <span>타입: ${result.type || "알 수 없음"}</span>
-            <span>ID: ${result.id || "N/A"}</span>
+        <div class="result-header">
+            <span class="result-icon">${typeIcon}</span>
+            <h4 class="result-title">${
+              result.title || result.name || "제목 없음"
+            }</h4>
+            <span class="result-type">${typeLabel}</span>
         </div>
+        <p class="result-description">${
+          result.description || result.content || "설명이 없습니다."
+        }</p>
     `;
 
   item.addEventListener("click", () => {
@@ -353,13 +506,72 @@ function createResultItem(result) {
   return item;
 }
 
+// 모든 Chapter를 검색 결과 영역에 표시
+async function loadAllChapters() {
+  const searchResults = document.getElementById("searchResults");
+  if (!searchResults) return;
+
+  try {
+    showSearchLoading();
+
+    const response = await fetch(`${API_BASE_URL}/chapters/search/all`);
+    if (!response.ok) throw new Error("챕터를 불러오는데 실패했습니다.");
+
+    const chapters = await response.json();
+
+    if (chapters && chapters.length > 0) {
+      const allResults = chapters.map((chapter) => ({
+        id: chapter.id,
+        title: chapter.chapterTitle,
+        description: `Chapter ${chapter.chapterNumber}: ${chapter.chapterTitle}`,
+        type: "chapter",
+        data: chapter,
+      }));
+
+      displaySearchResults(allResults);
+    } else {
+      showNoResults();
+    }
+  } catch (error) {
+    console.error("Chapter 로드 오류:", error);
+    showSearchError();
+  }
+}
+
 function filterSearchResults() {
   const resultItems = document.querySelectorAll(".result-item");
   resultItems.forEach((item) => {
     if (currentFilter === "all") {
       item.style.display = "block";
+    } else if (currentFilter === "chapter") {
+      item.style.display = item.classList.contains("result-chapter")
+        ? "block"
+        : "none";
+    } else if (currentFilter === "lesson") {
+      item.style.display = item.classList.contains("result-lesson")
+        ? "block"
+        : "none";
+    } else if (currentFilter === "section") {
+      item.style.display = item.classList.contains("result-section")
+        ? "block"
+        : "none";
+    } else if (currentFilter === "subsection") {
+      item.style.display = item.classList.contains("result-subsection")
+        ? "block"
+        : "none";
+    } else if (currentFilter === "topic") {
+      item.style.display = item.classList.contains("result-topic")
+        ? "block"
+        : "none";
+    } else if (currentFilter === "keyword") {
+      item.style.display = item.classList.contains("result-keyword")
+        ? "block"
+        : "none";
+    } else if (currentFilter === "content") {
+      item.style.display = item.classList.contains("result-content")
+        ? "block"
+        : "none";
     } else {
-      // 실제 구현에서는 결과 타입에 따라 필터링
       item.style.display = "block";
     }
   });
@@ -461,8 +673,10 @@ function animateNumber(element, targetNumber) {
 
   const timer = setInterval(() => {
     currentNumber += increment;
-    if ((increment > 0 && currentNumber >= targetNumber) || 
-        (increment < 0 && currentNumber <= targetNumber)) {
+    if (
+      (increment > 0 && currentNumber >= targetNumber) ||
+      (increment < 0 && currentNumber <= targetNumber)
+    ) {
       currentNumber = targetNumber;
       clearInterval(timer);
     }
@@ -520,25 +734,30 @@ function scrollToSection(sectionId) {
 
 // ===== 상세 페이지 열기 =====
 function openChapterDetail(chapter) {
-  // Chapter 상세 페이지로 이동
-  navigateToChapterDetail(chapter.id);
-}
-
-function navigateToChapterDetail(chapterId) {
-  // 페이드 아웃 애니메이션
-  document.body.classList.add('page-fade-out');
-  
-  // 애니메이션 완료 후 페이지 이동
-  setTimeout(() => {
-    window.location.href = `pages/chapter-detail.html?id=${chapterId}`;
-  }, 300);
+  // 실제 구현에서는 상세 페이지로 이동
+  alert(
+    `"${chapter.title}" 상세 페이지로 이동합니다.\n\n(실제 구현에서는 별도 페이지로 이동)`
+  );
 }
 
 function openResultDetail(result) {
-  // 실제 구현에서는 결과 상세 페이지로 이동
-  alert(
-    `"${result.title || result.name}" 상세 정보를 표시합니다.\n\n(실제 구현에서는 상세 모달 또는 페이지 표시)`
-  );
+  // result.html로 이동하면서 제목과 id를 URL 파라미터로 전달
+  // URLSearchParams는 자동으로 인코딩하므로 원본 값을 넣어야 함
+  const title = result.title || result.name || "제목 없음";
+  const type = result.type || "default";
+  const params = new URLSearchParams();
+  params.set("title", title);
+  params.set("type", type);
+  if (result.id !== undefined && result.id !== null) {
+    params.set("id", result.id);
+  }
+  
+  // chapter 필터가 활성화되어 있고 타입이 chapter인 경우 detail.html로 이동
+  if (currentFilter === "chapter" && type === "chapter") {
+    window.location.href = `pages/detail.html?${params.toString()}`;
+  } else {
+    window.location.href = `pages/result.html?${params.toString()}`;
+  }
 }
 
 // ===== 에러 처리 =====
@@ -586,11 +805,11 @@ document.addEventListener("keydown", function (e) {
 // ===== 페이지 전환 애니메이션 =====
 function navigateToChapter() {
   // 페이드 아웃 애니메이션
-  document.body.classList.add('page-fade-out');
-  
+  document.body.classList.add("page-fade-out");
+
   // 애니메이션 완료 후 페이지 이동
   setTimeout(() => {
-    window.location.href = 'pages/chapter.html';
+    window.location.href = "pages/chapter.html";
   }, 300);
 }
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Content 관리 - KoreaHistory</title>
+    <title>Content 관리 - 한국사 아띠</title>
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇰🇷</text></svg>">
@@ -61,10 +61,52 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="contentNumber">Content 번호</label>
+                    <input type="number" id="contentNumber" name="contentNumber" class="form-control"
+                        placeholder="Content 번호를 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label for="contentTitle">Content 제목</label>
+                    <input type="text" id="contentTitle" name="contentTitle" class="form-control"
+                        placeholder="Content 제목을 입력하세요" required>
+                </div>
+                <div class="form-group">
+                    <label for="contentType">Content Block 타입</label>
+                    <select id="contentType" name="contentType" class="form-control">
+                        <option value="">선택하지 않음 (기존 방식)</option>
+                        <option value="TEXT">텍스트 (TEXT)</option>
+                        <option value="TABLE">테이블 (TABLE)</option>
+                        <option value="COMPARISON_TABLE">비교 테이블 (COMPARISON_TABLE)</option>
+                        <option value="TIMELINE">타임라인 (TIMELINE)</option>
+                        <option value="HERITAGE">문화재 (HERITAGE)</option>
+                        <option value="IMAGE_GALLERY">이미지 갤러리 (IMAGE_GALLERY)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="detailsGroup">
                     <label for="details">상세 내용 (줄바꿈으로 구분)</label>
                     <textarea id="details" name="details" class="form-control" rows="5"
                         placeholder="각 줄이 하나의 detail이 됩니다&#10;예:&#10;뗀석기의 사용법&#10;뗀석기의 특징&#10;뗀석기의 역사적 의의"
                         required></textarea>
+                </div>
+                <div class="form-group" id="blockDataGroup" style="display: none;">
+                    <label for="blockData">Block Data (JSON)</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                        <textarea id="blockData" name="blockData" class="form-control" rows="10"
+                            placeholder='JSON 형태로 입력하세요&#10;예 (TEXT):&#10;{"title": "제목", "text": "내용"}'
+                            style="font-family: monospace;"></textarea>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="generateJSONTemplate()" title="선택된 타입의 JSON 템플릿 생성">
+                                📝 템플릿
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="formatJSON()" title="JSON 포맷 정리">
+                                ✨ 포맷
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="validateJSON()" title="JSON 유효성 검사">
+                                ✓ 검증
+                            </button>
+                        </div>
+                    </div>
+                    <small class="form-text">ContentBlock 타입을 선택한 경우에만 사용됩니다.</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Content 생성</button>
             </form>
@@ -112,8 +154,47 @@
                 <form id="editContentForm">
                     <input type="hidden" id="editContentId" name="id">
                     <div class="form-group">
+                        <label for="editContentNumber">Content 번호</label>
+                        <input type="number" id="editContentNumber" name="contentNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editContentTitle">Content 제목</label>
+                        <input type="text" id="editContentTitle" name="contentTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editContentType">Content Block 타입</label>
+                        <select id="editContentType" name="contentType" class="form-control">
+                            <option value="">선택하지 않음 (기존 방식)</option>
+                            <option value="TEXT">텍스트 (TEXT)</option>
+                            <option value="TABLE">테이블 (TABLE)</option>
+                            <option value="COMPARISON_TABLE">비교 테이블 (COMPARISON_TABLE)</option>
+                            <option value="TIMELINE">타임라인 (TIMELINE)</option>
+                            <option value="HERITAGE">문화재 (HERITAGE)</option>
+                            <option value="IMAGE_GALLERY">이미지 갤러리 (IMAGE_GALLERY)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editDetailsGroup">
                         <label for="editDetails">상세 내용</label>
                         <textarea id="editDetails" name="details" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group" id="editBlockDataGroup" style="display: none;">
+                        <label for="editBlockData">Block Data (JSON)</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                            <textarea id="editBlockData" name="blockData" class="form-control" rows="10"
+                                style="font-family: monospace;"></textarea>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="generateJSONTemplate('edit')" title="선택된 타입의 JSON 템플릿 생성">
+                                    📝 템플릿
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="formatJSON('edit')" title="JSON 포맷 정리">
+                                    ✨ 포맷
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="validateJSON('edit')" title="JSON 유효성 검사">
+                                    ✓ 검증
+                                </button>
+                            </div>
+                        </div>
+                        <small class="form-text">ContentBlock 타입을 선택한 경우에만 사용됩니다.</small>
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">수정</button>

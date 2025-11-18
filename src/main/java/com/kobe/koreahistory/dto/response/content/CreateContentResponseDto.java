@@ -3,6 +3,8 @@ package com.kobe.koreahistory.dto.response.content;
 import com.kobe.koreahistory.domain.entity.Content;
 import lombok.Getter;
 
+import java.util.List;
+
 /**
  * packageName    : com.kobe.koreahistory.dto.response.content
  * fileName       : CreateContentResponseDto
@@ -18,10 +20,14 @@ import lombok.Getter;
 @Getter
 public class CreateContentResponseDto {
 	private final Long id;
-	private final Long keywordId;
+	private final Integer contentNumber;
+	private final String contentTitle;
+	private final List<String> details;
 
 	public CreateContentResponseDto(Content entity) {
 		this.id = entity.getId();
-		this.keywordId = entity.getKeyword().getId();
+		this.contentNumber = entity.getContentNumber();
+		this.contentTitle = entity.getContentTitle();
+		this.details = entity.getDetails();
 	}
 }

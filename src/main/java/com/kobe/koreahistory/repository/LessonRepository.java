@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * packageName    : com.kobe.koreahistory.repository
@@ -34,4 +35,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 		@Param("number") Integer number,
 		@Param("title") String title
 	);
+
+	List<Lesson> findByLessonTitleContainingIgnoreCase(String title);
+
+	Optional<Lesson> findFirstByLessonTitleIgnoreCase(String title);
 }

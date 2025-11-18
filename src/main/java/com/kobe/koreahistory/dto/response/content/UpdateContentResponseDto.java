@@ -19,10 +19,14 @@ import java.util.List;
 @Getter
 public class UpdateContentResponseDto {
 	private final Long id;
+	private final Integer contentNumber;
+	private final String contentTitle;
 	private final List<String> details;
 
 	public UpdateContentResponseDto(Content entity) {
 		this.id = entity.getId();
+		this.contentNumber = entity.getContentNumber();
+		this.contentTitle = entity.getContentTitle();
 		this.details = entity.getDetails();
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * KoreaHistory 관리자 페이지 공통 JavaScript
+ * 한국사 아띠 관리자 페이지 공통 JavaScript
  */
 
 // API 베이스 URL
@@ -357,6 +357,7 @@ const ApiEndpoints = {
 
   // Topic 관련
   topics: {
+    getAll: () => ApiClient.get(`${API_BASE_URL}/topics/search/all`),
     create: (subsectionId, data) =>
       ApiClient.post(`${API_BASE_URL}/create/topic/${subsectionId}`, data),
     getById: (id) => ApiClient.get(`${API_BASE_URL}/search/topic/${id}`),
@@ -395,6 +396,11 @@ const ApiEndpoints = {
     create: (topicTitle, data) =>
       ApiClient.post(
         `${API_BASE_URL}/create/keyword?topicTitle=${encodeURIComponent(topicTitle)}`,
+        data
+      ),
+    createById: (topicId, data) =>
+      ApiClient.post(
+        `${API_BASE_URL}/create/keyword/${topicId}`,
         data
       ),
     update: (id, data) =>
