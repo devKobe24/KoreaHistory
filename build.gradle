@@ -14,6 +14,12 @@ java {
 	}
 }
 
+bootJar {
+    archiveBaseName = 'a-tti'
+    archiveVersion = '1.0.0'
+    archiveClassifier = ''
+}
+
 repositories {
 	mavenCentral()
 }
