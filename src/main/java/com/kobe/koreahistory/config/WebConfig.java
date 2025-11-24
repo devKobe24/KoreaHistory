@@ -1,8 +1,7 @@
 package com.kobe.koreahistory.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * packageName    : com.kobe.koreahistory.config
@@ -31,5 +30,21 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // /web/** 경로로 요청이 오면 classpath:/static/web/에서 정적 리소스를 찾음
+        registry.addResourceHandler("/web/**")
+                .addResourceLocations("classpath:/static/web/");
+        
+        // /admin/** 경로로 요청이 오면 classpath:/static/admin/에서 정적 리소스를 찾음
+        registry.addResourceHandler("/admin/**")
+                .addResourceLocations("classpath:/static/admin/");
+        
+        // forward:/index.html을 지원하기 위해 루트 경로의 정적 파일도 처리
+        // 하지만 컨트롤러가 우선 처리되도록 순서 조정
+        registry.addResourceHandler("/index.html", "/pages/**", "/css/**", "/js/**")
+                .addResourceLocations("classpath:/static/web/");
     }
 }
