@@ -24,12 +24,6 @@ public class AdminController {
 	 */
 	@GetMapping("")
 	public String adminHome() {
-		return "redirect:/admin/";
-	}
-
-	@GetMapping("/") // '/admin' 경로 매핑
-	public String indexPage() {
-		// /admin/index.html로 포워딩
 		return "forward:/admin/index.html";
 	}
 
@@ -70,6 +64,6 @@ public class AdminController {
 
 	@GetMapping("/dashboard") // 'admin/dashboard'
 	public String dashboardPage() {
-		return "forward:/admin/pages/dashboard.html";
+		return "redirect:/admin/pages/dashboard.html";
 	}
 }
