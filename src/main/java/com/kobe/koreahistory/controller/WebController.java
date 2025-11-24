@@ -25,16 +25,16 @@ public class WebController {
 
 	@GetMapping("/")
 	public String indexPage() {
-		return "forward:/web/index.html";
+		return "forward:/index.html";
 	}
 
 	@GetMapping("/chapter")
 	public String chapterPage() {
-		return "forward:/web/pages/chapter.html";
+		return "forward:/pages/chapter.html";
 	}
 
 	@GetMapping("/lesson")
 	public String lessonPage() {
-		return "forward:/web/pages/lesson.html";
+		return "forward:/pages/lesson.html";
 	}
 }
