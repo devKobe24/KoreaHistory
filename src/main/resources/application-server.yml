@@ -1,0 +1,26 @@
+spring:
+  config:
+    import: aws-secretsmanager:/koreahistory/prod/rds
+
+  datasource:
+    url: jdbc:mysql://${host}:${port}/koreahistory?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&useSSL=true&allowPublicKeyRetrieval=true
+    username: ${username}
+    password: ${password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # 운영: validate 권장
+    open-in-view: false
+    properties:
+      hibernate.format_sql: true
+      hibernate.default_batch_fetch_size: 100
+
+  flyway:
+    locations: classpath:db/migration/mysql
+    enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug      # 너무 시끄러우면 info 로 낮추기
+    org.hibernate.type: warn
