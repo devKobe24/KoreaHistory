@@ -88,6 +88,13 @@ public class ContentService {
 	@Transactional(readOnly = true)
 	public List<ReadContentResponseDto> findAllContents() {
 		List<Content> contents = contentRepository.findAllWithKeywordAndTopic();
+		// 지연 로딩 컬렉션 초기화 (트랜잭션 내에서)
+		contents.forEach(content -> {
+			content.getDetails().size(); // details 컬렉션 초기화
+			if (content.getKeyword() != null) {
+				content.getKeyword().getKeywords().size(); // keyword의 keywords 컬렉션 초기화
+			}
+		});
 		return contents.stream()
 			.map(ReadContentResponseDto::new)
 			.collect(Collectors.toList());
