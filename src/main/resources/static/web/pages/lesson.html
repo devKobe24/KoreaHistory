@@ -512,7 +512,7 @@
       async function loadSpecificLesson(lessonId) {
         try {
           const response = await fetch(
-            `http://localhost:8080/api/v1/lessons/${lessonId}`
+            `${window.location.origin}/api/v1/lessons/${lessonId}`
           );
           if (!response.ok) throw new Error("레슨을 불러올 수 없습니다.");
 
@@ -530,7 +530,7 @@
       async function loadAllLessons() {
         try {
           const response = await fetch(
-            "http://localhost:8080/api/v1/lessons/search/all"
+            `${window.location.origin}/api/v1/lessons/search/all`
           );
           if (!response.ok) throw new Error("레슨 목록을 불러올 수 없습니다.");
 
