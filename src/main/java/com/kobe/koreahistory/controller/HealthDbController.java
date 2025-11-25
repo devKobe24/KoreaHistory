@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * -----------------------------------------------------------
  * 2025. 11. 24.        kobe       최초 생성
  */
-@Profile("admin")
+@Profile({"admin", "web"})
 @RestController
 @RequiredArgsConstructor
 public class HealthDbController {
