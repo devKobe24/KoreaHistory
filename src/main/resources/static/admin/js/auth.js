@@ -12,8 +12,10 @@ async function login(adminId, password) {
   console.log("login 함수 호출됨 - adminId:", adminId, "password:", password);
   
   try {
-    console.log("API 요청 시작 - URL: http://localhost:8080/api/v1/auth/login");
-    const response = await fetch("http://localhost:8080/api/v1/auth/login", {
+    // 현재 도메인을 기반으로 API URL 생성
+    const apiUrl = `${window.location.origin}/api/v1/auth/login`;
+    console.log("API 요청 시작 - URL:", apiUrl);
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
