@@ -1,12 +1,6 @@
 package com.kobe.koreahistory.service;
 
-import com.kobe.koreahistory.domain.entity.Chapter;
-import com.kobe.koreahistory.domain.entity.Content;
-import com.kobe.koreahistory.domain.entity.Keyword;
-import com.kobe.koreahistory.domain.entity.Lesson;
-import com.kobe.koreahistory.domain.entity.Section;
-import com.kobe.koreahistory.domain.entity.Subsection;
-import com.kobe.koreahistory.domain.entity.Topic;
+import com.kobe.koreahistory.domain.entity.*;
 import com.kobe.koreahistory.dto.request.keyword.CreateKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.DeleteKeywordRequestDto;
 import com.kobe.koreahistory.dto.request.keyword.PatchKeywordNumberRequestDto;
@@ -173,6 +167,10 @@ public class KeywordService {
 	@Transactional(readOnly = true)
 	public List<ReadKeywordResponseDto> findAllKeywords() {
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
+		// 지연 로딩 컬렉션 초기화 (트랜잭션 내에서)
+		keywords.forEach(keyword -> {
+			keyword.getKeywords().size(); // keywords 컬렉션 초기화
+		});
 		return keywords.stream()
 			.map(ReadKeywordResponseDto::new)
 			.collect(Collectors.toList());
