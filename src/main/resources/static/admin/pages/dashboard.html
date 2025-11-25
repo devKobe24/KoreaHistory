@@ -179,12 +179,17 @@
                 <div>
                     <h3>서버 정보</h3>
                     <ul>
-                        <li><strong>서버 주소:</strong> http://localhost:8080</li>
+                        <li><strong>서버 주소:</strong> <span id="serverAddress"></span></li>
                         <li><strong>API 베이스:</strong> /api/v1</li>
-                        <li><strong>데이터베이스:</strong> H2 (In-Memory)</li>
-                        <li><strong>H2 콘솔:</strong> <a href="http://localhost:8080/h2-console"
-                                target="_blank">http://localhost:8080/h2-console</a></li>
+                        <li><strong>데이터베이스:</strong> MySQL</li>
+                        <li><strong>H2 콘솔:</strong> <a href="/h2-console"
+                                target="_blank" id="h2ConsoleLink">/h2-console</a></li>
                     </ul>
+                    <script>
+                        // 현재 도메인을 기반으로 서버 주소 표시
+                        document.getElementById('serverAddress').textContent = window.location.origin;
+                        document.getElementById('h2ConsoleLink').href = window.location.origin + '/h2-console';
+                    </script>
                 </div>
                 <div>
                     <h3>데이터베이스 접속 정보</h3>
