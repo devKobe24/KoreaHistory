@@ -41,6 +41,13 @@ public class ChapterService {
 	@Transactional(readOnly = true)
 	public List<ChapterResponseDto> findAll() {
 		List<Chapter> results = chapterRepository.findAll();
+		
+		// 지연 로딩 컬렉션 초기화 (트랜잭션 내에서)
+		// ChapterResponseDto가 LessonResponseDto를 생성하고,
+		// LessonResponseDto가 CreateSectionResponseDto를 생성하고,
+		// CreateSectionResponseDto가 CreateSubsectionResponseDto를 생성하므로
+		// 모든 하위 계층을 초기화해야 함
+		results.forEach(this::initializeChapterHierarchy);
 
 		return results.stream()
 			.map(ChapterResponseDto::new)
