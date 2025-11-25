@@ -23,6 +23,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "https://a-tti.com",
                         "https://www.a-tti.com",
+                        "https://a-tti-admin.com",
+                        "https://www.a-tti-admin.com",
                         "http://localhost:8080",
                         "http://127.0.0.1:8080"
                 )
