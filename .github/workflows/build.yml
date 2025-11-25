@@ -51,19 +51,24 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.BASTION_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          echo "Scanning SSH keys for ${{ secrets.BASTION_HOST }}"
-          ssh-keyscan -H "${{ secrets.BASTION_HOST }}" >> ~/.ssh/known_hosts
+          cat > ~/.ssh/config << EOF
+          Host bastion
+            HostName ${{ secrets.BASTION_HOST }}
+            User ubuntu
+            IdentityFile ~/.ssh/id_ed25519
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+          EOF
           echo "SSH setup completed"
 
       - name: Copy jar to Bastion
         run: |
-          echo "Copying $JAR_NAME to ubuntu@${{ secrets.BASTION_HOST }}:/opt/deploy/a-tti/"
-          scp -v -i ~/.ssh/id_ed25519 "$JAR_NAME" ubuntu@${{ secrets.BASTION_HOST }}:/opt/deploy/a-tti/"$JAR_NAME"
+          echo "Copying $JAR_NAME to bastion:/opt/deploy/a-tti/"
+          scp -v "$JAR_NAME" bastion:/opt/deploy/a-tti/"$JAR_NAME"
           echo "File copy completed"
 
       - name: Run deploy script on Bastion
         run: |
           echo "Connecting to Bastion and running deploy script with $JAR_NAME"
-          ssh -v -i ~/.ssh/id_ed25519 ubuntu@${{ secrets.BASTION_HOST }} \
-            "cd /opt/deploy/a-tti && ./deploy.sh '$JAR_NAME'"
+          ssh -v bastion "cd /opt/deploy/a-tti && ./deploy.sh '$JAR_NAME'"
           echo "Deploy script completed"
