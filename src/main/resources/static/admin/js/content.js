@@ -682,8 +682,8 @@ function generateJSONTemplate(mode = 'create') {
           "year": "연도",
           "event": "이벤트",
           "details": ["상세내용1", "상세내용2"]
-        },
-        {
+            },
+            {
           "year": "연도",
           "event": "이벤트",
           "details": ["상세내용1"]

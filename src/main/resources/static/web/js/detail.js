@@ -422,7 +422,7 @@
     updateDataAttributes(currentItem);
     // type이 chapter, lesson, section, subsection, topic, keyword, 또는 content가 아닐 때만 관련 항목 로드
     if (type !== "chapter" && type !== "lesson" && type !== "section" && type !== "subsection" && type !== "topic" && type !== "keyword" && type !== "content") {
-      loadRelatedItems(type);
+    loadRelatedItems(type);
     }
   }
 

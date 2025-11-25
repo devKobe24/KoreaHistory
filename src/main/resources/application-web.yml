@@ -37,7 +37,7 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
-  flyway:
+flyway:
     locations: classpath:db/migration/mysql
     enabled: true
 
