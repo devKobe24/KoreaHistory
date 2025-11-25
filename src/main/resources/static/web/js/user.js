@@ -1,5 +1,6 @@
 // ===== 전역 변수 =====
-const API_BASE_URL = "http://localhost:8080/api/v1";
+// API 베이스 URL (현재 도메인을 기반으로 동적으로 생성)
+const API_BASE_URL = `${window.location.origin}/api/v1`;
 let currentFilter = "all";
 let searchResults = [];
 
