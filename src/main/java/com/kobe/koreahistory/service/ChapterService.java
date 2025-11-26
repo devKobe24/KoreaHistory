@@ -112,14 +112,22 @@ public class ChapterService {
 	}
 
 	private void initializeKeywordHierarchy(Keyword keyword) {
-		if (keyword == null || keyword.getContents() == null) {
+		if (keyword == null) {
 			return;
 		}
 
-		keyword.getContents().forEach(content -> {
-			// Trigger initialization of lazy fields if needed
-			content.getContentTitle();
-		});
+		// Initialize keywords collection (ElementCollection)
+		if (keyword.getKeywords() != null) {
+			keyword.getKeywords().size(); // Force initialization
+		}
+
+		// Initialize contents collection
+		if (keyword.getContents() != null) {
+			keyword.getContents().forEach(content -> {
+				// Trigger initialization of lazy fields if needed
+				content.getContentTitle();
+			});
+		}
 	}
 
 	@Transactional(readOnly = true)
