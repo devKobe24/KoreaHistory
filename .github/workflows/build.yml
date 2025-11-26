@@ -46,29 +46,14 @@ jobs:
           echo "JAR_NAME=$(ls *.jar | head -n 1)" >> $GITHUB_ENV
           echo "Detected JAR file: $(ls *.jar | head -n 1)"
 
-      - name: Setup SSH to Bastion
+      - name: Copy jar to deploy directory
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.BASTION_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          cat > ~/.ssh/config << EOF
-          Host bastion
-            HostName ${{ secrets.BASTION_HOST }}
-            User ubuntu
-            IdentityFile ~/.ssh/id_ed25519
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
-          EOF
-          echo "SSH setup completed"
-
-      - name: Copy jar to Bastion
-        run: |
-          echo "Copying $JAR_NAME to bastion:/opt/deploy/a-tti/"
-          scp -v "$JAR_NAME" bastion:/opt/deploy/a-tti/"$JAR_NAME"
+          echo "Copying $JAR_NAME to /opt/deploy/a-tti/"
+          cp -v "$JAR_NAME" /opt/deploy/a-tti/"$JAR_NAME"
           echo "File copy completed"
 
-      - name: Run deploy script on Bastion
+      - name: Run deploy script
         run: |
-          echo "Connecting to Bastion and running deploy script with $JAR_NAME"
-          ssh -v bastion "cd /opt/deploy/a-tti && ./deploy.sh '$JAR_NAME'"
+          echo "Running deploy script with $JAR_NAME"
+          cd /opt/deploy/a-tti && ./deploy.sh "$JAR_NAME"
           echo "Deploy script completed"
