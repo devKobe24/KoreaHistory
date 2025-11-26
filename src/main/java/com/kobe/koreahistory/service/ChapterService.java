@@ -124,8 +124,13 @@ public class ChapterService {
 		// Initialize contents collection
 		if (keyword.getContents() != null) {
 			keyword.getContents().forEach(content -> {
-				// Trigger initialization of lazy fields if needed
+				// Trigger initialization of lazy fields
 				content.getContentTitle();
+				
+				// Initialize details collection (ElementCollection)
+				if (content.getDetails() != null) {
+					content.getDetails().size(); // Force initialization
+				}
 			});
 		}
 	}
