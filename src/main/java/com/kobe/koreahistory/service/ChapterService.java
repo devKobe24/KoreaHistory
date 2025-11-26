@@ -138,6 +138,10 @@ public class ChapterService {
 	@Transactional(readOnly = true)
 	public List<ChapterResponseDto> searchChaptersByTitle(String title) {
 		List<Chapter> chapters = chapterRepository.findByChapterTitleContainingIgnoreCase(title);
+		
+		// 지연 로딩 컬렉션 초기화 (트랜잭션 내에서)
+		chapters.forEach(this::initializeChapterHierarchy);
+		
 		return chapters.stream()
 			.map(ChapterResponseDto::new)
 			.collect(Collectors.toList());
