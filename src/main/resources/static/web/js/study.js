@@ -2846,6 +2846,24 @@
       }
       return null;
     }
+    
+    // Lesson 구조인 경우 (1-1 형식: section-subsection)
+    if (loadedLesson && parts.length === 2) {
+      const [secStr, subStr] = parts;
+      const sIdx = Math.max(1, parseInt(secStr || "1", 10)) - 1;
+      const subIdx = Math.max(1, parseInt(subStr || "1", 10)) - 1;
+      
+      if (loadedLesson.sections && loadedLesson.sections[sIdx]) {
+        const section = loadedLesson.sections[sIdx];
+        if (section.subsections && section.subsections[subIdx]) {
+          const subsection = section.subsections[subIdx];
+          return subsection.subsectionTitle || subsection.subsection_title;
+        }
+      }
+      return null;
+    }
+    
+    return null;
   }
 
   function findSubsectionById(targetIdStr) {
