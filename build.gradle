@@ -21,7 +21,7 @@ java {
 
 bootJar {
     archiveBaseName = 'a-tti'
-    archiveVersion = '1.8.4'
+    archiveVersion = '1.8.5'
 }
 
 repositories {
