@@ -543,9 +543,7 @@
     } else if (type === "lesson" && title) {
       // Lesson 타입인 경우 실제 API에서 Section 데이터 로드
       loadLessonSections(decodeURIComponent(title));
-      // moveKeywordSectionAboveDetail은 loadLessonSections 내부에서 호출됨
-      // type이 lesson일 때 subsection-keyword 관계를 로드하여 업데이트
-      loadSubsectionKeywordRelations();
+      // moveKeywordSectionAboveDetail과 loadSubsectionKeywordRelations는 loadLessonSections 내부에서 호출됨
     } else if (type === "section" && title) {
       // Section 타입인 경우 해당 Section의 Subsection들을 로드
       loadSectionSubsections(decodeURIComponent(title));
