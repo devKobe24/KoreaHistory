@@ -39,3 +39,6 @@ out/
 
 # 민감한 설정 파일 제외
 application-prod.yml
+application-admin.yml
+application-server.yml
+application-web.yml
