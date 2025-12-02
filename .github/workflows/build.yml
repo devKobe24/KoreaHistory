@@ -39,17 +39,25 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: a-tti
-          path: .
+          path: ./artifacts
 
       - name: Detect jar filename
         run: |
-          echo "JAR_NAME=$(ls *.jar | head -n 1)" >> $GITHUB_ENV
-          echo "Detected JAR file: $(ls *.jar | head -n 1)"
+          echo "Working directory: $(pwd)"
+          echo "Checking artifacts directory:"
+          ls -la ./artifacts/ || echo "Artifacts directory not found"
+          JAR_FILE=$(ls ./artifacts/*.jar 2>/dev/null | head -n 1 | xargs basename)
+          if [ -z "$JAR_FILE" ]; then
+            echo "Error: No JAR file found in artifacts directory"
+            exit 1
+          fi
+          echo "JAR_NAME=$JAR_FILE" >> $GITHUB_ENV
+          echo "✅ Detected JAR file: $JAR_FILE"
 
       - name: Copy jar to deploy directory
         run: |
-          echo "Copying $JAR_NAME to /opt/deploy/a-tti/"
-          cp -v "$JAR_NAME" /opt/deploy/a-tti/"$JAR_NAME"
+          echo "Copying artifacts/$JAR_NAME to /opt/deploy/a-tti/"
+          cp -v "./artifacts/$JAR_NAME" "/opt/deploy/a-tti/$JAR_NAME"
           echo "File copy completed"
 
       - name: Run deploy script
