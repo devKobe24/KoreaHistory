@@ -56,8 +56,11 @@ jobs:
 
       - name: Copy jar to deploy directory
         run: |
-          echo "Copying artifacts/$JAR_NAME to /opt/deploy/a-tti/"
+          echo "Copying artifacts/$JAR_NAME to /opt/deploy/a-tti"
           cp -v "./artifacts/$JAR_NAME" "/opt/deploy/a-tti/$JAR_NAME"
+          echo "Keeping only latest 3 JAR files"
+          cd /opt/deploy/a-tti
+          ls -t a-tti-*.jar 2>/dev/null | tail -n +4 | xargs rm -f || true
           echo "File copy completed"
 
       - name: Run deploy script
