@@ -185,7 +185,6 @@ src/main/java/com/kobe/koreahistory
 src/main/resources
 ├── application.yml         # 공통 설정
 ├── application-dev.yml     # 개발 프로필 (H2)
-├── application-server.yml  # 운영 프로필 (MySQL + AWS)
 ├── db/migration/mysql      # Flyway SQL 스크립트
 └── static                  # 정적 리소스
     ├── admin               # 관리자 페이지 (HTML/CSS/JS)
