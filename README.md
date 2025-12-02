@@ -1,350 +1,203 @@
-# Korean History API 🇰🇷
+# 🇰🇷 한국사 아띠 (KoreaHistory)
 
 <div align="center">
 
-한국사 학습을 위한 **계층적 데이터 관리 RESTful API**
+**체계적인 한국사 학습을 위한 계층형 데이터 관리 플랫폼 & RESTful API**
 
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Gradle](https://img.shields.io/badge/Gradle-8.14.3-02303A.svg?logo=gradle)](https://gradle.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1.svg?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C.svg?logo=hibernate)](https://hibernate.org/)
+[![Flyway](https://img.shields.io/badge/Flyway-DB%20Migration-CC0200.svg?logo=flyway)](https://flywaydb.org/)
+[![AWS](https://img.shields.io/badge/AWS-Secrets%20Manager-FF9900.svg?logo=amazonaws)](https://aws.amazon.com/secrets-manager/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-[주요 기능](#-주요-기능) •
-[시작하기](#-시작하기) •
-[API 문서](#-api-명세) •
-[기여하기](#-기여하기)
+• [기능 소개](#-주요-기능)
+• [데이터 구조](#-데이터-구조)
+• [기술 스택](#-기술-스택)
+• [시작하기](#-시작하기-getting-started)
+• [API 명세](#-api-명세-endpoints)
 
 </div>
 
 ---
 
-## 📌 프로젝트 소개
+## 📖 프로젝트 소개
 
-Spring Boot와 JPA를 기반으로 한국사의 시대별 대분류(Chapter)부터 세부 키워드(Keyword)까지 **7단계 계층 구조**로 관리하는 API 서버입니다.
+**한국사 아띠(KoreaHistory)** 는 한국사의 방대한 데이터를 **7단계 계층 구조(Hierarchy)** 로 체계화하여 관리하고 제공하는 웹 플랫폼입니다.
 
-### 핵심 특징
-
-- ✅ **계층적 데이터 구조** - Chapter → Lesson → Section → Subsection → Topic → Keyword → Content
-- ✅ **완전한 CRUD 지원** - 모든 계층에서 생성, 조회, 수정, 삭제 가능
-- ✅ **다중 키워드 관리** - `@ElementCollection`을 활용한 유연한 키워드 저장
-- ✅ **Cascade 적용** - 상위 엔티티 삭제 시 하위 데이터 자동 삭제
-- ✅ **부분 검색 지원** - 키워드 부분 일치 검색 기능
+단순한 텍스트 나열이 아닌, 시대(Chapter)부터 세부 내용(Content)까지 논리적으로 연결된 학습 경험을 제공합니다. 관리자는 전용 대시보드를 통해 데이터를 시각적으로 관리할 수 있으며, 학습자는 웹 페이지를 통해 구조화된 한국사 콘텐츠를 학습할 수 있습니다.
 
 ---
 
-## 🛠️ 기술 스택
+## ✨ 주요 기능
 
-| 분류 | 기술 | 버전 |
-|:----:|:----:|:----:|
-| **Backend** | Java | 17 |
-| **Framework** | Spring Boot | 3.5.6 |
-| **ORM** | Spring Data JPA | - |
-| **Database** | H2 (In-Memory) | - |
-| **Build** | Gradle | 8.14.3 |
-| **Util** | Lombok | - |
+### 1. 7단계 계층적 데이터 관리
 
----
+한국사의 흐름을 끊김 없이 연결하기 위해 정교한 7단계 구조를 설계했습니다.
 
-## 🗂️ 데이터 구조
+- **구조:** `Chapter` > `Lesson` > `Section` > `Subsection` > `Topic` > `Keyword` > `Content`
+- 상위 개념 삭제 시 하위 데이터가 함께 정리되는 **Cascade** 정책 적용
 
-### 계층 관계도
+### 2. 다형성(Polymorphism) 기반 ContentBlock 시스템
 
-```
-Chapter (대분류 - 선사시대, 고대)
-  │
-  └── Lesson (중분류 - 구석기~철기 시대)
-        │
-        └── Section (소분류 - 구석기와 신석기)
-              │
-              └── Subsection (서브섹션 - 구석기 시대)
-                    │
-                    └── Topic (토픽 - 도구, 생활, 사회)
-                          │
-                          └── Keyword (키워드 그룹)
-                                │
-                                ├── keywords[] (뗀석기, 주먹도끼...)
-                                └── Content (상세 설명)
-                                      └── details[] (사용법, 특징...)
-```
+학습 내용은 단순 텍스트에 그치지 않고, 다양한 형태의 블록으로 구성됩니다. (JSON 기반 저장)
 
-### 주요 엔티티
+- **TEXT:** 일반 텍스트 설명
+- **TABLE:** 키-값 형태의 정보 테이블
+- **COMPARISON_TABLE:** 국가/시대 간 비교표
+- **TIMELINE:** 역사적 사건의 흐름 (연표)
+- **HERITAGE:** 문화재 정보 및 이미지
+- **IMAGE_GALLERY:** 관련 유물/유적 갤러리
 
-| 엔티티 | 설명 | 예시 |
-|:------:|:----:|:----:|
-| `Chapter` | 시대별 대분류 | 선사시대, 고대 |
-| `Lesson` | 시대 내 주제 | 구석기~철기 시대 |
-| `Section` | 세부 분류 | 구석기와 신석기 |
-| `Subsection` | 상세 주제 | 구석기 시대 |
-| `Topic` | 학습 주제 | 도구, 생활, 사회 |
-| `Keyword` | 키워드 묶음 | [뗀석기, 주먹도끼, 찍개] |
-| `Content` | 학습 내용 | [뗀석기의 사용법, 특징] |
+### 3. 관리자(Admin) & 학습자(Web) 듀얼 인터페이스
+
+- **Admin Dashboard:** 데이터 CRUD, JSON 템플릿 생성기, 실시간 미리보기 제공
+- **Web Learning:** 반응형 디자인, 학습 진도 체크, 키워드 검색 및 하이라이팅
+
+### 4. 강력한 검색 시스템
+
+- 키워드 조합 검색 지원 (예: "빗살무늬토기 + 신석기")
+- 계층 구조 역추적 검색 (Content 내용을 통해 상위 Chapter 찾기)
 
 ---
 
-## 🚀 시작하기
+## 🗂 데이터 구조
+
+이 프로젝트의 핵심은 **7-Layer Hierarchy** 입니다.
+
+<img src = "https://github.com/devKobe24/images2/blob/main/core_seven_layer.jpeg?raw=true">
+
+### 계층 구조 상세
+
+|     엔티티     | 설명                          | 예시                          |
+| :------------: | :---------------------------- | :---------------------------- |
+|  **Chapter**   | 가장 큰 시대적 구분           | 선사시대, 고대, 고려...       |
+|   **Lesson**   | 시대 내의 주요 강의 단위      | 구석기~철기 시대, 삼국의 성립 |
+|  **Section**   | 강의를 구성하는 소주제        | 구석기와 신석기               |
+| **Subsection** | 구체적인 학습 파트            | 구석기 시대                   |
+|   **Topic**    | 학습할 핵심 주제              | 도구, 생활, 사회              |
+|  **Keyword**   | 검색 및 학습의 핵심 어휘      | [뗀석기, 주먹도끼]            |
+|  **Content**   | 실제 학습 데이터 (JSON Block) | 텍스트, 이미지, 표 등         |
+
+---
+
+## 🛠 기술 스택
+
+### Backend
+
+- **Framework:** Spring Boot 3.5.6 (Java 17)
+- **Database:** MySQL 8.x (Prod), H2 (Dev)
+- **ORM:** Spring Data JPA
+- **Migration:** Flyway (DB 스키마 버전 관리)
+- **Cloud:** AWS Secrets Manager (환경 변수 보안 관리)
+- **Build:** Gradle 8.14.3
+
+### Frontend (Admin/Web)
+
+- **Core:** HTML5, CSS3, Vanilla JavaScript (ES6+)
+- **Styling:** Custom CSS (Responsive), CSS Grid/Flexbox
+- **Communication:** Fetch API (RESTful)
+
+---
+
+## 🚀 시작하기 (Getting Started)
 
 ### 사전 요구사항
 
-```
-✓ Java 17 이상 설치
-✓ IDE (IntelliJ IDEA 권장)
-```
+- JDK 17 이상
+- MySQL 8.0 이상 (Prod 프로필 사용 시)
 
-### 설치 및 실행
-
-#### 1️⃣ 프로젝트 클론
+### 1. 프로젝트 클론
 
 ```bash
-git clone https://github.com/your-username/KoreaHistory.git
+git clone https://github.com/devKobe24/KoreaHistory.git
 cd KoreaHistory
 ```
 
-#### 2️⃣ 애플리케이션 실행
+### 2. 설정 파일 (Local 개발)
+
+로컬 개발 환경(`dev` 프로필)은 H2 인메모리 DB를 사용하므로 별도 설정 없이 바로 실행 가능합니다.
+
+- Admin 계정 자동 생성: `admin` / `admin123`
+
+### 3. 애플리케이션 실행
 
 ```bash
+# Mac/Linux
+./gradlew bootRun
+
 # Windows
 gradlew.bat bootRun
-
-# Linux/Mac
-./gradlew bootRun
 ```
 
-#### 3️⃣ 서버 확인
+### 4. 접속 주소
 
-```
-🌐 API 서버: http://localhost:8080
-💾 H2 콘솔: http://localhost:8080/h2-console
-```
-
-### H2 데이터베이스 접속 정보
-
-| 항목 | 값 |
-|:----:|:----|
-| **JDBC URL** | `jdbc:h2:mem:koreahistory` |
-| **Username** | `sa` |
-| **Password** | *(공백)* |
-
-> 💡 **초기 데이터**: `data.sql` 파일로 선사시대 관련 샘플 데이터가 자동 생성됩니다.
+- **학습자 웹:** http://localhost:8080
+- **관리자 대시보드:** http://localhost:8080/admin/pages/login.html
+- **H2 콘솔:** http://localhost:8080/h2-console
 
 ---
 
-## 📖 API 명세
+## 🔌 API 명세 (Endpoints)
 
-### Base URL
+주요 REST API 엔드포인트입니다.
 
-```
-http://localhost:8080/api/v1
-```
+### 📚 Hierarchy Search
 
-### 주요 엔드포인트
+| Method | Endpoint                                 | Description         |
+| :----: | :--------------------------------------- | :------------------ |
+| `GET`  | `/api/v1/chapters/search/all`            | 전체 계층 구조 조회 |
+| `GET`  | `/api/v1/search/lessons?title={title}`   | 강의 제목 검색      |
+| `GET`  | `/api/v1/search/keywords?keyword={word}` | 키워드 검색         |
+| `GET`  | `/api/v1/search/contents?detail={text}`  | 내용 본문 검색      |
 
-#### 📚 Chapter (대분류)
+### 📝 Management (Admin)
 
-| 메서드 | 엔드포인트 | 설명 |
-|:------:|:----------|:-----|
-| `GET` | `/chapters/search/all` | 전체 대분류 조회 |
-| `POST` | `/search/chapters` | 제목으로 대분류 검색 |
-| `POST` | `/create/chapter` | 대분류 생성 (계층 포함) |
-| `PATCH` | `/chapters/{id}/number` | 대분류 번호 수정 |
-| `PATCH` | `/chapters/{id}/title` | 대분류 제목 수정 |
-| `DELETE` | `/chapters/{id}` | 대분류 삭제 |
-
-#### 📖 Lesson (중분류)
-
-| 메서드 | 엔드포인트 | 설명 |
-|:------:|:----------|:-----|
-| `GET` | `/detail/search?lessonNumber=1&lessonTitle=구석기` | 중분류 검색 |
-| `POST` | `/chapters/{chapterId}/details` | 중분류 생성 |
-| `PATCH` | `/chapter/lesson/{id}/title` | 중분류 제목 수정 |
-| `PATCH` | `/chapter/lesson/{id}/number` | 중분류 번호 수정 |
-| `DELETE` | `/lesson/{lessonId}` | 중분류 삭제 |
-
-#### 📄 Section (소분류)
-
-| 메서드 | 엔드포인트 | 설명 |
-|:------:|:----------|:-----|
-| `GET` | `/search/section/{sectionId}` | 소분류 조회 |
-| `POST` | `/create/section/{lessonId}` | 소분류 생성 |
-| `PATCH` | `/section/{sectionId}/number` | 소분류 번호 수정 |
-| `PATCH` | `/section/{sectionId}/title` | 소분류 제목 수정 |
-| `DELETE` | `/section/{sectionId}` | 소분류 삭제 |
-
-#### 🔖 Keyword (키워드)
-
-| 메서드 | 엔드포인트 | 설명 |
-|:------:|:----------|:-----|
-| `GET` | `/search/keywords?keyword=뗀석기` | 키워드 검색 (부분 일치) |
-| `POST` | `/create/keyword?topicTitle=도구` | 키워드 생성 |
-| `PATCH` | `/keywords/{keywordId}/update` | 키워드 추가 |
-| `PATCH` | `/keyword/number/{keywordId}/update` | 키워드 번호 수정 |
-| `DELETE` | `/delete/keyword/{keywordId}` | 특정 키워드 삭제 |
-| `DELETE` | `/keyword/group/{id}` | 키워드 그룹 삭제 |
-
-### 요청/응답 예시
-
-<details>
-<summary><b>대분류 생성 (POST /create/chapter)</b></summary>
-
-**요청:**
-```json
-[
-  {
-    "chapterNumber": 2,
-    "chapterTitle": "고대",
-    "lessons": [
-      {
-        "lessonNumber": 1,
-        "lessonTitle": "고구려",
-        "sections": []
-      }
-    ]
-  }
-]
-```
-
-**응답 (201 Created):**
-```json
-[
-  {
-    "id": 2,
-    "chapterNumber": 2,
-    "chapterTitle": "고대",
-    "lessons": [
-      {
-        "id": 3,
-        "lessonNumber": 1,
-        "lessonTitle": "고구려",
-        "sections": []
-      }
-    ]
-  }
-]
-```
-</details>
-
-<details>
-<summary><b>키워드 검색 (GET /search/keywords?keyword=뗀석기)</b></summary>
-
-**응답 (200 OK):**
-```json
-[
-  {
-    "id": 1,
-    "keywordNumber": 1,
-    "keywords": ["뗀석기"]
-  },
-  {
-    "id": 2,
-    "keywordNumber": 2,
-    "keywords": ["주요 뗀석기", "주먹 도끼", "찍개", "슴베찌르개"]
-  }
-]
-```
-</details>
-
-> 📘 **전체 API 문서**는 추후 Swagger UI로 제공 예정입니다.
+|  Method  | Endpoint                             | Description                       |
+| :------: | :----------------------------------- | :-------------------------------- |
+|  `POST`  | `/api/v1/create/chapter`             | 대분류 생성 (하위 계층 포함 가능) |
+|  `POST`  | `/api/v1/create/content/{keywordId}` | 특정 키워드 하위에 컨텐츠 생성    |
+| `PATCH`  | `/api/v1/content/{id}`               | 컨텐츠 수정 (JSON Block 업데이트) |
+| `DELETE` | `/api/v1/chapters/{id}`              | 챕터 및 하위 데이터 전체 삭제     |
 
 ---
 
-## 📁 프로젝트 구조
+## 📂 프로젝트 구조
+
+### Java 패키지 구조
 
 ```
-src/main/java/com/kobe/koreahistory/
-├── controller/          # REST API 컨트롤러
-├── service/            # 비즈니스 로직
-├── repository/         # JPA 리포지토리
-├── domain/entity/      # JPA 엔티티
-└── dto/
-    ├── request/        # 요청 DTO
-    └── response/       # 응답 DTO
+src/main/java/com/kobe/koreahistory
+├── config          # Flyway, WebMvc(CORS) 설정
+├── controller      # REST API 및 View Controller
+├── domain/entity   # JPA Entity (7-Layer + Admin)
+├── dto             # Request/Response DTO
+├── repository      # Spring Data JPA Repositories
+├── service         # 비즈니스 로직 (Transaction 관리)
+└── util            # ContentBlockUtil (JSON 처리), JwtUtil
+```
+
+### 리소스 구조
+
+```
+src/main/resources
+├── application.yml         # 공통 설정
+├── application-dev.yml     # 개발 프로필 (H2)
+├── application-server.yml  # 운영 프로필 (MySQL + AWS)
+├── db/migration/mysql      # Flyway SQL 스크립트
+└── static                  # 정적 리소스
+    ├── admin               # 관리자 페이지 (HTML/CSS/JS)
+    └── web                 # 사용자 페이지 (HTML/CSS/JS)
 ```
 
 ---
 
-## 🧪 테스트
+## 📜 라이선스
 
-```bash
-# 전체 테스트 실행
-./gradlew test
+이 프로젝트는 [MIT License](LICENSE)를 따릅니다.
 
-# 특정 테스트 실행
-./gradlew test --tests KoreaHistoryApplicationTests
-```
+Copyright (c) 2025 Minseong Kang
 
 ---
-
-## 🤝 기여하기
-
-프로젝트에 기여해주셔서 감사합니다! 
-
-### 기여 절차
-
-1. Fork the Project
-2. Create Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit Changes (`git commit -m 'feat: Add AmazingFeature'`)
-4. Push to Branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-### Commit Convention
-
-이 프로젝트는 **Conventional Commits**를 따릅니다:
-
-```
-feat:     새로운 기능 추가
-fix:      버그 수정
-refactor: 코드 리팩토링
-docs:     문서 수정
-test:     테스트 코드
-chore:    빌드 설정, 기타
-```
-
----
-
-## 🗺️ 로드맵
-
-### v1.0 (현재)
-- [x] 기본 CRUD API 구현
-- [x] 7단계 계층 구조 구축
-- [x] 키워드 검색 기능
-
-### v1.1 (예정)
-- [ ] Swagger/OpenAPI 문서화
-- [ ] 단위/통합 테스트 확대
-- [ ] 예외 처리 표준화
-- [ ] 페이징 및 정렬 기능
-
-### v2.0 (계획)
-- [ ] 사용자 인증/권한 관리
-- [ ] 검색 기능 고도화
-- [ ] 학습 진도 추적
-- [ ] 이미지 업로드 지원
-
----
-
-## 📝 라이센스
-
-이 프로젝트는 **MIT 라이센스** 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
-
----
-
-## 📧 문의
-
-프로젝트 관련 문의나 버그 리포트는 [Issues](https://github.com/your-username/KoreaHistory/issues)에 남겨주세요.
-
-**Author**: Minseong Kang
-
----
-
-## 📚 참고 자료
-
-- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
-- [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [RESTful API Design Best Practices](https://restfulapi.net/)
-
----
-
-<div align="center">
-
-⭐ 이 프로젝트가 도움이 되셨다면 Star를 눌러주세요!
-
-</div>
