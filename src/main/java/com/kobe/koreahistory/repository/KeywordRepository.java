@@ -32,5 +32,14 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 	@Query("SELECT k FROM Keyword k LEFT JOIN FETCH k.topic")
 	List<Keyword> findAllWithTopic();
 
+	/**
+	 * keywords 테이블에서 특정 keyword_id에 속한 모든 keywords_value를 조회
+	 * @param keywordId Keyword ID
+	 * @return keywords_value 리스트
+	 */
+	@Query(value = "SELECT keywords_value FROM keywords WHERE keywords_id = :keywordId ORDER BY keywords_value", 
+		nativeQuery = true)
+	List<String> findKeywordsByKeywordId(@Param("keywordId") Long keywordId);
+
 	Optional<Keyword> findFirstByKeywordTitleIgnoreCase(String title);
 }
