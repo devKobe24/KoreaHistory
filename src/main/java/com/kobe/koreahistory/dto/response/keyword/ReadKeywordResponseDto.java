@@ -4,6 +4,7 @@ import com.kobe.koreahistory.domain.entity.Keyword;
 import com.kobe.koreahistory.dto.response.topic.TopicInfoResponseDto;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +31,15 @@ public class ReadKeywordResponseDto {
 		this.keywordNumber = entity.getKeywordNumber();
 		this.keywordTitle = entity.getKeywordTitle();
 		this.keywords = entity.getKeywords();
+		this.topic = entity.getTopic() != null ? new TopicInfoResponseDto(entity.getTopic()) : null;
+	}
+
+	// keywords를 직접 받는 생성자 추가
+	public ReadKeywordResponseDto(Keyword entity, List<String> keywords) {
+		this.id = entity.getId();
+		this.keywordNumber = entity.getKeywordNumber();
+		this.keywordTitle = entity.getKeywordTitle();
+		this.keywords = keywords != null ? keywords : new ArrayList<>();
 		this.topic = entity.getTopic() != null ? new TopicInfoResponseDto(entity.getTopic()) : null;
 	}
 }
