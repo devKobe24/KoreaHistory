@@ -10,7 +10,6 @@ import com.kobe.koreahistory.dto.response.keyword.*;
 import com.kobe.koreahistory.repository.KeywordRepository;
 import com.kobe.koreahistory.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -171,39 +170,22 @@ public class KeywordService {
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
 		
 		// Native Query를 사용하여 각 Keyword의 keywords 컬렉션을 명시적으로 로드
-		// @ElementCollection은 별도 테이블이므로 Native Query로 직접 조회 후 수동 매핑
-		for (Keyword keyword : keywords) {
-			// Native Query로 keywords 테이블에서 해당 keyword_id의 모든 keywords_value 조회
-			// TRIM으로 공백 제거 및 NULL 필터링이 이미 포함됨
-			List<String> keywordsList = keywordRepository.findKeywordsByKeywordId(keyword.getId());
-			
-			// 조회한 keywords를 Keyword 엔티티의 컬렉션에 설정
-			// @ElementCollection은 getter로 반환된 리스트에 직접 수정 가능
-			// keywords 컬렉션 초기화
-			Hibernate.initialize(keyword.getKeywords());
-			
-			if (keywordsList != null && !keywordsList.isEmpty()) {
-				// Native Query로 조회한 데이터로 컬렉션 채우기
-				// 추가로 각 키워드의 공백 제거 (이중 방어)
+		// @ElementCollection은 별도 테이블이므로 Native Query로 직접 조회 후 DTO에 직접 전달
+		return keywords.stream()
+			.map(keyword -> {
+				// Native Query로 keywords 테이블에서 해당 keyword_id의 모든 keywords_value 조회
+				// TRIM으로 공백 제거 및 NULL 필터링이 이미 포함됨
+				List<String> keywordsList = keywordRepository.findKeywordsByKeywordId(keyword.getId());
+				
+				// 추가로 각 키워드의 공백 제거 및 필터링 (이중 방어)
 				List<String> trimmedKeywords = keywordsList.stream()
 					.filter(kw -> kw != null && !kw.trim().isEmpty())
 					.map(String::trim)
 					.collect(Collectors.toList());
 				
-				if (keyword.getKeywords() != null) {
-					keyword.getKeywords().clear();
-					keyword.getKeywords().addAll(trimmedKeywords);
-				}
-			} else {
-				// keywords가 없으면 빈 리스트로 설정
-				if (keyword.getKeywords() != null) {
-					keyword.getKeywords().clear();
-				}
-			}
-		}
-		
-		return keywords.stream()
-			.map(ReadKeywordResponseDto::new)
+				// DTO 생성 시 keywords를 직접 전달 (엔티티 컬렉션 수정 불필요)
+				return new ReadKeywordResponseDto(keyword, trimmedKeywords);
+			})
 			.collect(Collectors.toList());
 	}
 
