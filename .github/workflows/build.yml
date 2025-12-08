@@ -12,6 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify checkout and build.gradle
+        run: |
+          echo "Current commit: $(git rev-parse HEAD)"
+          echo "Commit message: $(git log -1 --pretty=%B)"
+          echo "Checking build.gradle archiveVersion:"
+          grep -A 2 "bootJar" build.gradle || echo "bootJar section not found"
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -23,6 +30,22 @@ jobs:
 
       - name: Build jar
         run: ./gradlew clean bootJar
+
+      - name: Verify JAR version
+        run: |
+          echo "Checking generated JAR files:"
+          ls -la build/libs/
+          echo "JAR files found:"
+          find build/libs -name "*.jar" -type f
+          JAR_NAME=$(ls build/libs/*.jar 2>/dev/null | head -n 1 | xargs basename)
+          echo "✅ Generated JAR: $JAR_NAME"
+          if [[ "$JAR_NAME" == *"1.9.2"* ]]; then
+            echo "❌ ERROR: JAR version is 1.9.2, expected 1.9.3"
+            exit 1
+          fi
+          if [[ "$JAR_NAME" == *"1.9.3"* ]]; then
+            echo "✅ JAR version is 1.9.3 - correct!"
+          fi
 
       - name: Upload jar artifact
         uses: actions/upload-artifact@v4
@@ -46,6 +69,8 @@ jobs:
           echo "Working directory: $(pwd)"
           echo "Checking artifacts directory:"
           ls -la ./artifacts/ || echo "Artifacts directory not found"
+          echo "All JAR files in artifacts:"
+          ls -lh ./artifacts/*.jar 2>/dev/null || echo "No JAR files found"
           JAR_FILE=$(ls ./artifacts/*.jar 2>/dev/null | head -n 1 | xargs basename)
           if [ -z "$JAR_FILE" ]; then
             echo "Error: No JAR file found in artifacts directory"
@@ -53,6 +78,11 @@ jobs:
           fi
           echo "JAR_NAME=$JAR_FILE" >> $GITHUB_ENV
           echo "✅ Detected JAR file: $JAR_FILE"
+          if [[ "$JAR_FILE" == *"1.9.2"* ]]; then
+            echo "⚠️  WARNING: Deploying JAR with version 1.9.2 (expected 1.9.3)"
+          elif [[ "$JAR_FILE" == *"1.9.3"* ]]; then
+            echo "✅ Confirmed: JAR version is 1.9.3"
+          fi
 
       - name: Copy jar to deploy directory
         run: |
