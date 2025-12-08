@@ -10,6 +10,7 @@ import com.kobe.koreahistory.dto.response.keyword.*;
 import com.kobe.koreahistory.repository.KeywordRepository;
 import com.kobe.koreahistory.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -169,7 +170,8 @@ public class KeywordService {
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
 		// 지연 로딩 컬렉션 초기화 (트랜잭션 내에서)
 		keywords.forEach(keyword -> {
-			keyword.getKeywords().size(); // keywords 컬렉션 초기화
+			// keywords 컬렉션 초기화
+			Hibernate.initialize(keyword.getKeywords());
 		});
 		return keywords.stream()
 			.map(ReadKeywordResponseDto::new)
