@@ -167,12 +167,32 @@ public class KeywordService {
 
 	@Transactional(readOnly = true)
 	public List<ReadKeywordResponseDto> findAllKeywords() {
+		// 먼저 모든 Keyword와 Topic 정보 조회
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
-		// 지연 로딩 컬렉션 초기화 (트랜잭션 내에서)
-		keywords.forEach(keyword -> {
-			// keywords 컬렉션 초기화
-			Hibernate.initialize(keyword.getKeywords());
-		});
+		
+		// Native Query를 사용하여 각 Keyword의 keywords 컬렉션을 명시적으로 로드
+		// @ElementCollection은 별도 테이블이므로 Native Query로 직접 조회 후 수동 매핑
+		for (Keyword keyword : keywords) {
+			// Native Query로 keywords 테이블에서 해당 keyword_id의 모든 keywords_value 조회
+			List<String> keywordsList = keywordRepository.findKeywordsByKeywordId(keyword.getId());
+			
+			// 조회한 keywords를 Keyword 엔티티의 컬렉션에 설정
+			// @ElementCollection은 getter로 반환된 리스트에 직접 수정 가능
+			if (keywordsList != null && !keywordsList.isEmpty()) {
+				// keywords 컬렉션 초기화
+				Hibernate.initialize(keyword.getKeywords());
+				
+				// Native Query로 조회한 데이터로 컬렉션 채우기
+				if (keyword.getKeywords() != null) {
+					keyword.getKeywords().clear();
+					keyword.getKeywords().addAll(keywordsList);
+				}
+			} else {
+				// keywords가 없어도 컬렉션 초기화하여 빈 리스트로 설정
+				Hibernate.initialize(keyword.getKeywords());
+			}
+		}
+		
 		return keywords.stream()
 			.map(ReadKeywordResponseDto::new)
 			.collect(Collectors.toList());
