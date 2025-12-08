@@ -34,10 +34,11 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
 	/**
 	 * keywords 테이블에서 특정 keyword_id에 속한 모든 keywords_value를 조회
+	 * 공백 제거 및 NULL 필터링 포함
 	 * @param keywordId Keyword ID
-	 * @return keywords_value 리스트
+	 * @return keywords_value 리스트 (공백 제거됨, NULL 제외)
 	 */
-	@Query(value = "SELECT keywords_value FROM keywords WHERE keywords_id = :keywordId ORDER BY keywords_value", 
+	@Query(value = "SELECT TRIM(keywords_value) FROM keywords WHERE keywords_id = :keywordId AND keywords_value IS NOT NULL AND TRIM(keywords_value) != '' ORDER BY TRIM(keywords_value)", 
 		nativeQuery = true)
 	List<String> findKeywordsByKeywordId(@Param("keywordId") Long keywordId);
 
