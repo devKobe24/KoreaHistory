@@ -173,15 +173,24 @@ public class KeywordService {
 
 	@Transactional(readOnly = true)
 	public List<ReadKeywordResponseDto> findAllKeywords() {
-		log.info("[KEYWORD DEBUG] findAllKeywords() 메서드 호출됨");
+		log.info("[KEYWORD DEBUG] ========== findAllKeywords() 메서드 호출됨 ==========");
 		
 		// keywords 테이블의 전체 데이터 확인 (디버깅용)
-		@SuppressWarnings("unchecked")
-		List<Object[]> allKeywordsData = entityManager.createNativeQuery(
-			"SELECT keywords_id, keywords_value FROM keywords LIMIT 10")
-			.getResultList();
-		log.info("[KEYWORD DEBUG] keywords 테이블 샘플 데이터 (최대 10개): {}", 
-			allKeywordsData.stream().map(r -> "id=" + r[0] + ", value=" + r[1]).toList());
+		try {
+			@SuppressWarnings("unchecked")
+			List<Object[]> allKeywordsData = entityManager.createNativeQuery(
+				"SELECT keywords_id, keywords_value FROM keywords LIMIT 10")
+				.getResultList();
+			log.info("[KEYWORD DEBUG] keywords 테이블 샘플 데이터 개수: {}", allKeywordsData.size());
+			if (!allKeywordsData.isEmpty()) {
+				log.info("[KEYWORD DEBUG] keywords 테이블 샘플 데이터 (최대 10개): {}", 
+					allKeywordsData.stream().map(r -> "id=" + r[0] + ", value='" + r[1] + "'").toList());
+			} else {
+				log.warn("[KEYWORD DEBUG] ⚠️ keywords 테이블이 비어있습니다!");
+			}
+		} catch (Exception e) {
+			log.error("[KEYWORD DEBUG] keywords 테이블 조회 중 오류 발생: {}", e.getMessage());
+		}
 		
 		// 먼저 모든 Keyword와 Topic 정보 조회
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
@@ -199,15 +208,22 @@ public class KeywordService {
 		return keywords.stream()
 			.map(keyword -> {
 				// EntityManager를 사용하여 Native Query로 keywords 테이블에서 직접 조회
-				// 먼저 데이터 존재 여부 확인용 쿼리
+				// 먼저 데이터 존재 여부 확인용 쿼리 (ID 1-5만 상세 로그)
 				@SuppressWarnings("unchecked")
 				List<Object[]> rawResults = entityManager.createNativeQuery(
 					"SELECT keywords_value FROM keywords WHERE keywords_id = :keywordId")
 					.setParameter("keywordId", keyword.getId())
 					.getResultList();
 				
-				log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}", 
-					keyword.getId(), rawResults != null ? rawResults.size() : 0);
+				// ID 1-5에 대해서만 상세 로그 출력
+				if (keyword.getId() != null && keyword.getId() <= 5) {
+					log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}, Results: {}", 
+						keyword.getId(), rawResults != null ? rawResults.size() : 0, 
+						rawResults != null ? rawResults.stream().map(r -> r[0]).toList() : "null");
+				} else {
+					log.debug("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}", 
+						keyword.getId(), rawResults != null ? rawResults.size() : 0);
+				}
 				
 				// 실제 keywords 조회 (TRIM 적용)
 				@SuppressWarnings("unchecked")
