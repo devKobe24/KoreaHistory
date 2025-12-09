@@ -247,9 +247,19 @@ public class KeywordService {
 					keyword.getId(), keywordsList != null ? keywordsList.size() : 0);
 				
 				// Raw 데이터 확인 (처음 3개만)
-				if (rawResults != null && !rawResults.isEmpty() && keyword.getId() <= 5) {
-					log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw data sample (first 3): {}", 
-						keyword.getId(), rawResults.stream().limit(3).map(r -> r[0]).toList());
+				if (rawResults != null && !rawResults.isEmpty() && keyword.getId() != null && keyword.getId() <= 5) {
+					try {
+						List<String> rawValues = rawResults.stream()
+							.limit(3)
+							.filter(r -> r != null && r.length > 0 && r[0] != null)
+							.map(r -> String.valueOf(r[0]))
+							.toList();
+						log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw data sample (first 3): {}", 
+							keyword.getId(), rawValues);
+					} catch (Exception e) {
+						log.warn("[KEYWORD DEBUG] Keyword ID: {}, Error processing raw data: {}", 
+							keyword.getId(), e.getMessage());
+					}
 				}
 				
 				if (keywordsList != null && !keywordsList.isEmpty()) {
