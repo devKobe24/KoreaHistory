@@ -173,102 +173,19 @@ public class KeywordService {
 
 	@Transactional(readOnly = true)
 	public List<ReadKeywordResponseDto> findAllKeywords() {
-		log.info("[KEYWORD DEBUG] ========== findAllKeywords() 메서드 호출됨 ==========");
-		
-		// keywords 테이블의 전체 데이터 확인 (디버깅용)
-		try {
-			@SuppressWarnings("unchecked")
-			List<Object[]> allKeywordsData = entityManager.createNativeQuery(
-				"SELECT keywords_id, keywords_value FROM keywords LIMIT 10")
-				.getResultList();
-			log.info("[KEYWORD DEBUG] keywords 테이블 샘플 데이터 개수: {}", allKeywordsData.size());
-			if (!allKeywordsData.isEmpty()) {
-				log.info("[KEYWORD DEBUG] keywords 테이블 샘플 데이터 (최대 10개): {}", 
-					allKeywordsData.stream().map(r -> "id=" + r[0] + ", value='" + r[1] + "'").toList());
-			} else {
-				log.warn("[KEYWORD DEBUG] ⚠️ keywords 테이블이 비어있습니다!");
-			}
-		} catch (Exception e) {
-			log.error("[KEYWORD DEBUG] keywords 테이블 조회 중 오류 발생: {}", e.getMessage());
-		}
-		
-		// 먼저 모든 Keyword와 Topic 정보 조회
+		// 모든 Keyword와 Topic 정보 조회
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
-		log.info("[KEYWORD DEBUG] 조회된 Keyword 개수: {}", keywords.size());
-		
-		// ID 1부터 5까지의 Keyword가 있는지 확인
-		if (!keywords.isEmpty()) {
-			keywords.stream()
-				.filter(k -> k.getId() != null && k.getId() <= 5)
-				.forEach(k -> log.info("[KEYWORD DEBUG] Keyword ID: {}, Title: {}", k.getId(), k.getKeywordTitle()));
-		}
 		
 		// EntityManager를 사용하여 각 Keyword의 keywords 컬렉션을 명시적으로 로드
 		// @ElementCollection은 별도 테이블이므로 Native Query로 직접 조회 후 DTO에 직접 전달
 		return keywords.stream()
 			.map(keyword -> {
-				// EntityManager를 사용하여 Native Query로 keywords 테이블에서 직접 조회
-				// 먼저 데이터 존재 여부 확인용 쿼리 (ID 1-5만 상세 로그)
-				@SuppressWarnings("unchecked")
-				List<Object[]> rawResults = entityManager.createNativeQuery(
-					"SELECT keywords_value FROM keywords WHERE keywords_id = :keywordId")
-					.setParameter("keywordId", keyword.getId())
-					.getResultList();
-				
-				// ID 1-5에 대해서만 상세 로그 출력
-				if (keyword.getId() != null && keyword.getId() <= 5) {
-					try {
-						List<String> rawValues = rawResults != null 
-							? rawResults.stream()
-								.filter(r -> r != null && r.length > 0 && r[0] != null)
-								.map(r -> String.valueOf(r[0]))
-								.toList()
-							: List.of();
-						log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}, Results: {}", 
-							keyword.getId(), rawResults != null ? rawResults.size() : 0, rawValues);
-					} catch (Exception e) {
-						log.warn("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}, Error logging results: {}", 
-							keyword.getId(), rawResults != null ? rawResults.size() : 0, e.getMessage());
-					}
-				} else {
-					log.debug("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}", 
-						keyword.getId(), rawResults != null ? rawResults.size() : 0);
-				}
-				
-				// 실제 keywords 조회 (TRIM 적용)
+				// Native Query로 keywords 테이블에서 직접 조회 (TRIM 적용, NULL/공백 필터링)
 				@SuppressWarnings("unchecked")
 				List<String> keywordsList = entityManager.createNativeQuery(
 					"SELECT TRIM(keywords_value) FROM keywords WHERE keywords_id = :keywordId AND keywords_value IS NOT NULL AND TRIM(keywords_value) != '' ORDER BY TRIM(keywords_value)")
 					.setParameter("keywordId", keyword.getId())
 					.getResultList();
-				
-				// 디버깅: Native Query 결과 로그 출력 (SLF4J Logger 사용)
-				log.info("[KEYWORD DEBUG] Keyword ID: {}, Native Query result size: {}", 
-					keyword.getId(), keywordsList != null ? keywordsList.size() : 0);
-				
-				// Raw 데이터 확인 (처음 3개만)
-				if (rawResults != null && !rawResults.isEmpty() && keyword.getId() != null && keyword.getId() <= 5) {
-					try {
-						List<String> rawValues = rawResults.stream()
-							.limit(3)
-							.filter(r -> r != null && r.length > 0 && r[0] != null)
-							.map(r -> String.valueOf(r[0]))
-							.toList();
-						log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw data sample (first 3): {}", 
-							keyword.getId(), rawValues);
-					} catch (Exception e) {
-						log.warn("[KEYWORD DEBUG] Keyword ID: {}, Error processing raw data: {}", 
-							keyword.getId(), e.getMessage());
-					}
-				}
-				
-				if (keywordsList != null && !keywordsList.isEmpty()) {
-					log.info("[KEYWORD DEBUG] Keyword ID: {}, Keywords from DB: {}", 
-						keyword.getId(), keywordsList);
-				} else {
-					log.warn("[KEYWORD DEBUG] Keyword ID: {}, No keywords found in database (Raw count: {})", 
-						keyword.getId(), rawResults != null ? rawResults.size() : 0);
-				}
 				
 				// 추가로 각 키워드의 공백 제거 및 필터링 (이중 방어)
 				List<String> trimmedKeywords = keywordsList != null 
@@ -277,10 +194,6 @@ public class KeywordService {
 						.map(String::trim)
 						.collect(Collectors.toList())
 					: new ArrayList<>();
-				
-				// 디버깅: 최종 keywords 로그 출력
-				log.info("[KEYWORD DEBUG] Keyword ID: {}, Final keywords size: {}, Keywords: {}", 
-					keyword.getId(), trimmedKeywords.size(), trimmedKeywords);
 				
 				// DTO 생성 시 keywords를 직접 전달 (엔티티 컬렉션 수정 불필요)
 				return new ReadKeywordResponseDto(keyword, trimmedKeywords);
