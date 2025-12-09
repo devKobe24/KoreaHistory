@@ -217,9 +217,19 @@ public class KeywordService {
 				
 				// ID 1-5에 대해서만 상세 로그 출력
 				if (keyword.getId() != null && keyword.getId() <= 5) {
-					log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}, Results: {}", 
-						keyword.getId(), rawResults != null ? rawResults.size() : 0, 
-						rawResults != null ? rawResults.stream().map(r -> r[0]).toList() : "null");
+					try {
+						List<String> rawValues = rawResults != null 
+							? rawResults.stream()
+								.filter(r -> r != null && r.length > 0 && r[0] != null)
+								.map(r -> String.valueOf(r[0]))
+								.toList()
+							: List.of();
+						log.info("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}, Results: {}", 
+							keyword.getId(), rawResults != null ? rawResults.size() : 0, rawValues);
+					} catch (Exception e) {
+						log.warn("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}, Error logging results: {}", 
+							keyword.getId(), rawResults != null ? rawResults.size() : 0, e.getMessage());
+					}
 				} else {
 					log.debug("[KEYWORD DEBUG] Keyword ID: {}, Raw query result count: {}", 
 						keyword.getId(), rawResults != null ? rawResults.size() : 0);
