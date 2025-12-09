@@ -50,6 +50,7 @@ import com.kobe.koreahistory.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,6 +66,7 @@ import java.util.List;
  * -----------------------------------------------------------
  * 2025. 10. 7.        kobe       최초 생성
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -268,7 +270,9 @@ public class KoreaHistoryController {
 
 	@GetMapping("/keywords/search/all")
 	public ResponseEntity<List<ReadKeywordResponseDto>> searchAllKeywords() {
+		log.info("[KEYWORD DEBUG] /keywords/search/all API 호출됨");
 		List<ReadKeywordResponseDto> response = keywordService.findAllKeywords();
+		log.info("[KEYWORD DEBUG] /keywords/search/all 응답 반환, 키워드 개수: {}", response.size());
 		return ResponseEntity.ok(response);
 	}
 
