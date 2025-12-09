@@ -185,6 +185,13 @@ public class KeywordService {
 					.setParameter("keywordId", keyword.getId())
 					.getResultList();
 				
+				// 디버깅: Native Query 결과 로그 출력
+				System.out.println("[DEBUG] Keyword ID: " + keyword.getId() + 
+					", Native Query result size: " + (keywordsList != null ? keywordsList.size() : 0));
+				if (keywordsList != null && !keywordsList.isEmpty()) {
+					System.out.println("[DEBUG] Keywords from DB: " + keywordsList);
+				}
+				
 				// 추가로 각 키워드의 공백 제거 및 필터링 (이중 방어)
 				List<String> trimmedKeywords = keywordsList != null 
 					? keywordsList.stream()
@@ -192,6 +199,11 @@ public class KeywordService {
 						.map(String::trim)
 						.collect(Collectors.toList())
 					: new ArrayList<>();
+				
+				// 디버깅: 최종 keywords 로그 출력
+				System.out.println("[DEBUG] Keyword ID: " + keyword.getId() + 
+					", Final keywords size: " + trimmedKeywords.size() + 
+					", Keywords: " + trimmedKeywords);
 				
 				// DTO 생성 시 keywords를 직접 전달 (엔티티 컬렉션 수정 불필요)
 				return new ReadKeywordResponseDto(keyword, trimmedKeywords);
