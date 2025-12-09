@@ -12,6 +12,7 @@ import com.kobe.koreahistory.repository.TopicRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
  * -----------------------------------------------------------
  * 2025. 10. 15.        kobe       최초 생성
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KeywordService {
@@ -171,8 +173,10 @@ public class KeywordService {
 
 	@Transactional(readOnly = true)
 	public List<ReadKeywordResponseDto> findAllKeywords() {
+		log.info("[KEYWORD DEBUG] findAllKeywords() 메서드 호출됨");
 		// 먼저 모든 Keyword와 Topic 정보 조회
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
+		log.info("[KEYWORD DEBUG] 조회된 Keyword 개수: {}", keywords.size());
 		
 		// EntityManager를 사용하여 각 Keyword의 keywords 컬렉션을 명시적으로 로드
 		// @ElementCollection은 별도 테이블이므로 Native Query로 직접 조회 후 DTO에 직접 전달
@@ -185,11 +189,15 @@ public class KeywordService {
 					.setParameter("keywordId", keyword.getId())
 					.getResultList();
 				
-				// 디버깅: Native Query 결과 로그 출력
-				System.out.println("[DEBUG] Keyword ID: " + keyword.getId() + 
-					", Native Query result size: " + (keywordsList != null ? keywordsList.size() : 0));
+				// 디버깅: Native Query 결과 로그 출력 (SLF4J Logger 사용)
+				log.debug("Keyword ID: {}, Native Query result size: {}", 
+					keyword.getId(), keywordsList != null ? keywordsList.size() : 0);
 				if (keywordsList != null && !keywordsList.isEmpty()) {
-					System.out.println("[DEBUG] Keywords from DB: " + keywordsList);
+					log.info("[KEYWORD DEBUG] Keyword ID: {}, Keywords from DB: {}", 
+						keyword.getId(), keywordsList);
+				} else {
+					log.warn("[KEYWORD DEBUG] Keyword ID: {}, No keywords found in database", 
+						keyword.getId());
 				}
 				
 				// 추가로 각 키워드의 공백 제거 및 필터링 (이중 방어)
@@ -201,9 +209,8 @@ public class KeywordService {
 					: new ArrayList<>();
 				
 				// 디버깅: 최종 keywords 로그 출력
-				System.out.println("[DEBUG] Keyword ID: " + keyword.getId() + 
-					", Final keywords size: " + trimmedKeywords.size() + 
-					", Keywords: " + trimmedKeywords);
+				log.info("[KEYWORD DEBUG] Keyword ID: {}, Final keywords size: {}, Keywords: {}", 
+					keyword.getId(), trimmedKeywords.size(), trimmedKeywords);
 				
 				// DTO 생성 시 keywords를 직접 전달 (엔티티 컬렉션 수정 불필요)
 				return new ReadKeywordResponseDto(keyword, trimmedKeywords);
