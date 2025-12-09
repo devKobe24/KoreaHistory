@@ -9,6 +9,8 @@ import com.kobe.koreahistory.dto.response.hierarchy.HierarchyResponseDto;
 import com.kobe.koreahistory.dto.response.keyword.*;
 import com.kobe.koreahistory.repository.KeywordRepository;
 import com.kobe.koreahistory.repository.TopicRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,9 @@ public class KeywordService {
 
 	private final KeywordRepository keywordRepository;
 	private final TopicRepository topicRepository;
+	
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Transactional
 	public CreateKeywordResponseDto createKeyword(String topicTitle, CreateKeywordRequestDto requestDto) {
@@ -169,19 +174,24 @@ public class KeywordService {
 		// 먼저 모든 Keyword와 Topic 정보 조회
 		List<Keyword> keywords = keywordRepository.findAllWithTopic();
 		
-		// Native Query를 사용하여 각 Keyword의 keywords 컬렉션을 명시적으로 로드
+		// EntityManager를 사용하여 각 Keyword의 keywords 컬렉션을 명시적으로 로드
 		// @ElementCollection은 별도 테이블이므로 Native Query로 직접 조회 후 DTO에 직접 전달
 		return keywords.stream()
 			.map(keyword -> {
-				// Native Query로 keywords 테이블에서 해당 keyword_id의 모든 keywords_value 조회
-				// TRIM으로 공백 제거 및 NULL 필터링이 이미 포함됨
-				List<String> keywordsList = keywordRepository.findKeywordsByKeywordId(keyword.getId());
+				// EntityManager를 사용하여 Native Query로 keywords 테이블에서 직접 조회
+				@SuppressWarnings("unchecked")
+				List<String> keywordsList = entityManager.createNativeQuery(
+					"SELECT TRIM(keywords_value) FROM keywords WHERE keywords_id = :keywordId AND keywords_value IS NOT NULL AND TRIM(keywords_value) != '' ORDER BY TRIM(keywords_value)")
+					.setParameter("keywordId", keyword.getId())
+					.getResultList();
 				
 				// 추가로 각 키워드의 공백 제거 및 필터링 (이중 방어)
-				List<String> trimmedKeywords = keywordsList.stream()
-					.filter(kw -> kw != null && !kw.trim().isEmpty())
-					.map(String::trim)
-					.collect(Collectors.toList());
+				List<String> trimmedKeywords = keywordsList != null 
+					? keywordsList.stream()
+						.filter(kw -> kw != null && !kw.trim().isEmpty())
+						.map(String::trim)
+						.collect(Collectors.toList())
+					: new ArrayList<>();
 				
 				// DTO 생성 시 keywords를 직접 전달 (엔티티 컬렉션 수정 불필요)
 				return new ReadKeywordResponseDto(keyword, trimmedKeywords);
