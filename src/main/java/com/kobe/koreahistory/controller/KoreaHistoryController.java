@@ -270,10 +270,16 @@ public class KoreaHistoryController {
 
 	@GetMapping("/keywords/search/all")
 	public ResponseEntity<List<ReadKeywordResponseDto>> searchAllKeywords() {
-		log.info("[KEYWORD DEBUG] /keywords/search/all API 호출됨");
-		List<ReadKeywordResponseDto> response = keywordService.findAllKeywords();
-		log.info("[KEYWORD DEBUG] /keywords/search/all 응답 반환, 키워드 개수: {}", response.size());
-		return ResponseEntity.ok(response);
+		try {
+			log.info("[KEYWORD DEBUG] /keywords/search/all API 호출됨");
+			List<ReadKeywordResponseDto> response = keywordService.findAllKeywords();
+			log.info("[KEYWORD DEBUG] /keywords/search/all 응답 반환, 키워드 개수: {}", response.size());
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			log.error("[KEYWORD DEBUG] /keywords/search/all API 오류 발생", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(null);
+		}
 	}
 
 	@GetMapping("/lessons/search/all")
