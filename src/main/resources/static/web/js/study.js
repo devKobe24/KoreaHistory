@@ -586,6 +586,11 @@
       console.log("Found chapter:", targetChapter);
       loadedChapter = targetChapter; // Chapter 전체 구조 저장
       
+      // Chapter 정보로 breadcrumb 업데이트
+      if (targetChapter.chapterTitle) {
+        updateBreadcrumbChapter(targetChapter.chapterTitle, targetChapter.id);
+      }
+      
       // Lesson 데이터가 있는지 확인
       if (targetChapter.lessons && targetChapter.lessons.length > 0) {
         // study-nav를 동적으로 생성
@@ -646,6 +651,7 @@
       
       const chapters = await response.json();
       let targetLesson = null;
+      let targetChapter = null;
       
       // 모든 Chapter에서 해당 Lesson 찾기
       for (const chapter of chapters) {
@@ -653,6 +659,7 @@
           const foundLesson = chapter.lessons.find(l => l.lessonTitle === lessonTitle);
           if (foundLesson) {
             targetLesson = foundLesson;
+            targetChapter = chapter;
             break;
           }
         }
@@ -669,7 +676,13 @@
       }
       
       console.log("Found lesson:", targetLesson);
+      console.log("Found chapter:", targetChapter);
       loadedLesson = targetLesson;
+      
+      // Chapter 정보가 있으면 breadcrumb 업데이트
+      if (targetChapter && targetChapter.chapterTitle) {
+        updateBreadcrumbChapter(targetChapter.chapterTitle, targetChapter.id);
+      }
       
       // Section 데이터가 있는지 확인
       if (targetLesson.sections && targetLesson.sections.length > 0) {
@@ -737,6 +750,7 @@
       let targetSection = null;
       
       // 모든 Chapter에서 해당 Section 찾기
+      let targetChapter = null;
       for (const chapter of chapters) {
         if (chapter.lessons) {
           for (const lesson of chapter.lessons) {
@@ -744,6 +758,7 @@
               const foundSection = lesson.sections.find(s => s.sectionTitle === sectionTitle);
               if (foundSection) {
                 targetSection = foundSection;
+                targetChapter = chapter;
                 break;
               }
             }
@@ -758,6 +773,11 @@
       }
       
       console.log("Found section:", targetSection);
+      
+      // Chapter 정보로 breadcrumb 업데이트
+      if (targetChapter && targetChapter.chapterTitle) {
+        updateBreadcrumbChapter(targetChapter.chapterTitle, targetChapter.id);
+      }
       
       // Subsection 데이터가 있는지 확인
       if (targetSection.subsections && targetSection.subsections.length > 0) {
@@ -806,6 +826,7 @@
       let targetSubsection = null;
       
       // 모든 Chapter에서 해당 Subsection 찾기
+      let targetChapter = null;
       for (const chapter of chapters) {
         if (chapter.lessons) {
           for (const lesson of chapter.lessons) {
@@ -815,6 +836,7 @@
                   const foundSubsection = section.subsections.find(sub => sub.subsectionTitle === subsectionTitle);
                   if (foundSubsection) {
                     targetSubsection = foundSubsection;
+                    targetChapter = chapter;
                     break;
                   }
                 }
@@ -832,6 +854,11 @@
       }
       
       console.log("Found subsection:", targetSubsection);
+      
+      // Chapter 정보로 breadcrumb 업데이트
+      if (targetChapter && targetChapter.chapterTitle) {
+        updateBreadcrumbChapter(targetChapter.chapterTitle, targetChapter.id);
+      }
       
       // Topic 데이터가 있는지 확인
       if (targetSubsection.topics && targetSubsection.topics.length > 0) {
@@ -3190,6 +3217,20 @@
 
   function updatePageTitle(title) {
     document.title = title + " - 한국사 아띠";
+  }
+
+  // ===== Update Breadcrumb Chapter =====
+  function updateBreadcrumbChapter(chapterTitle, chapterId) {
+    const breadcrumbChapter = document.getElementById("breadcrumbChapter");
+    if (breadcrumbChapter && chapterTitle) {
+      breadcrumbChapter.textContent = chapterTitle;
+      // chapter id가 있으면 detail.html에 id 파라미터 추가
+      if (chapterId) {
+        breadcrumbChapter.href = `detail.html?title=${encodeURIComponent(chapterTitle)}&type=chapter&id=${chapterId}`;
+      } else {
+        breadcrumbChapter.href = `detail.html?title=${encodeURIComponent(chapterTitle)}&type=chapter`;
+      }
+    }
   }
 
   // ===== Progress =====
