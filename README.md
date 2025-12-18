@@ -134,8 +134,8 @@ gradlew.bat bootRun
 
 ### 4. 접속 주소
 
-- **학습자 웹:** http://localhost:8080
-- **관리자 대시보드:** http://localhost:8080/admin/pages/login.html
+- **학습자 웹:** https://a-tti.com/
+- **관리자 대시보드:** https://a-tti-admin.com/
 - **H2 콘솔:** http://localhost:8080/h2-console
 
 ---
